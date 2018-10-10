@@ -1,11 +1,17 @@
 # include <stdio.h>
 # include <stdlib.h>
 
+<<<<<<< HEAD
 //Should pass in a pointer if it's going to be an array
 int *half_adder(int wire_a, int wire_b) {
 
     int *sum_carry = (int*) malloc(sizeof *sum_carry);
     //not a good idea since would have to reallocate and the free for every call
+=======
+int *half_adder(int wire_a, int wire_b) {
+
+    int *sum_carry = (int*) malloc(sizeof *sum_carry);
+>>>>>>> e3b269e... added new folder
     int sum_wire = wire_a ^ wire_b;
     int carry_wire = wire_a & wire_b;
 
@@ -19,12 +25,15 @@ int *half_adder(int wire_a, int wire_b) {
 
 }
 
+<<<<<<< HEAD
 //For tick pass in four pointers, 
 // ray of input
 // ray of input output values
 // 
 // 
 
+=======
+>>>>>>> e3b269e... added new folder
 int main(int argc, char *argv[]) {
 
     //Half adder
