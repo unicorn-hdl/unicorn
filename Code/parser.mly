@@ -3,11 +3,15 @@
 %{
 open Ast 
 %}
-
 %token OPAREN CPAREN OCURL CCURL OSQUARED CSQUARED 
+<<<<<<< HEAD
 %token COMMA COLON
 %token SEMI UNICORN UNICORN2 EOF 
 %token OGENERIC CGENERIC 
+=======
+%token COMMA
+%token SEMI UNICORN NEWLINE EOF %token OGENERIC CGENERIC 
+>>>>>>> b3fcd7c... Put made support for comments. Put in some { } things.
 %token ASSIGN REGASSIGN 
 %token PLUS MINUS
 %token PLUSDOT TIMESDOT
@@ -35,6 +39,7 @@ open Ast
 %%
 
 program:
+<<<<<<< HEAD
  | modulezList UNICORN  EOF { $1 }
  | modulezList UNICORN2 EOF { $1 }
 
@@ -106,11 +111,46 @@ binExpr:
 assignment:
  | binExpr REGASSIGN binExpr boolval{ Assign(true, $1, $3, $4) }
  | binExpr ASSIGN binExpr { Assign(false, $1, $3, false) } 
+=======
+ | comment mainz modulezList UNICORN EOF {bigTree($1, $2)}
+
+mainz:
+ | MAIN OPAREN argList CPAREN OCURL structureList CCURL {makeMain($3, $6)}
+ 
+structureList:
+ | /* Nothing */ {}
+ | structure structureList {listIs($1::$2)}
+
+structure:
+ | line  {$1}
+ | comment {}
+ | loop  {$1}
+
+argList:
+ | /*Nothing*/ {}
+ | argList COMMA arg {argListIs($1,$3)}
+ 
+arg:
+ | ID{literalSize($1, 1)}
+ | ID OSQUARED LITERAL CSQUARED {literalSize($1, $3)}
+ | ID OGENERIC ID OGENERIC {genericSize($1, $3)}
+
+line: 
+ | assignment SEMI {}
+ | call  SEMI {} 
+ | print SEMI {} 
+ | declare SEMI {}
+ | OUT assignment SEMI{}
+
+comment:
+ | OBLOCK anythingList  CBLOCK{}
+>>>>>>> b3fcd7c... Put made support for comments. Put in some { } things.
 
 boolval:
  | ONE {true}
  | ZERO {false}
 
+<<<<<<< HEAD
 call:
  | ID OPAREN argList CPAREN {Call($1, $3)}
 
@@ -134,3 +174,58 @@ loop:
 outlist:
  | OUT COLON formalsList SEMI {$3}
 
+=======
+assignment:
+ | ID REGASSIGN ID INIT boolval{ RegisterAssign($1, $5, $3)} 
+ | ID ASSIGN ID OPAREN argList CPAREN { WireAssign($1, valueOf($3, $5))}
+ | ID ASSIGN ID OPAREN argList CPAREN OSQUARED ID CSQUARED {WireAssign($1, ValueOf($3, $5, $8)) }
+ | ID ASSIGN ID OPAREN argList CPAREN OSQUARED ID CSQUARED OSQUARED CSQUARED {WireAssign($1, ValueOf($3, $5, $8))}
+
+call:
+ | ID OPAREN argList CPAREN {}
+print: | PRINT ID {}
+
+declare:
+ | ID {}
+
+modulez:
+ | MODULE ID OPAREN argList CPAREN OCURL structureList CCURL {makeModule($4, $7)}
+ | comment{}
+
+modulezList:
+ | /*Nothing*/{}
+ | modulez modulezList{}
+
+varNum:
+ | ID { StringLit($1) }
+ | LITERAL { Literal($1) }
+ | varNum PLUS varNum {$1 + $3}
+ | varNum MINUS varNum {$1 - $3}
+
+loop:
+ | FOR OPAREN ID FROM varNum TO varNum CPAREN OCURL loopBody CCURL {}
+ | FOR OPAREN ID TO varNum CPAREN OCURL loopBody CCURL {}
+
+loopBody:
+ | structure {}
+
+anything:
+ | OPAREN{} | CPAREN{} | OCURL{} | CCURL {}| OSQUARED {}| CSQUARED {}
+ | COMMA{} | SEMI{} | UNICORN{} | OGENERIC {}| CGENERIC{} | ASSIGN{} | REGASSIGN {}
+ | LINECOMMENT{} | OBLOCK{}
+ | PLUS {}| MINUS{}
+ | FOR {}| TO {}| FROM{}
+ | OUT {}| INIT{}
+ | AND {}| OR {}| NOT {}| NAND {}| NOR {}| XOR {}| XNOR{}
+ | MODULE {}
+ | MAIN{}
+ | PRINT{}
+ | ONE {}| ZERO{}
+ | LITERAL{}
+ | ID{}
+ | NEWLINE {}
+
+anythingList:
+ | /*Nothing*/ {} 
+ | anything anythingList {}
+>>>>>>> b3fcd7c... Put made support for comments. Put in some { } things.
