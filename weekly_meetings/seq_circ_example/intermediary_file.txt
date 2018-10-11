@@ -1,0 +1,29 @@
+// Random sequential circuit
+
+Main() {
+
+    //Variable A of type register with two inputs (input, state)
+    wire aa = val aX;
+    wire ab = val aY;
+    wire ac = XOR(aa,ab);
+    wire ad = NOT(ab);
+
+    register init0 aX := ac;
+    register init1 aY := ad;
+
+    out:ac;
+    out:ad;
+
+    //Variable A of type register with two inputs (input, state)
+    wire ba = val bX;
+    wire bb = val bY;
+    wire bc = XOR(ba,bb);
+    wire bd = NOT(bb);
+
+    register init0 bX := bc;
+    register init1 bY := bd;
+
+    print out:bc;
+    out:bd;
+
+}
