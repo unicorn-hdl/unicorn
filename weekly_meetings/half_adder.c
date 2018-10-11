@@ -1,9 +1,11 @@
 # include <stdio.h>
 # include <stdlib.h>
 
+//Should pass in a pointer if it's going to be an array
 int *half_adder(int wire_a, int wire_b) {
 
     int *sum_carry = (int*) malloc(sizeof *sum_carry);
+    //not a good idea since would have to reallocate and the free for every call
     int sum_wire = wire_a ^ wire_b;
     int carry_wire = wire_a & wire_b;
 
@@ -16,6 +18,12 @@ int *half_adder(int wire_a, int wire_b) {
     return sum_carry;
 
 }
+
+//For tick pass in four pointers, 
+// ray of input
+// ray of input output values
+// 
+// 
 
 int main(int argc, char *argv[]) {
 
