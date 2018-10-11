@@ -1,0 +1,30 @@
+// Toggle circuit
+
+module seqCirc() {
+
+
+    //Wire with the value released by register X
+    wire a = val X;
+    //Wire with the value released by register Y
+    wire b = val Y;
+
+    wire c = XOR(a,b);
+    wire d = NOT(b);
+
+    //The combinational logic output fed back into registers
+    register init0 X := c;
+    register init1 Y := d;
+
+    //The wires coming out of this circuit
+    out:c;
+    out:d;
+
+}
+
+
+Main() {
+	
+    seqCirc(); //Puts c and d onto the stack
+    wire z = seqCirc()[c]; //Assigns output c only to new wire
+
+}
