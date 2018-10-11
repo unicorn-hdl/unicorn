@@ -2,16 +2,22 @@
 # include <stdlib.h>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3c9d5d2... Seqential circuit example in UNI-corn and c-like language
 //Should pass in a pointer if it's going to be an array
 int *half_adder(int wire_a, int wire_b) {
 
     int *sum_carry = (int*) malloc(sizeof *sum_carry);
     //not a good idea since would have to reallocate and the free for every call
+<<<<<<< HEAD
 =======
 int *half_adder(int wire_a, int wire_b) {
 
     int *sum_carry = (int*) malloc(sizeof *sum_carry);
 >>>>>>> e3b269e... added new folder
+=======
+>>>>>>> 3c9d5d2... Seqential circuit example in UNI-corn and c-like language
     int sum_wire = wire_a ^ wire_b;
     int carry_wire = wire_a & wire_b;
 
@@ -26,14 +32,20 @@ int *half_adder(int wire_a, int wire_b) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3c9d5d2... Seqential circuit example in UNI-corn and c-like language
 //For tick pass in four pointers, 
 // ray of input
 // ray of input output values
 // 
 // 
 
+<<<<<<< HEAD
 =======
 >>>>>>> e3b269e... added new folder
+=======
+>>>>>>> 3c9d5d2... Seqential circuit example in UNI-corn and c-like language
 int main(int argc, char *argv[]) {
 
     //Half adder
