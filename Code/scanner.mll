@@ -11,8 +11,8 @@ let whitespace = [' ' '\r' '\t' '\n']
 
 rule token = parse
     whitespace { token lexbuf }
-| '//' { single lexbuf }
-| '/**' { multi lexbuf }
+| "//" { single lexbuf }
+| "/**" { multi lexbuf }
 | '{' { OCURL }
 | '}' { CCURL }
 | '[' { OSQUARED }
@@ -22,36 +22,36 @@ rule token = parse
 | ';' { SEMI }
 | ',' { COMMA }
 | '=' { ASSIGN }
-| 'out' { OUT } 
+| "out" { OUT } 
 | '<' { OGENERIC }
 | '>' { CGENERIC }
-| ':=' { REGASSIGN }
+| ":=" { REGASSIGN }
 | '+' { PLUS }
 | '-' { MINUS }
-| 'for' { FOR }
-| 'to' { TO }
-| 'from' { FROM }
-| 'init' { INIT }
-| 'AND' { AND }
-| 'OR' { OR }
-| 'NOT' { NOT }
-| 'NAND' { NAND }
-| 'NOR' { NOR }
-| 'XOR' { XOR }
-| 'XNOR' { XNOR }
-| 'module' { MODULE }
-| 'main' { MAIN }
-| 'print' { PRINT }
+| "for" { FOR }
+| "to" { TO }
+| "from" { FROM }
+| "init" { INIT }
+| "AND" { AND }
+| "OR" { OR }
+| "NOT" { NOT }
+| "NAND" { NAND }
+| "NOR" { NOR }
+| "XOR" { XOR }
+| "XNOR" { XNOR }
+| "module" { MODULE }
+| "main" { MAIN }
+| "print" { PRINT }
 | '1' { ONE }
 | var { ID(var) }
 | int { LITERAL(int_of_string int) } (*does this need 'as lxm'*)
 | '0' { ZER0 }
 | eof { EOF }
-|'🦄' { UNICORN }
+|"🦄" { UNICORN }
 | _         { error lexbuf (* do we need this? *)
                 "found '%s' - don't know how to handle" @@ get lexbuf }
 and multi = parse
-    '**/' { token lexbuf }
+    "**/" { token lexbuf }
 |   _     { multi lexbuf }
 
 and single = parse
