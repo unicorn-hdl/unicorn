@@ -47,7 +47,7 @@ rule token = parse
 | '0' { ZER0 }
 | eof { EOF }
 |"🦄" { UNICORN }
-| _         { error lexbuf (* do we need this? *)
+| _         { error lexbuf
                 "found '%s' - don't know how to handle" @@ get lexbuf }
 and multi = parse
     "**/" { token lexbuf }
