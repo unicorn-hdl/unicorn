@@ -3,11 +3,9 @@
 %{
 open Ast 
 %}
-
 %token OPAREN CPAREN OCURL CCURL OSQUARED CSQUARED 
 %token COMMA
-%token SEMI UNICORN EOF
-%token OGENERIC CGENERIC 
+%token SEMI UNICORN NEWLINE EOF %token OGENERIC CGENERIC 
 %token ASSIGN REGASSIGN 
 %token LINECOMMENT OBLOCK CBLOCK
 %token PLUS MINUS
@@ -33,67 +31,93 @@ open Ast
 %%
 
 program:
- | mainz modulez UNICORN EOF {}
- | mainz EOF {}
+ | comment mainz modulezList UNICORN EOF {bigTree($1, $2)}
 
- mainz:
- | MAIN OPAREN argList CPAREN OCURL body CCURL {}
+mainz:
+ | MAIN OPAREN argList CPAREN OCURL structureList CCURL {makeMain($3, $6)}
  
- body:
- | structureList{} 
-
- structureList:
+structureList:
  | /* Nothing */ {}
- | structure structureList {}
+ | structure structureList {listIs($1::$2)}
 
- structure:
- | line  {}
- | loop {}
+structure:
+ | line  {$1}
+ | comment {}
+ | loop  {$1}
 
- argList:
+argList:
  | /*Nothing*/ {}
- | argList COMMA arg {}
+ | argList COMMA arg {argListIs($1,$3)}
  
- arg:
- | ID{}
- | ID OSQUARED LITERAL CSQUARED {}
- | ID OGENERIC ID OGENERIC {}
+arg:
+ | ID{literalSize($1, 1)}
+ | ID OSQUARED LITERAL CSQUARED {literalSize($1, $3)}
+ | ID OGENERIC ID OGENERIC {genericSize($1, $3)}
 
- line: 
+line: 
  | assignment SEMI {}
  | call  SEMI {} 
  | print SEMI {} 
  | declare SEMI {}
+ | OUT assignment SEMI{}
 
- boolval:
- | ONE {}
- | ZERO {}
+comment:
+ | OBLOCK anythingList  CBLOCK{}
 
- assignment:
- | ID REGASSIGN ID INIT boolval{}
- | ID ASSIGN ID OPAREN argList CPAREN {}
- | ID ASSIGN ID OPAREN argList CPAREN OSQUARED ID CSQUARED {}
- | ID ASSIGN ID OPAREN argList CPAREN OSQUARED ID CSQUARED OSQUARED CSQUARED {}
+boolval:
+ | ONE {true}
+ | ZERO {false}
 
- call:
+assignment:
+ | ID REGASSIGN ID INIT boolval{ RegisterAssign($1, $5, $3)} 
+ | ID ASSIGN ID OPAREN argList CPAREN { WireAssign($1, valueOf($3, $5))}
+ | ID ASSIGN ID OPAREN argList CPAREN OSQUARED ID CSQUARED {WireAssign($1, ValueOf($3, $5, $8)) }
+ | ID ASSIGN ID OPAREN argList CPAREN OSQUARED ID CSQUARED OSQUARED CSQUARED {WireAssign($1, ValueOf($3, $5, $8))}
+
+call:
  | ID OPAREN argList CPAREN {}
+print: | PRINT ID {}
 
- print:
- | PRINT ID {}
-
- declare:
+declare:
  | ID {}
 
- modulez:
- | MODULE ID OPAREN argList CPAREN OCURL body CCURL {}
+modulez:
+ | MODULE ID OPAREN argList CPAREN OCURL structureList CCURL {makeModule($4, $7)}
+ | comment{}
 
- varNum:
- | ID {}
- | LITERAL {}
+modulezList:
+ | /*Nothing*/{}
+ | modulez modulezList{}
 
- loop:
+varNum:
+ | ID { StringLit($1) }
+ | LITERAL { Literal($1) }
+ | varNum PLUS varNum {$1 + $3}
+ | varNum MINUS varNum {$1 - $3}
+
+loop:
  | FOR OPAREN ID FROM varNum TO varNum CPAREN OCURL loopBody CCURL {}
  | FOR OPAREN ID TO varNum CPAREN OCURL loopBody CCURL {}
 
- loopBody:
+loopBody:
  | structure {}
+
+anything:
+ | OPAREN{} | CPAREN{} | OCURL{} | CCURL {}| OSQUARED {}| CSQUARED {}
+ | COMMA{} | SEMI{} | UNICORN{} | OGENERIC {}| CGENERIC{} | ASSIGN{} | REGASSIGN {}
+ | LINECOMMENT{} | OBLOCK{}
+ | PLUS {}| MINUS{}
+ | FOR {}| TO {}| FROM{}
+ | OUT {}| INIT{}
+ | AND {}| OR {}| NOT {}| NAND {}| NOR {}| XOR {}| XNOR{}
+ | MODULE {}
+ | MAIN{}
+ | PRINT{}
+ | ONE {}| ZERO{}
+ | LITERAL{}
+ | ID{}
+ | NEWLINE {}
+
+anythingList:
+ | /*Nothing*/ {} 
+ | anything anythingList {}
