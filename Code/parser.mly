@@ -18,7 +18,12 @@ open Ast
 %token FOR TO FROM
 %token OUT INIT
 %token AND OR NOT NAND NOR XOR XNOR
+<<<<<<< HEAD
 %token PRINT MAKE 
+=======
+%token MAIN
+%token PRINT
+>>>>>>> 60a67d8... Got rid of module keyword
 %token ONE ZERO
 %token <int> LITERAL
 %token <string> BOOLLIT
@@ -39,6 +44,7 @@ open Ast
 %%
 
 program:
+<<<<<<< HEAD
 <<<<<<< HEAD
  | modulezList UNICORN  EOF { $1 }
  | modulezList UNICORN2 EOF { $1 }
@@ -113,6 +119,9 @@ assignment:
  | binExpr ASSIGN binExpr { Assign(false, $1, $3, false) } 
 =======
  | comment mainz modulezList UNICORN EOF {bigTree($1, $2)}
+=======
+ | mainz modulezList UNICORN EOF {bigTree($1, $2)}
+>>>>>>> 46fcfed... Fixed the dumb comment thing I'd done
 
 mainz:
  | MAIN OPAREN argList CPAREN OCURL structureList CCURL {makeMain($3, $6)}
@@ -123,7 +132,6 @@ structureList:
 
 structure:
  | line  {$1}
- | comment {}
  | loop  {$1}
 
 argList:
@@ -142,10 +150,13 @@ line:
  | declare SEMI {}
  | OUT assignment SEMI{}
 
+<<<<<<< HEAD
 comment:
  | OBLOCK anythingList  CBLOCK{}
 >>>>>>> b3fcd7c... Put made support for comments. Put in some { } things.
 
+=======
+>>>>>>> 46fcfed... Fixed the dumb comment thing I'd done
 boolval:
  | ONE {true}
  | ZERO {false}
@@ -183,14 +194,15 @@ assignment:
 
 call:
  | ID OPAREN argList CPAREN {}
-print: | PRINT ID {}
+
+print: 
+ | PRINT ID {}
 
 declare:
  | ID {}
 
 modulez:
- | MODULE ID OPAREN argList CPAREN OCURL structureList CCURL {makeModule($4, $7)}
- | comment{}
+ | ID OPAREN argList CPAREN OCURL structureList CCURL {makeModule($3, $6)}
 
 modulezList:
  | /*Nothing*/{}
@@ -208,6 +220,7 @@ loop:
 
 loopBody:
  | structure {}
+<<<<<<< HEAD
 
 anything:
  | OPAREN{} | CPAREN{} | OCURL{} | CCURL {}| OSQUARED {}| CSQUARED {}
@@ -217,7 +230,6 @@ anything:
  | FOR {}| TO {}| FROM{}
  | OUT {}| INIT{}
  | AND {}| OR {}| NOT {}| NAND {}| NOR {}| XOR {}| XNOR{}
- | MODULE {}
  | MAIN{}
  | PRINT{}
  | ONE {}| ZERO{}
@@ -229,3 +241,5 @@ anythingList:
  | /*Nothing*/ {} 
  | anything anythingList {}
 >>>>>>> b3fcd7c... Put made support for comments. Put in some { } things.
+=======
+>>>>>>> 46fcfed... Fixed the dumb comment thing I'd done
