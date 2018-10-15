@@ -12,7 +12,6 @@ open Ast
 %token FOR TO FROM
 %token OUT INIT
 %token AND OR NOT NAND NOR XOR XNOR
-%token MODULE 
 %token MAIN
 %token PRINT
 %token ONE ZERO
@@ -82,7 +81,7 @@ declare:
  | ID {}
 
 modulez:
- | MODULE ID OPAREN argList CPAREN OCURL structureList CCURL {makeModule($4, $7)}
+ | ID OPAREN argList CPAREN OCURL structureList CCURL {makeModule($3, $6)}
  | comment{}
 
 modulezList:
@@ -110,7 +109,6 @@ anything:
  | FOR {}| TO {}| FROM{}
  | OUT {}| INIT{}
  | AND {}| OR {}| NOT {}| NAND {}| NOR {}| XOR {}| XNOR{}
- | MODULE {}
  | MAIN{}
  | PRINT{}
  | ONE {}| ZERO{}
