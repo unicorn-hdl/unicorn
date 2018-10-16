@@ -10,8 +10,13 @@ open Ast
 %token OGENERIC CGENERIC 
 =======
 %token COMMA
+<<<<<<< HEAD
 %token SEMI UNICORN NEWLINE EOF %token OGENERIC CGENERIC 
 >>>>>>> b3fcd7c... Put made support for comments. Put in some { } things.
+=======
+%token SEMI UNICORN NEWLINE EOF 
+%token OGENERIC CGENERIC 
+>>>>>>> b1378ab... fixed token newline
 %token ASSIGN REGASSIGN 
 %token PLUS MINUS
 %token PLUSDOT TIMESDOT
@@ -141,7 +146,7 @@ argList:
 arg:
  | ID{literalSize($1, 1)}
  | ID OSQUARED LITERAL CSQUARED {literalSize($1, $3)}
- | ID OGENERIC ID OGENERIC {genericSize($1, $3)}
+ | ID OGENERIC ID CGENERIC {genericSize($1, $3)}
 
 line: 
  | assignment SEMI {}
