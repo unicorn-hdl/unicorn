@@ -32,14 +32,13 @@ rule token = parse
 | "to" { TO }
 | "from" { FROM }
 | "init" { INIT }
-| "AND" { AND }
-| "OR" { OR }
-| "NOT" { NOT }
-| "NAND" { NAND }
-| "NOR" { NOR }
-| "XOR" { XOR }
-| "XNOR" { XNOR }
-| "module" { MODULE }
+| "and" { AND }
+| "or" { OR }
+| "not" { NOT }
+| "nand" { NAND }
+| "nor" { NOR }
+| "xor" { XOR }
+| "xnor" { XNOR }
 | "main" { MAIN }
 | "print" { PRINT }
 | '1' { ONE }
@@ -48,7 +47,7 @@ rule token = parse
 | '0' { ZER0 }
 | eof { EOF }
 |"🦄" { UNICORN }
-| _         { error lexbuf (* do we need this? *)
+| _         { error lexbuf
                 "found '%s' - don't know how to handle" @@ get lexbuf }
 and multi = parse
     "**/" { token lexbuf }

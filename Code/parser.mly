@@ -5,7 +5,8 @@ open Ast
 %}
 %token OPAREN CPAREN OCURL CCURL OSQUARED CSQUARED 
 %token COMMA
-%token SEMI UNICORN NEWLINE EOF %token OGENERIC CGENERIC 
+%token SEMI UNICORN NEWLINE EOF 
+%token OGENERIC CGENERIC 
 %token ASSIGN REGASSIGN 
 %token LINECOMMENT OBLOCK CBLOCK
 %token PLUS MINUS
@@ -50,7 +51,7 @@ argList:
 arg:
  | ID{literalSize($1, 1)}
  | ID OSQUARED LITERAL CSQUARED {literalSize($1, $3)}
- | ID OGENERIC ID OGENERIC {genericSize($1, $3)}
+ | ID OGENERIC ID CGENERIC {genericSize($1, $3)}
 
 line: 
  | assignment SEMI {}
