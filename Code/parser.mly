@@ -30,7 +30,7 @@ open Ast
 %%
 
 program:
- | comment mainz modulezList UNICORN EOF {bigTree($1, $2)}
+ | mainz modulezList UNICORN EOF {bigTree($1, $2)}
 
 mainz:
  | MAIN OPAREN argList CPAREN OCURL structureList CCURL {makeMain($3, $6)}
@@ -41,7 +41,6 @@ structureList:
 
 structure:
  | line  {$1}
- | comment {}
  | loop  {$1}
 
 argList:
@@ -60,9 +59,6 @@ line:
  | declare SEMI {}
  | OUT assignment SEMI{}
 
-comment:
- | OBLOCK anythingList  CBLOCK{}
-
 boolval:
  | ONE {true}
  | ZERO {false}
@@ -75,14 +71,15 @@ assignment:
 
 call:
  | ID OPAREN argList CPAREN {}
-print: | PRINT ID {}
+
+print: 
+ | PRINT ID {}
 
 declare:
  | ID {}
 
 modulez:
  | ID OPAREN argList CPAREN OCURL structureList CCURL {makeModule($3, $6)}
- | comment{}
 
 modulezList:
  | /*Nothing*/{}
@@ -100,22 +97,3 @@ loop:
 
 loopBody:
  | structure {}
-
-anything:
- | OPAREN{} | CPAREN{} | OCURL{} | CCURL {}| OSQUARED {}| CSQUARED {}
- | COMMA{} | SEMI{} | UNICORN{} | OGENERIC {}| CGENERIC{} | ASSIGN{} | REGASSIGN {}
- | LINECOMMENT{} | OBLOCK{}
- | PLUS {}| MINUS{}
- | FOR {}| TO {}| FROM{}
- | OUT {}| INIT{}
- | AND {}| OR {}| NOT {}| NAND {}| NOR {}| XOR {}| XNOR{}
- | MAIN{}
- | PRINT{}
- | ONE {}| ZERO{}
- | LITERAL{}
- | ID{}
- | NEWLINE {}
-
-anythingList:
- | /*Nothing*/ {} 
- | anything anythingList {}
