@@ -41,13 +41,12 @@ rule token = parse
 | "xnor" { XNOR }
 | "print" { PRINT }
 | '1' { ONE }
-| var { ID(var) }
-| int { LITERAL(int_of_string int) } (*does this need 'as lxm'*)
-| '0' { ZER0 }
+| var as lxm { ID(lxm) }
+| int as lxm  { LITERAL(int_of_string lxm) } (*does this need 'as lxm'*)
+| '0' { ZERO }
 | eof { EOF }
 |"🦄" { UNICORN }
-| _         { error lexbuf
-                "found '%s' - don't know how to handle" @@ get lexbuf }
+| _ as ch { raise (Failure("illegal character " ^ Char.escaped ch)) }
 and multi = parse
     "**/" { token lexbuf }
 |   _     { multi lexbuf }
