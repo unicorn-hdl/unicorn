@@ -6,16 +6,17 @@ type bind = typ * string
 
 type intExpr = 
       Literal of int
-    | Id of string
+    | IntId of string
     | IntBinop of intExpr * intOp * intExpr
 
-and type binExpr = 
+and  binExpr = 
       Buslit of bool list
-    | Id of string
-    | BoolBinop of binExpr * binOp * binExpr | Unop of unOp * binExpr
+    | BoolId of string
+    | BoolBinop of binExpr * boolOp * binExpr 
+    | Unop of unOp * binExpr
     | Assign of string * binExpr
     | Call of string * binExpr list
-    | For of Id * intExpr * intExpr
+    | For of string * intExpr * intExpr
     | Noexpr
 
 type module_decl = { typ    : int list;
