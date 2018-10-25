@@ -29,20 +29,20 @@ open Ast
 %%
 
 program:
- | modulezList UNICORN EOF {bigTree($1)}
+ | modulezList UNICORN EOF { $1 }
 
 structureList:
- | /* Nothing */ {}
- | structure structureList {listIs($1::$2)}
+ | /* Nothing */ { [] }
+ | structureList structure { $2::$1 }
 
 structure:
  | line  {$1}
  | loop  {$1}
 
 argList:
- | /*Nothing*/ {}
- | argList COMMA arg {argListIs($1,$3)}
- | arg {argListIs($1)}
+ | /*Nothing*/ { [] }
+ | argList COMMA arg { $3::$1 }
+ | arg { $1::[] }
  
 arg:
  | ID{literalSize($1, 1)}
