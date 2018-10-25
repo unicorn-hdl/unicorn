@@ -92,7 +92,6 @@ and multi = parse
 | "nor" { NOR }
 | "xor" { XOR }
 | "xnor" { XNOR }
-| "main" { MAIN }
 | "print" { PRINT }
 | '1' { ONE }
 | var { ID(var) }
