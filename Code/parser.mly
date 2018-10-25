@@ -29,7 +29,7 @@ open Ast
 %%
 
 program:
- | modulezList UNICORN EOF {bigTree($1, $2)}
+ | modulezList UNICORN EOF {bigTree($1)}
 
 structureList:
  | /* Nothing */ {}
