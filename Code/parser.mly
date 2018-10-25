@@ -13,12 +13,10 @@ open Ast
 %token FOR TO FROM
 %token OUT INIT
 %token AND OR NOT NAND NOR XOR XNOR
-%token MAIN
 %token PRINT
 %token ONE ZERO
 %token <int> LITERAL
 %token <string> ID
-
 
 %right ASSIGN REGASSIGN
 %left OSQUARED CSQUARED
@@ -31,11 +29,8 @@ open Ast
 %%
 
 program:
- | mainz modulezList UNICORN EOF {bigTree($1, $2)}
+ | modulezList UNICORN EOF {bigTree($1, $2)}
 
-mainz:
- | MAIN OPAREN argList CPAREN OCURL structureList CCURL {makeMain($3, $6)}
- 
 structureList:
  | /* Nothing */ {}
  | structure structureList {listIs($1::$2)}
@@ -47,6 +42,7 @@ structure:
 argList:
  | /*Nothing*/ {}
  | argList COMMA arg {argListIs($1,$3)}
+ | arg {argListIs($1)}
  
 arg:
  | ID{literalSize($1, 1)}
