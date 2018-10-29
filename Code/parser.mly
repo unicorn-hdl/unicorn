@@ -10,16 +10,22 @@ open Ast
 %token ASSIGN REGASSIGN 
 %token LINECOMMENT OBLOCK CBLOCK
 %token PLUS MINUS
+%token PLUSDOT TIMESDOT
 %token FOR TO FROM
 %token OUT INIT
 %token AND OR NOT NAND NOR XOR XNOR
 %token PRINT
 %token ONE ZERO
 %token <int> LITERAL
+%token <bool list> BOOLLIT
 %token <string> ID
 
 %right ASSIGN REGASSIGN
 %left OSQUARED CSQUARED
+%left XNOR XOR
+%left OR NOR PLUSDOT
+%left AND NAND TIMESDOT
+%left NOT
 %left PLUS MINUS
 %left OPAREN CPAREN
 
@@ -45,9 +51,9 @@ argList:
  | arg { $1::[] }
  
 arg:
- | ID{literalSize($1, 1)}
- | ID OSQUARED LITERAL CSQUARED {literalSize($1, $3)}
- | ID OGENERIC ID CGENERIC {genericSize($1, $3)}
+ | ID{($1 , Literal(1))}
+ | ID OSQUARED LITERAL CSQUARED { $1 , Literal($3) }
+ | ID OGENERIC ID CGENERIC { $1 , IntId($3)}
 
 line: 
  | assignment SEMI {}
@@ -60,11 +66,30 @@ boolval:
  | ONE {true}
  | ZERO {false}
 
+/*may need to add register constructor from ast*/
 assignment:
- | ID REGASSIGN ID INIT boolval{ RegisterAssign($1, $5, $3)} 
- | ID ASSIGN ID OPAREN argList CPAREN { WireAssign($1, valueOf($3, $5))}
- | ID ASSIGN ID OPAREN argList CPAREN OSQUARED ID CSQUARED {WireAssign($1, ValueOf($3, $5, $8)) }
- | ID ASSIGN ID OPAREN argList CPAREN OSQUARED ID CSQUARED OSQUARED CSQUARED {WireAssign($1, ValueOf($3, $5, $8))}
+ | ID REGASSIGN binExprz INIT boolval{ Assign(true, $1, Literal(0), Literal(1), $3, $5) }
+ | ID ASSIGN binExprz { Assign (false, $1, Literal(0), IntId($1^"Max"), $3, false) }
+ 
+ | ID OSQUARED intExprz CSQUARED ASSIGN binExprz { Assign(false, $1, $3, $3, $6, false) } 
+
+ binExprz:
+ | LITERAL { Buslit($1) } 
+ | binExprz PLUSDOT binExprz { BoolBinop($1, Or, $3) }
+ | binExprz TIMESDOT binExprz { BoolBinop($1, And, $3) }
+ | binExprz XOR binExprz { BoolBinop($1, Xor, $3) }
+ | binExprz XNOR binExprz { BoolBinop($1, Xnor, $3) }
+ | binExprz NAND binExprz { BoolBinop($1, Nand, $3) }
+ | binExprz AND binExprz { BoolBinop($1, And, $3) }
+ | binExprz OR binExprz { BoolBinop($1, Or, $3) }
+ | NOT binExprz { Unop($2) }
+ | binExprz NOR binExprz { BoolBinop($1, Nor, $3) }
+ | ID { boolId($1) } 
+ intExprz:
+ | LITERAL { Literal($1) }
+ | intExprz PLUS intExprz { IntBinop($1, Add, $3) }
+ | intExprz MINUS intExprz { IntBinop($1, Sub, $3) }
+ | ID { IntId($1) }
 
 call:
  | ID OPAREN argList CPAREN {}
