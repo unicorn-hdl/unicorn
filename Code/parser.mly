@@ -4,8 +4,8 @@
 open Ast 
 %}
 %token OPAREN CPAREN OCURL CCURL OSQUARED CSQUARED 
-%token COMMA
-%token SEMI UNICORN NEWLINE EOF 
+%token COMMA COLON
+%token SEMI UNICORN UNICORN2 NEWLINE EOF 
 %token OGENERIC CGENERIC 
 %token ASSIGN REGASSIGN 
 %token LINECOMMENT OBLOCK CBLOCK
@@ -14,10 +14,10 @@ open Ast
 %token FOR TO FROM
 %token OUT INIT
 %token AND OR NOT NAND NOR XOR XNOR
-%token PRINT
+%token PRINT MAKE 
 %token ONE ZERO
 %token <int> LITERAL
-%token <bool list> BOOLLIT
+%token <string> BOOLLIT
 %token <string> ID
 
 %right ASSIGN REGASSIGN
@@ -35,87 +35,96 @@ open Ast
 %%
 
 program:
- | modulezList UNICORN EOF { $1 }
+ | modulezList UNICORN  EOF { ([], $1)}
+ | modulezList UNICORN2 EOF { ([], $1) }
 
-structureList:
- | /* Nothing */ { [] }
- | structureList structure { $2::$1 }
-
-structure:
- | line  {$1}
- | loop  {$1}
-
-argList:
- | /*Nothing*/ { [] }
- | argList COMMA arg { $3::$1 }
- | arg { $1::[] }
+modulezList:
+ | /*Nothing*/{ [] }
+ | modulez modulezList{ $1::$2 }
  
-arg:
- | ID{($1 , Literal(1))}
- | ID OSQUARED LITERAL CSQUARED { $1 , Literal($3) }
- | ID OGENERIC ID CGENERIC { $1 , IntId($3)}
+modulez:
+ | ID OPAREN formalsList CPAREN OCURL lineList outlist CCURL 
+            { Module_decl($7, $1, $3, $6) }
 
-line: 
- | assignment SEMI {}
- | call  SEMI {} 
- | print SEMI {} 
- | declare SEMI {}
- | OUT assignment SEMI{}
+formalsList:
+ | /* Nothing */ { [] }
+ | formalsList COMMA formal{ $3::$1 }
+ | formal { [$1] }
+
+formal:
+ | ID typdecl{ (Bus, $2, $1) }
+ 
+typdecl:
+ | /*Nothing (reduces to size 1)*/ {Lit(1)}
+ | OGENERIC intExpr CGENERIC {$2}
+
+index:
+ | /*Nothing (whole bus)*/ {Range(Lit(0),Lit(-1))}
+ | OSQUARED intExpr CSQUARED {Range($2, $2)}
+ | OSQUARED intExpr COLON intExpr CSQUARED {Range($2, $4)}
+
+intExpr:
+ | intExpr PLUS intExpr { IntBinop($1, Add, $3) }
+ | intExpr MINUS intExpr { IntBinop($1, Sub, $3) }
+ | LITERAL { Lit($1) }
+ | ID { IntId($1) }
+
+lineList:
+ | /* Nothing */ { [] }
+ | lineList line { $2::$1 }
+
+line:
+ | binExpr SEMI{$1}
+
+binExpr:
+ | BOOLLIT { Buslit($1) } 
+ | binExpr PLUSDOT binExpr { BoolBinop($1, Or, $3) }
+ | binExpr TIMESDOT binExpr { BoolBinop($1, And, $3) }
+ | binExpr XOR binExpr { BoolBinop($1, Xor, $3) }
+ | binExpr XNOR binExpr { BoolBinop($1, Xnor, $3) }
+ | binExpr NAND binExpr { BoolBinop($1, Nand, $3) }
+ | binExpr AND binExpr { BoolBinop($1, And, $3) }
+ | binExpr OR binExpr { BoolBinop($1, Or, $3) }
+ | NOT binExpr { Unop(Not, $2) }
+ | binExpr NOR binExpr { BoolBinop($1, Nor, $3) }
+ | ID { BoolId($1) } 
+ /*note these other important things are exprs too: */
+ | assignment {$1}
+ | call {$1}
+ | print {$1}
+ | declare {$1}
+ | loop {$1}
+
+/*may need to add register constructor from ast*/ assignment:
+ | ID index REGASSIGN binExpr INIT boolval{ 
+            Assign(true, $1, $2, $4, $6) }
+ | ID index ASSIGN binExpr {
+            Assign(false, $1, $2, $4, false) } 
 
 boolval:
  | ONE {true}
  | ZERO {false}
 
-/*may need to add register constructor from ast*/
-assignment:
- | ID REGASSIGN binExprz INIT boolval{ Assign(true, $1, Literal(0), Literal(1), $3, $5) }
- | ID ASSIGN binExprz { Assign (false, $1, Literal(0), IntId($1^"Max"), $3, false) }
- 
- | ID OSQUARED intExprz CSQUARED ASSIGN binExprz { Assign(false, $1, $3, $3, $6, false) } 
-
- binExprz:
- | LITERAL { Buslit($1) } 
- | binExprz PLUSDOT binExprz { BoolBinop($1, Or, $3) }
- | binExprz TIMESDOT binExprz { BoolBinop($1, And, $3) }
- | binExprz XOR binExprz { BoolBinop($1, Xor, $3) }
- | binExprz XNOR binExprz { BoolBinop($1, Xnor, $3) }
- | binExprz NAND binExprz { BoolBinop($1, Nand, $3) }
- | binExprz AND binExprz { BoolBinop($1, And, $3) }
- | binExprz OR binExprz { BoolBinop($1, Or, $3) }
- | NOT binExprz { Unop($2) }
- | binExprz NOR binExprz { BoolBinop($1, Nor, $3) }
- | ID { boolId($1) } 
- intExprz:
- | LITERAL { Literal($1) }
- | intExprz PLUS intExprz { IntBinop($1, Add, $3) }
- | intExprz MINUS intExprz { IntBinop($1, Sub, $3) }
- | ID { IntId($1) }
-
 call:
- | ID OPAREN argList CPAREN {}
+ | ID OPAREN argList CPAREN index {Call($1, $3, $5)}
+
+argList:
+ | /*Nothing*/ { [] }
+ | argList COMMA binExpr { $3::$1 }
+ | binExpr { $1::[] }
 
 print: 
- | PRINT ID {}
+ | PRINT ID {BoolId($2)}
 
 declare:
- | ID {}
-
-modulez:
- | ID OPAREN argList CPAREN OCURL structureList CCURL {makeModule($3, $6)}
-
-modulezList:
- | /*Nothing*/{}
- | modulez modulezList{}
-
-varNum:
- | ID { StringLit($1) }
- | LITERAL { Literal($1) }
- | varNum PLUS varNum {$1 + $3}
- | varNum MINUS varNum {$1 - $3}
+ | MAKE ID typdecl {BoolId($2)}
 
 loop:
- | FOR OPAREN ID FROM varNum TO varNum CPAREN OCURL loopBody CCURL {}
- | FOR OPAREN ID TO varNum CPAREN OCURL loopBody CCURL {}
+ | FOR OPAREN ID FROM intExpr TO intExpr CPAREN OCURL lineList CCURL {
+            For($3, Range($5, $7), $10)}
+ | FOR OPAREN ID TO intExpr CPAREN OCURL lineList CCURL {
+            For($3, Range(Lit(0), $5), $8)}
 
-loopBody:
- | structure {}
+outlist:
+ | OUT COLON formalsList SEMI {$3}
+

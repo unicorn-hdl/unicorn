@@ -1,7 +1,6 @@
 (*Ocamllex scanner for UNI-corn*)
 
 { open Parser }
-
 let digit = ['0'-'9']
 let int = digit+
 let alphaNum = ['A'-'z' '0'-'9']
@@ -20,6 +19,7 @@ rule token = parse
 | '(' { OPAREN }
 | ')' { CPAREN }
 | ';' { SEMI }
+| ':' { COLON }
 | ',' { COMMA }
 | '=' { ASSIGN }
 | "out" { OUT } 
@@ -40,13 +40,15 @@ rule token = parse
 | "xor" { XOR }
 | "xnor" { XNOR }
 | "print" { PRINT }
+| "make" { MAKE }
 | '1' { ONE }
 | var as lxm { ID(lxm) }
 | int as lxm  { LITERAL(int_of_string lxm) } (*does this need 'as lxm'*)
-| boollist as lxm { BOOLLIT((*method to make bool list goes here*) lxm) }
+| boollist as lxm { BOOLLIT(lxm) }
 | '0' { ZERO }
 | eof { EOF }
 |"🦄" { UNICORN }
+| "neigh" { UNICORN2}
 | _ as ch { raise (Failure("illegal character " ^ Char.escaped ch)) }
 and multi = parse
     "**/" { token lexbuf }
