@@ -28,11 +28,6 @@ and  binExpr =
 
 and range = Range of intExpr * intExpr
 
-type module_decl = {typ     : bind  list;
-					mname   : string;
-					formals : bind list;
-					body    : binExpr list; }
-
 type md = Module_decl of bind list * string * bind list * binExpr list
 
 type program = bind list * md list
