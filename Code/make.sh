@@ -8,6 +8,7 @@ ocamlc -c parser.mli
 ocamlc -c scanner.ml
 ocamlc -c parser.ml
 
+mkdir made
 mv ast.cmi made/ast.cmi
 mv make.sh~ made/make.sh~
 mv parser.cmi made/parser.cmi
