@@ -7,7 +7,7 @@ let alphaNum = ['A'-'z' '0'-'9']
 let alphaLow = ['a'-'z']
 let var = (alphaLow)(alphaNum)*
 let whitespace = [' ' '\r' '\t' '\n']
-let boollist = ['0'-'1']+
+let boollist = ['0'-'1']+ 'b'
 rule token = parse
     whitespace { token lexbuf }
 | "//" { single lexbuf }
