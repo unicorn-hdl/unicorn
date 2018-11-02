@@ -20,12 +20,12 @@ open Ast
 %token <string> ID
 
 %right ASSIGN REGASSIGN
-%left OSQUARED CSQUARED
 %left XNOR XOR
 %left OR NOR PLUSDOT
 %left AND NAND TIMESDOT
 %left NOT
 %left PLUS MINUS
+%left OSQUARED CSQUARED
 %left OPAREN CPAREN
 
 %start program
@@ -34,8 +34,8 @@ open Ast
 %%
 
 program:
- | modulezList UNICORN  EOF { ([], $1)}
- | modulezList UNICORN2 EOF { ([], $1) }
+ | modulezList UNICORN  EOF { $1 }
+ | modulezList UNICORN2 EOF { $1 }
 
 modulezList:
  | /*Nothing*/{ [] }
@@ -57,8 +57,13 @@ typdecl:
  | /*Nothing (reduces to size 1)*/ {Lit(1)}
  | OGENERIC intExpr CGENERIC {$2}
 
+/*
+opt_index:
+ |*/ /*Nothing (whole bus)*//* {Range(Lit(0),Lit(-1))}
+ | index {$1}
+*/
+
 index:
- | /*Nothing (whole bus)*/ {Range(Lit(0),Lit(-1))}
  | OSQUARED intExpr CSQUARED {Range($2, $2)}
  | OSQUARED intExpr COLON intExpr CSQUARED {Range($2, $4)}
 
@@ -87,6 +92,7 @@ binExpr:
  | NOT binExpr { Unop(Not, $2) }
  | binExpr NOR binExpr { BoolBinop($1, Nor, $3) }
  | ID { BoolId($1) } 
+ | binExpr index { Index($1, $2) }
  /*note these other important things are exprs too: */
  | assignment {$1}
  | call {$1}
@@ -95,17 +101,17 @@ binExpr:
  | loop {$1}
 
 /*may need to add register constructor from ast*/ assignment:
- | ID index REGASSIGN binExpr INIT boolval{ 
-            Assign(true, $1, $2, $4, $6) }
- | ID index ASSIGN binExpr {
-            Assign(false, $1, $2, $4, false) } 
+ | binExpr REGASSIGN binExpr INIT boolval{ 
+            Assign(true, $1, $3, $5) }
+ | binExpr ASSIGN binExpr {
+            Assign(false, $1, $3, false) } 
 
 boolval:
  | ONE {true}
  | ZERO {false}
 
 call:
- | ID OPAREN argList CPAREN index {Call($1, $3, $5)}
+ | ID OPAREN argList CPAREN {Call($1, $3)}
 
 argList:
  | /*Nothing*/ { [] }

@@ -18,16 +18,18 @@ and  binExpr =
     | BoolId of string
     | BoolBinop of binExpr * boolOp * binExpr
     | Unop of unOp * binExpr
-    | Assign of bool * string * range * binExpr * bool
+    | Assign of bool * binExpr *  binExpr * bool
+    | Index of binExpr * range
     (*when bool = false, normal; bool = true, register*)
     (*final bool is init state*)
     (*add new assign indexing rule to LRM*)
-    | Call of string * binExpr list * range
+    | Call of string * binExpr list
     | For of string * range * binExpr list
     | Noexpr
 
 and range = Range of intExpr * intExpr
 
 type md = Module_decl of bind list * string * bind list * binExpr list
+                        (*outlist   name      formals     line list *)  
 
-type program = bind list * md list
+type program = (*bind list *  *) md list
