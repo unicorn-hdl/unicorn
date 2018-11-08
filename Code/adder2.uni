@@ -3,7 +3,7 @@ main(a<5>, b<5>) {
 	out: rippleAdder<5>;
 }
 
-fullAdder(a<0>, b<0>, carryIn<0>){
+fullAdder(a<1>, b<1>, carryIn<1>){
     x = a xor b;
     y = a and b;
     z = carryIn and x;
