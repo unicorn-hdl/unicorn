@@ -7,7 +7,7 @@ let alphaNum = ['A'-'z' '0'-'9']
 let alphaLow = ['a'-'z']
 let var = (alphaLow)(alphaNum)*
 let whitespace = [' ' '\r' '\t' '\n']
-let boollist = ['0'-'1']+ 'b'
+let boollist = ('0'|'1')+ ('b')
 rule token = parse
     whitespace { token lexbuf }
 | "//" { single lexbuf }
@@ -29,8 +29,7 @@ rule token = parse
 | '+' { PLUS }
 | '-' { MINUS }
 | "for" { FOR }
-| "to" { TO }
-| "from" { FROM }
+| "to" { TO } | "from" { FROM }
 | "init" { INIT }
 | "and" { AND }
 | "or" { OR }
@@ -41,11 +40,11 @@ rule token = parse
 | "xnor" { XNOR }
 | "print" { PRINT }
 | "make" { MAKE }
-| '1' { ONE }
+| "0b" { ZERO }
+| "1b" { ONE } 
 | var as lxm { ID(lxm) }
 | int as lxm  { LITERAL(int_of_string lxm) } (*does this need 'as lxm'*)
 | boollist as lxm { BOOLLIT(lxm) }
-| '0' { ZERO }
 | eof { EOF }
 |"🦄" { UNICORN }
 | "neigh" { UNICORN2}

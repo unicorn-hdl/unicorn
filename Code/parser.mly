@@ -82,6 +82,7 @@ line:
 
 binExpr:
  | BOOLLIT { Buslit($1) } 
+ | boolval {$1}
  | binExpr PLUSDOT binExpr { BoolBinop($1, Or, $3) }
  | binExpr TIMESDOT binExpr { BoolBinop($1, And, $3) }
  | binExpr XOR binExpr { BoolBinop($1, Xor, $3) }
@@ -106,8 +107,8 @@ assignment:
  | binExpr ASSIGN binExpr { Assign(false, $1, $3, false) } 
 
 boolval:
- | ONE {true}
- | ZERO {false}
+ | ONE {Boolval(true)}
+ | ZERO {Boolval(false)}
 
 call:
  | ID OPAREN argList CPAREN {Call($1, $3)}

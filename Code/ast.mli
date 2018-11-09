@@ -15,6 +15,7 @@ and intExpr =
 
 and  binExpr = 
       Buslit of string (*since lex is annoying about turning 01011 into [0;1;0;1;1] keep as string until later down the line*)
+    | Boolval of bool
     | BoolId of string
     | BoolBinop of binExpr * boolOp * binExpr
     | Unop of unOp * binExpr
