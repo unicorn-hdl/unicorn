@@ -120,6 +120,7 @@ binExpr:
  | loop {$1}
 
 assignment:
+<<<<<<< HEAD
  | binExpr REGASSIGN binExpr boolval{ Assign(true, $1, $3, $4) }
  | binExpr ASSIGN binExpr { Assign(false, $1, $3, false) } 
 =======
@@ -138,6 +139,10 @@ structureList:
 structure:
  | line  {$1}
  | loop  {$1}
+=======
+ | binExpr REGASSIGN binExpr INIT boolval{ Assign(true, $1, $3, $5) }
+ | binExpr ASSIGN binExpr { Assign(false, $1, $3, false) } 
+>>>>>>> 1f1c4a5... SAME THING PUT I Pulled
 
 argList:
  | /*Nothing*/ {}
