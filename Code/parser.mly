@@ -25,8 +25,7 @@ open Ast
 %left AND NAND TIMESDOT
 %left NOT
 %left PLUS MINUS
-%left OSQUARED CSQUARED
-%left OPAREN CPAREN
+%left OSQUARED
 
 %start program
 %type <Ast.program> program
@@ -55,7 +54,7 @@ formal:
  
 typdecl:
  | /*Nothing (reduces to size 1)*/ {Lit(1)}
- | OGENERIC intExpr CGENERIC {$2}
+ | OGENERIC intExprz CGENERIC {$2}
 
 /*
 opt_index:
@@ -64,12 +63,13 @@ opt_index:
 */
 
 index:
- | OSQUARED intExpr CSQUARED {Range($2, $2)}
- | OSQUARED intExpr COLON intExpr CSQUARED {Range($2, $4)}
+ | OSQUARED intExprz CSQUARED {Range($2, $2)}
+ | OSQUARED intExprz COLON intExprz CSQUARED {Range($2, $4)}
 
-intExpr:
- | intExpr PLUS intExpr { IntBinop($1, Add, $3) }
- | intExpr MINUS intExpr { IntBinop($1, Sub, $3) }
+intExprz:
+ | intExprz PLUS intExprz { IntBinop($1, Add, $3) }
+ | intExprz MINUS intExprz { IntBinop($1, Sub, $3) }
+ | OPAREN intExprz CPAREN { $2 }
  | LITERAL { Lit($1) }
  | ID { IntId($1) }
 
@@ -89,8 +89,9 @@ binExpr:
  | binExpr NAND binExpr { BoolBinop($1, Nand, $3) }
  | binExpr AND binExpr { BoolBinop($1, And, $3) }
  | binExpr OR binExpr { BoolBinop($1, Or, $3) }
- | NOT binExpr { Unop(Not, $2) }
  | binExpr NOR binExpr { BoolBinop($1, Nor, $3) }
+ | OPAREN binExpr CPAREN { $2 } 
+ | NOT binExpr { Unop(Not, $2) }
  | ID { BoolId($1) } 
  | binExpr index { Index($1, $2) }
  /*note these other important things are exprs too: */
@@ -100,11 +101,9 @@ binExpr:
  | declare {$1}
  | loop {$1}
 
-/*may need to add register constructor from ast*/ assignment:
- | binExpr REGASSIGN binExpr INIT boolval{ 
-            Assign(true, $1, $3, $5) }
- | binExpr ASSIGN binExpr {
-            Assign(false, $1, $3, false) } 
+assignment:
+ | binExpr REGASSIGN binExpr INIT boolval{ Assign(true, $1, $3, $5) }
+ | binExpr ASSIGN binExpr { Assign(false, $1, $3, false) } 
 
 boolval:
  | ONE {true}
@@ -125,9 +124,9 @@ declare:
  | MAKE ID typdecl {BoolId($2)}
 
 loop:
- | FOR OPAREN ID FROM intExpr TO intExpr CPAREN OCURL lineList CCURL {
+ | FOR OPAREN ID FROM intExprz TO intExprz CPAREN OCURL lineList CCURL {
             For($3, Range($5, $7), $10)}
- | FOR OPAREN ID TO intExpr CPAREN OCURL lineList CCURL {
+ | FOR OPAREN ID TO intExprz CPAREN OCURL lineList CCURL {
             For($3, Range(Lit(0), $5), $8)}
 
 outlist:

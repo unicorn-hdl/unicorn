@@ -9,18 +9,34 @@ let opToString = function
  | Or  -> "or"
  | Nand -> "nand"
  | _ -> "op"
+(*someone can finish this bit*)
+
+let rec getIntExpr = function
+ | IntBinop(lval, Add, rval) -> getIntExpr lval ^ "+" ^ getIntExpr rval
+ | IntBinop(lval, Sub, rval) -> getIntExpr lval ^ "-" ^ getIntExpr rval
+ | Lit(x) -> string_of_int x
+ | IntId(x) -> x
+
+let index = function | Range (a,b) ->  "[" ^ getIntExpr a ^ ":" ^ getIntExpr b ^ "]"
+
+let bindFn (a,b,c) =  "" ^ "thing " 
+let toStringBindlist blist = listToString bindFn blist
 
 let rec getBinExpr = function
    Buslit(x) -> x
  | BoolId(x) -> x
  | BoolBinop(a,b,c) -> (getBinExpr a) ^ (opToString b) ^ (getBinExpr c)
+ | Unop(Not,a) -> "~" ^ getBinExpr a
  | Noexpr -> ""
- | _ -> "im lazy"
-let semiColon x = x ^ ";\n"
-let toStringBinExprlist explist = listToString semiColon (List.map getBinExpr explist)
+ | Index(expr, ind) -> getBinExpr expr ^ index ind
+ | Assign(isReg, lval, rval, initval) -> if isReg
+        then getBinExpr lval ^ ":= " ^ getBinExpr rval ^ " init " ^ string_of_bool initval
+        else getBinExpr lval ^ "= " ^ getBinExpr rval
+ | Call(id, arglist) -> id ^ "(" ^ toStringBinExprlist arglist ^ ")"
+ | For(var, range, lines) -> "for(" ^ var ^ "){\n" ^ toStringBinExprlist lines
 
-let bindFn (a,b,c) =  "" ^ "thing " 
-let toStringBindlist blist = listToString bindFn blist
+ and semiColon x = x ^ ";\n"
+ and toStringBinExprlist explist = listToString semiColon (List.map getBinExpr explist)
 
 let toStringMod = function
         |Module_decl (outlist, name, formals, linelist) ->
