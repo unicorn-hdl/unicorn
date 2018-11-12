@@ -19,6 +19,7 @@ open Ast
 %token <string> BOOLLIT
 %token <string> ID
 
+%left COLON
 %right ASSIGN REGASSIGN
 %left XNOR XOR
 %left OR NOR PLUSDOT
@@ -97,7 +98,7 @@ binExpr:
  /*note these other important things are exprs too: */
  | assignment {$1}
  | call {$1}
- | print {$1}
+ | print {Buslit("0b")}
  | declare {$1}
  | loop {$1}
 
@@ -108,7 +109,6 @@ assignment:
 boolval:
  | ONE {true}
  | ZERO {false}
- | /*Nothing*/ {false}
 
 call:
  | ID OPAREN argList CPAREN {Call($1, $3)}
@@ -119,7 +119,7 @@ argList:
  | binExpr { $1::[] }
 
 print: 
- | PRINT ID {BoolId($2)}
+ | PRINT ID COLON binExpr { Print($2, $4) }
 
 declare:
  | MAKE ID typdecl {BoolId($2)}
