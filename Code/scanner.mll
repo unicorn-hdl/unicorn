@@ -40,8 +40,8 @@ rule token = parse
 | "xnor" { XNOR }
 | "print" { PRINT }
 | "make" { MAKE }
-| "0b" { ZERO }
-| "1b" { ONE } 
+| "*0*" { ZERO }
+| "*1*" { ONE } 
 | var as lxm { ID(lxm) }
 | int as lxm  { LITERAL(int_of_string lxm) } (*does this need 'as lxm'*)
 | boollist as lxm { BOOLLIT(lxm) }

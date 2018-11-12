@@ -7,7 +7,9 @@ fullAdder(a<1>, b<1>, carryIn<1>){
     x = a xor b;
     y = a and b;
     z = carryIn and x;
+    make c;
     sum = x xor carryIn;
+    rA := varA *1*;
     carryOut = y or z;
 	out: sum<3>, carryOut<1>;
 }
