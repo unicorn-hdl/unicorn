@@ -15,6 +15,9 @@ ocamlc -c parser.ml
 	echo "parser.ml compiled"
 ocamlc -c printer.ml
 	echo "printer.ml compiled"
+ocamlc -c semant.ml
+#ocamlc -c unic.ml
+#ocamlc -o unic semant.cmo parser.cmo scanner.cmo printer.cmo
 ocamlc -o printer parser.cmo scanner.cmo printer.cmo
 
 mkdir made
