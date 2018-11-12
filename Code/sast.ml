@@ -1,18 +1,8 @@
 open Ast
-(*
-type intOp = Add | Sub
-type boolOp = And | Or | Nand | Nor | Xor | Xnor
-type unOp = Not
-type typ = Int | Bus
 
-type boolval = 
-        One of bool | Zero of bool
-*)
-
-(* I wasn't sure how to handle the bind*)
 type bind = typ * intExpr * string
 
-and intExpr = 
+and sintExpr = 
       SLit of int
     | SIntId of string
     | SIntBinop of sintExpr * intOp * sintExpr
@@ -21,23 +11,23 @@ and  sbinExpr =
       SBuslit of string (*since lex is annoying about turning 01011 into [0;1;0;1;1] keep as string until later down the line*)
     | SBoolId of string
     | SBoolBinop of sbinExpr * boolOp * sbinExpr
-    | SUnop of unOp * binExpr
-    | Assign of bool * binExpr *  binExpr * bool
-    | Index of binExpr * range
+    | SUnop of unOp * sbinExpr
+    | SAssign of bool * sbinExpr * sbinExpr * bool
+    | SIndex of sbinExpr * srange
     (*when bool = false, normal; bool = true, register*)
     (*final bool is init state*)
     (*add new assign indexing rule to LRM*)
-    | Print of string * binExpr
-    | Call of string * binExpr list
-    | For of string * range * binExpr list
-    | Noexpr
+    | SPrint of string * sbinExpr
+    | SCall of string * sbinExpr list
+    | SFor of string * srange * sbinExpr list
+    | SNoexpr
 
-and range = Range of intExpr * intExpr
+and srange = SRange of sintExpr * sintExpr
 
-type md = Module_decl of bind list * string * bind list * binExpr list
+type smd = SModule_decl of bind list * string * bind list * sbinExpr list
                         (*outlist   name      formals     line list *)  
 
-type program = (*bind list *  *) md list
+type sprogram = (*bind list *  *) smd list
 
-let string_of_program = function
+let string_of_sprogram = function
 | _ -> "this"
