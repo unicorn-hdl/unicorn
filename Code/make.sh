@@ -5,17 +5,17 @@ ocamllex scanner.mll
 	echo "scanner.mll compiled"
 ocamlyacc -v parser.mly
 	echo "parser.mly compiled"
-ocamlc -c ast.mli
-	echo "ast.mli compiled"
+ocamlc -c ast.ml
+	echo "ast.ml compiled"
 ocamlc -c parser.mli
 	echo "parser.mli compiled"
 ocamlc -c scanner.ml
 	echo "scanner.ml compiled"
 ocamlc -c parser.ml
 	echo "parser.ml compiled"
-ocamlc -c printer.ml
+ocamlc -c unic.ml
 	echo "printer.ml compiled"
-ocamlc -o printer parser.cmo scanner.cmo printer.cmo
+ocamlc -o unic parser.cmo scanner.cmo printer.cmo
 
 mkdir made
 mv ast.cmi made/ast.cmi
