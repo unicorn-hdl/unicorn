@@ -1,8 +1,6 @@
 open Ast
 
-type bind = typ * intExpr * string
-
-and sintExpr = 
+type sintExpr = 
       SLit of int
     | SIntId of string
     | SIntBinop of sintExpr * intOp * sintExpr
@@ -24,8 +22,12 @@ and  sbinExpr =
 
 and srange = SRange of sintExpr * sintExpr
 
-type smd = SModule_decl of bind list * string * bind list * sbinExpr list
-                        (*outlist   name      formals     line list *)  
+(*Important: Ast does not contatin a "locals" bind list, but this info is contained in the lineList. It must be extracted and put in the locals list here, when semant is building smds*)
+type smd = {outlist: bind list;
+            name: string;
+            formals: bind list;
+            locals: bind list;
+            lineList: sbinExpr list}
 
 type sprogram = (*bind list *  *) smd list
 

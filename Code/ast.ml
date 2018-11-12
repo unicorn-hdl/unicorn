@@ -2,12 +2,11 @@
 type intOp = Add | Sub
 type boolOp = And | Or | Nand | Nor | Xor | Xnor
 type unOp = Not
-type typ = Int | Bus
+type boolval = One of bool | Zero of bool
 
-type boolval = 
-        One of bool | Zero of bool
+type typ = Int | Bus of intExpr
 
-type bind = typ * intExpr * string
+and bind = intExpr * string
 
 and intExpr = 
       Lit of int

@@ -52,7 +52,7 @@ formalsList:
  | formal { [$1] }
 
 formal:
- | ID typdecl{ (Bus, $2, $1) }
+ | ID typdecl{ ($2, $1) }
  
 typdecl:
  | /*Nothing (reduces to size 1)*/ {Lit(1)}
