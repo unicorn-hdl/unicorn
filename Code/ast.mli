@@ -23,6 +23,7 @@ and  binExpr =
     (*when bool = false, normal; bool = true, register*)
     (*final bool is init state*)
     (*add new assign indexing rule to LRM*)
+    | Print of string * binExpr
     | Call of string * binExpr list
     | For of string * range * binExpr list
     | Noexpr

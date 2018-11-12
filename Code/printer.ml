@@ -33,6 +33,7 @@ let rec getBinExpr = function
         then getBinExpr lval ^ ":= " ^ getBinExpr rval ^ " init " ^ string_of_bool initval
         else getBinExpr lval ^ "= " ^ getBinExpr rval
  | Call(id, arglist) -> id ^ "(" ^ toStringBinExprlist arglist ^ ")"
+ | Print(id, x) -> "print " ^ id ^ ":  " ^ getBinExpr x ^ ";"
  | For(var, range, lines) -> "for(" ^ var ^ "){\n" ^ toStringBinExprlist lines
 
  and semiColon x = x ^ ";\n"
