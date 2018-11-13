@@ -17,7 +17,8 @@ let rec evalInt = function
 
 let evalBind (a,b) = (string_of_int (evalInt a), b)
 
-let astTosast ast = [{outlist = [(Lit(1), "out1")]; name = "module name"; formals = []; locals = []; lineList = []}] (*Obviously this has to made into a real thing TODO*)
+let hastToSast hast = [{outlist = [(Lit(1), "out1")]; name = "module name"; formals = []; locals = []; lineList = []}] (*Obviously this has to made into a real thing TODO*)
+let astToHast ast = 
 
 let harden sast =
 let hardenBind (expr, name) = (evalInt expr, name) in
