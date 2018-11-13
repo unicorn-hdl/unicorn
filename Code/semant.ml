@@ -3,7 +3,11 @@ open Sast
 module StringMap = Map.Make(String)
 
 type hardBind = int * string
-type hardSmd = {outlistH: hardBind list; name: string; formals: hardBind list; locals: hardBind list; lineList: sbinExpr list}
+type hardSmd = {outlistH: hardBind list;
+                name: string;
+                formals: hardBind list;
+                locals: hardBind list;
+                lineList: sbinExpr list}
 
 let rec evalInt = function
  | Lit(x) -> x
