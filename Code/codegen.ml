@@ -3,11 +3,13 @@ module L = Llvm
 module StringMap = Map.Make(String)
 
 open Semant
+open Sast
 
 let context = L.global_context ()
 let the_module = L.create_module context "UniC"
 let builder = L.builder context
-let intTyp = L.i32_type context 
+let i32_t = L.i32_type context 
+let i8_t = L.i8_type context
 (*
 let rec genExpr = function
  |  
@@ -20,27 +22,27 @@ let printf_t = L.var_arg_function_type i32_t [| L.pointer_type i8_t |]
 (*need to make actual print stuff that actually works*)
 
 let printf_t : L.lltype = 
-   L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
+   L.var_arg_function_type i32_t [| L.pointer_type i8_t |]
 let printf_func : L.llvalue = 
-   L.declare_function "printf" printf_t the_module in
+   L.declare_function "printf" printf_t the_module
 
 
 let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder
 
-let rec expr builder ((_,e): sexpr) = match e with
-    SBuslit b -> L.const_int i32_t i
+let rec expr builder ((_,e): sbinExpr) = match e with
+    SBuslit b -> L.const_int i32_t (int_of_string ("0b" ^ b))
     | SCall ("print", [e]) ->
 	    L.build_call printf_func [| int_format_str ; (expr builder e) |] "print" builder
+    | _ -> L.const_int i32_t (int_of_string "0")
 
-let addInlist inlist = _
-let addBinlist binlist = _
-let addOutlist outlist = _
+let addInlist inlist = expr builder (1, SCall ("print", [(1, SBuslit "1")] ))
+let addBinlist binlist = ""
+let addOutlist outlist = ""
 
-let translate (binlist * inlist * outlist) = 
+let translate (binlist,  inlist, outlist) = 
     let _ = addInlist inlist in
     let _ = addBinlist binlist in
-    let _ = addOutlist outlist;
-
+    let _ = addOutlist outlist in
 the_module
 
 (*

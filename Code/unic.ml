@@ -6,6 +6,7 @@ module L = Llvm
 type action = Ast | Sast | LLVM_IR | Compile
 
 let () =
+  let printsmt = print_endline("thisotherthing!") in
   let action = ref Compile in
   let set_action a () = action := a in
   let speclist = [
@@ -20,14 +21,18 @@ let () =
   Arg.parse speclist (fun filename -> channel := open_in filename) usage_msg;
   
   let lexbuf = Lexing.from_channel !channel in
+  let printsmt = print_endline("thisthing!") in 
+(*fake ast 
   let ast = Parser.program Scanner.token lexbuf in  
+*)
+let ast = [([(Ast.Lit(1), "input1")], "moduleName", [(Ast.Lit(1), "output1")], [])] in
   match !action with
     Ast -> print_string (Ast.string_of_program ast)
-  | _ -> let sast = Semant.check ast in
+  | _ -> let ssast = Semant.check ast in
       match !action with
         Ast     -> ()
-      | Sast    -> print_string (Sast.string_of_sprogram sast)
-      | LLVM_IR -> print_string (L.string_of_llmodule (Codegen.translate sast))
-      | Compile -> let m = Codegen.translate sast in
+      | Sast    -> print_string (Sast.string_of_sprogram ssast)
+      | LLVM_IR -> print_string (L.string_of_llmodule (Codegen.translate ssast))
+      | Compile -> let m = Codegen.translate ssast in
 	  Llvm_analysis.assert_valid_module m;
 	  print_string (L.string_of_llmodule m)
