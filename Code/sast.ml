@@ -2,10 +2,10 @@ open Ast
 
 type hardBind = int * string
 type hardmd = {outlistH: hardBind list;
-               name: string;
-               formals: hardBind list;
-               locals: hardBind list;
-               linelist: binExpr list}
+               nameH: string;
+               formalsH: hardBind list;
+               localsH: hardBind list;
+               linelistH: binExpr list}
 
 type sintExpr  = int * sintExpr2
 and  sintExpr2 = 

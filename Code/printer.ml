@@ -19,7 +19,7 @@ let rec getIntExpr = function
 
 let index = function | Range (a,b) ->  "[" ^ getIntExpr a ^ ":" ^ getIntExpr b ^ "]"
 
-let bindFn (a,b,c) =  "" ^ "thing " 
+let bindFn (b,c) =  "" ^ "thing " 
 let toStringBindlist blist = listToString bindFn blist
 
 let rec getBinExpr = function

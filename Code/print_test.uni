@@ -3,6 +3,7 @@
 main() {
 
 	print binary_bit : 0b;
+	out:;
 	
 }
 🦄
