@@ -5,3 +5,4 @@ rm *.cmo
 rm *.cmi
 rm *.*~
 rm .*
+rm -r made
