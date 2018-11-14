@@ -33,12 +33,10 @@ let translate (inlist,  binlist, outlist) =
   let rec expr ( (_,e): sbinExpr) = match e with
     | SBuslit b -> ignore(print_endline ("lit " ^ b));L.const_int i32_t (int_of_string ("0b" ^ b))
     | SPrint (str, e) -> ignore(print_string ("print " ^ str)); 
-    (* The bit for dealing with strings is fussy bc no built-in string_type
-     *
+    (* The bit for dealing with strings is fussy bc no built-in string_type*)
           L.build_call printf_func 
-                       [|L.const_float_of_string (str ^ ": ")|] 
+                       [|L.const_string context (str ^ ": ")|] 
                        "printf" builder;
-     *)
           L.build_call printf_func 
                        [|int_format_str; expr e|] 
                        "printf" builder
