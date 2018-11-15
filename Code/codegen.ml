@@ -30,9 +30,9 @@ let translate (inlist,  binlist, outlist) =
 
   let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
 
-  let rec expr ( (_,e): sbinExpr) = match e with
-    | SBuslit b -> ignore(print_endline ("lit " ^ b));L.const_int i32_t (int_of_string ("0b" ^ b))
-    | SPrint (str, e) -> ignore(print_string ("print " ^ str)); 
+  let rec expr ( (_,e): sbinExpr) = match e with (* 111418 commented out for submission *)
+    | SBuslit b -> ignore(print_endline (""));L.const_int i32_t (int_of_string ("0b" ^ b))
+    | SPrint (str, e) -> ignore(print_string ("")); (* 111418 commented out for submission *)  
     (* The bit for dealing with strings is fussy bc no built-in string_type*)
     (*
           L.build_call printf_func 
@@ -42,16 +42,16 @@ let translate (inlist,  binlist, outlist) =
           L.build_call printf_func 
                        [|int_format_str; expr e|] 
                        "printf" builder
-    | _ -> ignore (print_endline "nomatch! "); L.const_int i32_t 0
+    | _ -> ignore (print_endline ""); L.const_int i32_t 0 (* 111418 commented out for submission *)
   in  
 
   (*
   let builder = L.block_terminator (L.insertion_block builder) in
 *)
-  ignore(print_endline "this step is happenind");
+  (*ignore(print_endline ""); *)
   ignore(List.map expr binlist);
   ignore(L.build_ret_void (L.builder_at_end context (L.entry_block the_main_function)));
   ignore(L.block_terminator (L.insertion_block builder));
-  ignore(print_endline "hello")
+  (* ignore(print_endline "hello") *)
 );
  the_module
