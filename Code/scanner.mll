@@ -3,8 +3,8 @@
 { open Parser }
 let digit = ['0'-'9']
 let int = digit+
-let alphaNum = ['A'-'z' '0'-'9']
-let alphaLow = ['A'-'z']
+let alphaNum = ['A'-'Z' 'a'-'z' '0'-'9']
+let alphaLow = ['A'-'Z' 'a'-'z']
 let var = (alphaLow)(alphaNum)*
 let whitespace = [' ' '\r' '\t' '\n']
 let boollist = ('0'|'1')+ ('b')
