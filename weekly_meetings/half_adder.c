@@ -3,13 +3,17 @@
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 3c9d5d2... Seqential circuit example in UNI-corn and c-like language
+=======
+>>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
 //Should pass in a pointer if it's going to be an array
 int *half_adder(int wire_a, int wire_b) {
 
     int *sum_carry = (int*) malloc(sizeof *sum_carry);
     //not a good idea since would have to reallocate and the free for every call
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 int *half_adder(int wire_a, int wire_b) {
@@ -18,6 +22,8 @@ int *half_adder(int wire_a, int wire_b) {
 >>>>>>> e3b269e... added new folder
 =======
 >>>>>>> 3c9d5d2... Seqential circuit example in UNI-corn and c-like language
+=======
+>>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
     int sum_wire = wire_a ^ wire_b;
     int carry_wire = wire_a & wire_b;
 
@@ -33,8 +39,11 @@ int *half_adder(int wire_a, int wire_b) {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 3c9d5d2... Seqential circuit example in UNI-corn and c-like language
+=======
+>>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
 //For tick pass in four pointers, 
 // ray of input
 // ray of input output values
@@ -42,10 +51,13 @@ int *half_adder(int wire_a, int wire_b) {
 // 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> e3b269e... added new folder
 =======
 >>>>>>> 3c9d5d2... Seqential circuit example in UNI-corn and c-like language
+=======
+>>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
 int main(int argc, char *argv[]) {
 
     //Half adder

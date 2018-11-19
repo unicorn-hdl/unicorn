@@ -2,6 +2,9 @@
 
 { open Parser }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
 let digit = ['0'-'9']
 let int = digit+
 let alphaNum = ['A'-'Z' 'a'-'z' '0'-'9']
@@ -13,6 +16,7 @@ rule token = parse
     whitespace { token lexbuf }
 | "//" { single lexbuf }
 | "/**" { multi lexbuf }
+<<<<<<< HEAD
 =======
 
 let digit = ['0'-'9']
@@ -32,6 +36,8 @@ rule token = parse
 | "//" { single lexbuf }
 | "/**" { multi lexbuf }
 >>>>>>> 1412556... changed ' to " for tokens that were strings
+=======
+>>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
 | '{' { OCURL }
 | '}' { CCURL }
 | '[' { OSQUARED }
@@ -40,6 +46,9 @@ rule token = parse
 | ')' { CPAREN }
 | ';' { SEMI }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
 | ':' { COLON }
 | ',' { COMMA }
 | '=' { ASSIGN }
@@ -72,6 +81,7 @@ rule token = parse
 | _ as ch { raise (Failure("illegal character " ^ Char.escaped ch)) }
 and multi = parse
     "**/" { token lexbuf }
+<<<<<<< HEAD
 =======
 | ',' { COMMA }
 | '=' { ASSIGN }
@@ -107,6 +117,8 @@ and multi = parse
 =======
     "**/" { token lexbuf }
 >>>>>>> 1412556... changed ' to " for tokens that were strings
+=======
+>>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
 |   _     { multi lexbuf }
 
 and single = parse

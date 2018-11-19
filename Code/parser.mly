@@ -3,6 +3,7 @@
 %{
 open Ast 
 %}
+<<<<<<< HEAD
 %token OPAREN CPAREN OCURL CCURL OSQUARED CSQUARED 
 <<<<<<< HEAD
 %token COMMA COLON
@@ -17,6 +18,13 @@ open Ast
 %token SEMI UNICORN NEWLINE EOF 
 %token OGENERIC CGENERIC 
 >>>>>>> b1378ab... fixed token newline
+=======
+
+%token OPAREN CPAREN OCURL CCURL OSQUARED CSQUARED 
+%token COMMA COLON
+%token SEMI UNICORN UNICORN2 EOF 
+%token OGENERIC CGENERIC 
+>>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
 %token ASSIGN REGASSIGN 
 %token PLUS MINUS
 %token PLUSDOT TIMESDOT
@@ -24,11 +32,15 @@ open Ast
 %token OUT INIT
 %token AND OR NOT NAND NOR XOR XNOR
 <<<<<<< HEAD
+<<<<<<< HEAD
 %token PRINT MAKE 
 =======
 %token MAIN
 %token PRINT
 >>>>>>> 60a67d8... Got rid of module keyword
+=======
+%token PRINT MAKE 
+>>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
 %token ONE ZERO
 %token <int> LITERAL
 %token <string> BOOLLIT
@@ -51,6 +63,9 @@ open Ast
 program:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
  | modulezList UNICORN  EOF { $1 }
  | modulezList UNICORN2 EOF { $1 }
 
@@ -121,6 +136,7 @@ binExpr:
 
 assignment:
 <<<<<<< HEAD
+<<<<<<< HEAD
  | binExpr REGASSIGN binExpr boolval{ Assign(true, $1, $3, $4) }
  | binExpr ASSIGN binExpr { Assign(false, $1, $3, false) } 
 =======
@@ -167,11 +183,19 @@ comment:
 
 =======
 >>>>>>> 46fcfed... Fixed the dumb comment thing I'd done
+=======
+ | binExpr REGASSIGN binExpr boolval{ Assign(true, $1, $3, $4) }
+ | binExpr ASSIGN binExpr { Assign(false, $1, $3, false) } 
+
+>>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
 boolval:
  | ONE {true}
  | ZERO {false}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
 call:
  | ID OPAREN argList CPAREN {Call($1, $3)}
 
@@ -195,6 +219,7 @@ loop:
 outlist:
  | OUT COLON formalsList SEMI {$3}
 
+<<<<<<< HEAD
 =======
 assignment:
  | ID REGASSIGN ID INIT boolval{ RegisterAssign($1, $5, $3)} 
@@ -253,3 +278,5 @@ anythingList:
 >>>>>>> b3fcd7c... Put made support for comments. Put in some { } things.
 =======
 >>>>>>> 46fcfed... Fixed the dumb comment thing I'd done
+=======
+>>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
