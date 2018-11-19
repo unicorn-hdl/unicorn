@@ -19,15 +19,7 @@ let rec getIntExpr = function
 
 let index = function | Range (a,b) ->  "[" ^ getIntExpr a ^ ":" ^ getIntExpr b ^ "]"
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 let bindFn (b,c) =  "" ^ "thing " 
-=======
-let bindFn (a,b,c) =  "" ^ "thing " 
->>>>>>> 1f1c4a5... SAME THING PUT I Pulled
-=======
-let bindFn (b,c) =  "" ^ "thing " 
->>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
 let toStringBindlist blist = listToString bindFn blist
 
 let rec getBinExpr = function
@@ -41,14 +33,7 @@ let rec getBinExpr = function
         then getBinExpr lval ^ ":= " ^ getBinExpr rval ^ " init " ^ string_of_bool initval
         else getBinExpr lval ^ "= " ^ getBinExpr rval
  | Call(id, arglist) -> id ^ "(" ^ toStringBinExprlist arglist ^ ")"
-<<<<<<< HEAD
-<<<<<<< HEAD
  | Print(id, x) -> "print " ^ id ^ ":  " ^ getBinExpr x ^ ";"
-=======
->>>>>>> 1f1c4a5... SAME THING PUT I Pulled
-=======
- | Print(id, x) -> "print " ^ id ^ ":  " ^ getBinExpr x ^ ";"
->>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
  | For(var, range, lines) -> "for(" ^ var ^ "){\n" ^ toStringBinExprlist lines
 
  and semiColon x = x ^ ";\n"
