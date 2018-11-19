@@ -1,0 +1,14 @@
+--SYNTAX--
+A) Scanner (Adiza, Dan, & Gael)
+B) Parser (Maryam & Lalo)
+--SEMANTICS & SIMPLIFICATION--
+C) Syntactic Sugar (Adiza & Maryam)
+D) AST to SAST (harden incl.) (Dan)
+F) Noloops (Maryam)
+G) Registers (Adiza)
+H) Topolgize (Gael)
+I) Nomodules (Lalo)
+K) Noindex ()--Ask Edwards
+--Prep for LLVM--
+L) Simple to SSAST ()
+M) Codegen (Lalo)
