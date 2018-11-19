@@ -3,44 +3,18 @@
 %{
 open Ast 
 %}
-<<<<<<< HEAD
-%token OPAREN CPAREN OCURL CCURL OSQUARED CSQUARED 
-<<<<<<< HEAD
-%token COMMA COLON
-%token SEMI UNICORN UNICORN2 EOF 
-%token OGENERIC CGENERIC 
-=======
-%token COMMA
-<<<<<<< HEAD
-%token SEMI UNICORN NEWLINE EOF %token OGENERIC CGENERIC 
->>>>>>> b3fcd7c... Put made support for comments. Put in some { } things.
-=======
-%token SEMI UNICORN NEWLINE EOF 
-%token OGENERIC CGENERIC 
->>>>>>> b1378ab... fixed token newline
-=======
 
 %token OPAREN CPAREN OCURL CCURL OSQUARED CSQUARED 
 %token COMMA COLON
 %token SEMI UNICORN UNICORN2 EOF 
 %token OGENERIC CGENERIC 
->>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
 %token ASSIGN REGASSIGN 
 %token PLUS MINUS
 %token PLUSDOT TIMESDOT
 %token FOR TO FROM
 %token OUT INIT
 %token AND OR NOT NAND NOR XOR XNOR
-<<<<<<< HEAD
-<<<<<<< HEAD
 %token PRINT MAKE 
-=======
-%token MAIN
-%token PRINT
->>>>>>> 60a67d8... Got rid of module keyword
-=======
-%token PRINT MAKE 
->>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
 %token ONE ZERO
 %token <int> LITERAL
 %token <string> BOOLLIT
@@ -61,11 +35,6 @@ open Ast
 %%
 
 program:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
  | modulezList UNICORN  EOF { $1 }
  | modulezList UNICORN2 EOF { $1 }
 
@@ -135,67 +104,13 @@ binExpr:
  | loop {$1}
 
 assignment:
-<<<<<<< HEAD
-<<<<<<< HEAD
- | binExpr REGASSIGN binExpr boolval{ Assign(true, $1, $3, $4) }
- | binExpr ASSIGN binExpr { Assign(false, $1, $3, false) } 
-=======
- | comment mainz modulezList UNICORN EOF {bigTree($1, $2)}
-=======
- | mainz modulezList UNICORN EOF {bigTree($1, $2)}
->>>>>>> 46fcfed... Fixed the dumb comment thing I'd done
-
-mainz:
- | MAIN OPAREN argList CPAREN OCURL structureList CCURL {makeMain($3, $6)}
- 
-structureList:
- | /* Nothing */ {}
- | structure structureList {listIs($1::$2)}
-
-structure:
- | line  {$1}
- | loop  {$1}
-=======
- | binExpr REGASSIGN binExpr INIT boolval{ Assign(true, $1, $3, $5) }
- | binExpr ASSIGN binExpr { Assign(false, $1, $3, false) } 
->>>>>>> 1f1c4a5... SAME THING PUT I Pulled
-
-argList:
- | /*Nothing*/ {}
- | argList COMMA arg {argListIs($1,$3)}
- 
-arg:
- | ID{literalSize($1, 1)}
- | ID OSQUARED LITERAL CSQUARED {literalSize($1, $3)}
- | ID OGENERIC ID CGENERIC {genericSize($1, $3)}
-
-line: 
- | assignment SEMI {}
- | call  SEMI {} 
- | print SEMI {} 
- | declare SEMI {}
- | OUT assignment SEMI{}
-
-<<<<<<< HEAD
-comment:
- | OBLOCK anythingList  CBLOCK{}
->>>>>>> b3fcd7c... Put made support for comments. Put in some { } things.
-
-=======
->>>>>>> 46fcfed... Fixed the dumb comment thing I'd done
-=======
  | binExpr REGASSIGN binExpr boolval{ Assign(true, $1, $3, $4) }
  | binExpr ASSIGN binExpr { Assign(false, $1, $3, false) } 
 
->>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
 boolval:
  | ONE {true}
  | ZERO {false}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
 call:
  | ID OPAREN argList CPAREN {Call($1, $3)}
 
@@ -219,64 +134,3 @@ loop:
 outlist:
  | OUT COLON formalsList SEMI {$3}
 
-<<<<<<< HEAD
-=======
-assignment:
- | ID REGASSIGN ID INIT boolval{ RegisterAssign($1, $5, $3)} 
- | ID ASSIGN ID OPAREN argList CPAREN { WireAssign($1, valueOf($3, $5))}
- | ID ASSIGN ID OPAREN argList CPAREN OSQUARED ID CSQUARED {WireAssign($1, ValueOf($3, $5, $8)) }
- | ID ASSIGN ID OPAREN argList CPAREN OSQUARED ID CSQUARED OSQUARED CSQUARED {WireAssign($1, ValueOf($3, $5, $8))}
-
-call:
- | ID OPAREN argList CPAREN {}
-
-print: 
- | PRINT ID {}
-
-declare:
- | ID {}
-
-modulez:
- | ID OPAREN argList CPAREN OCURL structureList CCURL {makeModule($3, $6)}
-
-modulezList:
- | /*Nothing*/{}
- | modulez modulezList{}
-
-varNum:
- | ID { StringLit($1) }
- | LITERAL { Literal($1) }
- | varNum PLUS varNum {$1 + $3}
- | varNum MINUS varNum {$1 - $3}
-
-loop:
- | FOR OPAREN ID FROM varNum TO varNum CPAREN OCURL loopBody CCURL {}
- | FOR OPAREN ID TO varNum CPAREN OCURL loopBody CCURL {}
-
-loopBody:
- | structure {}
-<<<<<<< HEAD
-
-anything:
- | OPAREN{} | CPAREN{} | OCURL{} | CCURL {}| OSQUARED {}| CSQUARED {}
- | COMMA{} | SEMI{} | UNICORN{} | OGENERIC {}| CGENERIC{} | ASSIGN{} | REGASSIGN {}
- | LINECOMMENT{} | OBLOCK{}
- | PLUS {}| MINUS{}
- | FOR {}| TO {}| FROM{}
- | OUT {}| INIT{}
- | AND {}| OR {}| NOT {}| NAND {}| NOR {}| XOR {}| XNOR{}
- | MAIN{}
- | PRINT{}
- | ONE {}| ZERO{}
- | LITERAL{}
- | ID{}
- | NEWLINE {}
-
-anythingList:
- | /*Nothing*/ {} 
- | anything anythingList {}
->>>>>>> b3fcd7c... Put made support for comments. Put in some { } things.
-=======
->>>>>>> 46fcfed... Fixed the dumb comment thing I'd done
-=======
->>>>>>> 87c88e7be77c68e126af93f5cf71f9e93d45daa9
