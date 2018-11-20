@@ -12,3 +12,6 @@ K) Noindex ()--Ask Edwards
 --Prep for LLVM--
 L) Simple to SSAST ()
 M) Codegen (Lalo)
+
+N) writing test cases (Maryam) 
+O) modifying LRM (Dan, Maryam)
