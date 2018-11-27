@@ -1,12 +1,12 @@
 open Sast
 
-(*what all simplify files should more or less look like. The work is in making the functions in 2-6 do whatever useful thing they need to, instead of just returning what they're fed*)
+(*what all simplify files should more or less look like. The work is in making the functions in 5-9 do whatever useful thing they need to, instead of just returning what they're fed*)
 
-let doThingToOutlist list = list
+let doThingToOutlist llist = llist
 let doThingToName name = name
-let doThingToFormals list = list
-let doThingToLocals list = list
-let doThingToLinelist list = list
+let doThingToFormals llist = llist
+let doThingToLocals llist = llist
+let doThingToLinelist llist = llist
 
 let whatYouDoToEachSmd smd =
 	{outlist = doThingToOutlist smd.outlist;
@@ -16,5 +16,6 @@ let whatYouDoToEachSmd smd =
 	 linelist = doThingToLinelist smd.linelist;
 	}
 
+(*smd list-> smd list*)
 let thebigfunction smdList =
 	List.map whatYouDoToEachSmd smdList
