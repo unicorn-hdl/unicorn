@@ -1,0 +1,153 @@
+main(b<2>, c<2>){
+	a = b and c;
+	out:a<2>;
+}
+
+----------------------
+After elaboration:
+
+in: b0, b1, c0, c1
+a0 = b0 and c0
+a1 = b1 and c1
+out: a0, a1
+
+----------------------
+
+main(b<2>, c<2>){
+    a = d and not c;
+	d = b and c;
+	out:a<2>;
+}
+
+----------------------
+After elaboration:
+
+in: b0, b1, c0, c1
+a0 = d0 and c0'
+c0'= not c0
+a1 = d1 and c1'
+c1' = not c1
+d0 = b0 and c0
+d1 = b1 and c1
+out: a0, a1
+----------------------
+
+After topological sorting:
+
+in: b0, b1, c0, c1
+d0 = b0 and c0
+d1 = b1 and c1
+c0'= not c0
+a0 = d0 and c0'
+c1' = not c1
+a1 = d1 and c1'
+out: a0, a1
+
+--------------------
+modA(b){
+	a = b nand b
+	out: a;
+}
+
+main(cin, din){
+	
+	c = modA(cin);
+	d = modA(din);
+	e = c or d
+	out:e;
+}
+
+-------------------
+
+in: cin, din, 
+out: e
+e = c or d
+c = cin nand cin
+d = din nand din 
+
+-------------------
+
+in: cin, din, 
+out: e
+c = cin nand cin
+d = din nand din 
+e = c or d
+
+-------------------
+modA(b){
+	a = b nand b
+	z = a or a;
+	
+		
+	out: z;
+}
+
+main(cin, din){
+	
+	c = modA(cin);
+	d = modA(din);
+	e = c or d
+	out:e;
+}
+
+-------------------
+In: cin, din
+Out: e
+a0 = cin nane cin
+z0 = a0 or a0 
+c = z0
+a1 = din nand din
+z1 = a1 or a1
+d = z1
+E = c or d
+
+------------------
+
+In: cin, din
+Out: e
+modA_1_b = cin
+modA_1_a = modA_1_b nand modA_1_b
+modA_1_z = modA_1_a or modA_1_a
+c = modA_1_z
+modA_2_a = din nand din
+modA_2_z = modA_2_a or modA_2_a
+d = z1
+E = c or d
+
+A<2> expands to
+
+modA_1_a_0
+modA_1_a_1
+
+
+
+
+modA(){
+	modB();
+}
+
+modB(){
+	modC(101b);
+//	modC(11111b);
+}
+
+modC(a<n>){
+	modD(a);
+}
+
+modD(b<3>){}
+
+-------------------------
+
+modA(){
+	modB();
+}
+
+modB(){
+	modC();
+}
+
+modC(){
+
+}
+
