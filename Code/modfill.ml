@@ -40,6 +40,7 @@ let mdlistEx = [modA;
 (*md list-> md list*)
 let createMapz mdlist = List.fold_left populateMap StringMap.empty mdlist;;
 let call mdlist m= List.map replaceCalls (modzIntoTuples mdlist m);;
+let call2 mdlist m = List.map (fun (a,b)-> a) (call mdlist m)
 
 let theMap = createMapz (modzIntoTuples mdlistEx StringMap.empty);;
 let x = call mdlistEx theMap;;

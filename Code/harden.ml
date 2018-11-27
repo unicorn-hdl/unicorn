@@ -1,5 +1,6 @@
 open Ast
 open Printer
+open Modfill
 module StringMap = Map.Make(String)
 
 let modzIntoTuples d m = List.map (fun d-> (d,m)) d
@@ -67,7 +68,6 @@ let mdlistEx = [modA;
 let toString (Module_decl(a,b,c,d)) = b ^ "\n" ^ toStringBinExprlist d;;
 List.iter (fun x -> print_endline (toString x)) (harden mdlistEx);;
 let printfun key v = print_string(key ^ ": ");
-                     print_string (string_of_int(List.length v));
                      List.iter print_string v; print_endline "";;
 print_endline("table values");;
-StringMap.iter printfun (table mdlistEx)
+StringMap.iter printfun (table (call2 mdlistEx theMap))
