@@ -1,13 +1,16 @@
 open Ast
 module StringMap = Map.Make(String)
 
-let rec actonlines newmodlist m= function
-    | Call(name, args) -> StringMap.find name 
+let rec actOnline (newmodlist, m) = match newmodlist with 
+    | Call(name, args) -> ModExpr(StringMap.find name m)
+
+let modzIntoTuples d m = List.map (fun d-> (d,m)) d
+let runThroughLines d m = List.map actOnline (modzIntoTuples d m)
 
 let populateMap m (Module_decl(a,b,c,d), e) = StringMap.add b (Module_decl(a,b,c,d)) m
 
 let replaceCalls ((Module_decl(a, b, c, d)), m) =
-                        ((Module_decl(a, b, c, actonlines d m)), m)
+                        ((Module_decl(a, b, c, runThroughLines d m)), m)
 
 let callx x = (Call(x, []))
 let modx x = (Module_decl([], x, [], []))

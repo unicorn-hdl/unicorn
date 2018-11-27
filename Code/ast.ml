@@ -26,11 +26,12 @@ and  binExpr =
     | Print of string * binExpr
     | Call of string * binExpr list
     | For of string * range * binExpr list
+    | ModExpr of md 
     | Noexpr
 
 and range = Range of intExpr * intExpr
 
-type md = Module_decl of bind list * string * bind list * binExpr list
+and md = Module_decl of bind list * string * bind list * binExpr list
                         (*outlist   name      formals     line list *)  
 
 type program = (*bind list *  *) md list
