@@ -1,35 +1,47 @@
 open Ast
 module StringMap = Map.Make(String)
 
-let rec actOnline (newmodlist, m) = match newmodlist with 
-    | Call(name, args) -> ModExpr(StringMap.find name m)
-
 let modzIntoTuples d m = List.map (fun d-> (d,m)) d
-let runThroughLines d m = List.map actOnline (modzIntoTuples d m)
+let rec runThroughLines d m = List.map actOnline (modzIntoTuples d m)
+
+and actOnline (newmodlist, m) = match newmodlist with 
+    | Buslit(x) -> Buslit(x)
+    | BoolId(x) -> BoolId(x)
+    | BoolBinop(l, op, r) -> BoolBinop(actOnline (l,m), op, actOnline (r,m))
+    | Unop(op, exp) -> Unop(op, actOnline (exp,m))
+    | Assign(a, e1, e2, b) -> Assign(a, actOnline (e1,m), actOnline (e2,m), b)
+    | Index(e, r) -> Index(actOnline (e,m), r)
+    | Print(s, e) -> Print(s, actOnline (e,m))
+    (*
+    | For(s, r, e) -> For(s, r, runThroughLines e m)
+*)
+    | Call(name, args) -> print_endline(string_of_bool (StringMap.is_empty m));ModExpr(StringMap.find name m)
+    | ModExpr(x) -> ModExpr(x)
+    | Noexpr -> Noexpr
+
 
 let populateMap m (Module_decl(a,b,c,d), e) = StringMap.add b (Module_decl(a,b,c,d)) m
 
-let replaceCalls ((Module_decl(a, b, c, d)), m) =
+let replaceCalls (Module_decl(a, b, c, d), m) =
                         ((Module_decl(a, b, c, runThroughLines d m)), m)
 
-let callx x = (Call(x, []))
-let modx x = (Module_decl([], x, [], []))
+let callx x = ( Call(x, []) )
+let modA = Module_decl([], "modA", [], [])
+let bExprs = 
+        [callx "modA"]
+let modB = Module_decl([], "modB", [], bExprs)
 let e = StringMap.empty
 
-let mdlistEx = [((modx "modA"), e);
-                ((modx "modB"), e)
+let mdlistEx = [modA;
+                modB
                ]
-
-(*
-let mdlistEx = [(1,2); (3,2); (5,12)]
-*)
 
 (*md list-> md list*)
 let createMapz mdlist = List.fold_left populateMap StringMap.empty mdlist
-let call mdlist = List.map replaceCalls mdlist
+let call mdlist m= List.map replaceCalls (modzIntoTuples mdlist m);;
 
-let theMap = createMapz mdlistEx
-let x = call mdlistEx
+let theMap = createMapz (modzIntoTuples mdlistEx StringMap.empty);;
+let x = call mdlistEx theMap;;
 
 let toString (Module_decl(a,b,c,d)) = b
 let printx (x,y) = print_endline(toString x)
