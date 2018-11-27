@@ -35,6 +35,8 @@ let rec getBinExpr = function
  | Call(id, arglist) -> id ^ "(" ^ toStringBinExprlist arglist ^ ")"
  | Print(id, x) -> "print " ^ id ^ ":  " ^ getBinExpr x ^ ";"
  | For(var, range, lines) -> "for(" ^ var ^ "){\n" ^ toStringBinExprlist lines
+ | ModExpr(Module_decl(a,b,c,d)) -> "*" ^ b
+ | _ -> ""
 
  and semiColon x = x ^ ";\n"
  and toStringBinExprlist explist = listToString semiColon (List.map getBinExpr explist)
@@ -46,8 +48,10 @@ let toStringMod = function
         toStringBindlist outlist ^ "\n}\n\n"
 let toStringPgm pgm = List.map toStringMod pgm
 
+(*
 let _ =
 let lexbuf = Lexing.from_channel stdin in
 let pgm = Parser.program Scanner.token lexbuf in
 let result = listToString (fun x->x) (toStringPgm pgm) in
 print_endline (result)
+*)
