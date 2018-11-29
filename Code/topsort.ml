@@ -21,8 +21,39 @@ the module to the netlist expression being sorted
 
 *)
 
+
+
+(*open netlist*)
 open Sast
 
+let orig_netlist = [("a","b"); ("a", "c")]
+in
+let visited = []
+in
+(* successor function gives list of every direct successor to a node. Argument n is the node which the function will return the successor of*)
+let rec topsort orig_netlist visited = function
+        [] -> visited
+        |n::nodes ->
+        let visited' = if List.mem n visited then visited
+        else n:: topsort orig_netlist visited
+in topsort orig_netlist visited' nodes
+in
+let rec successors n = function
+         [] -> visited
+         |(s, t) :: orig_netlist ->
+                         if s = n then
+                                 t::successors n orig_netlist
+                         else successors n orig_netlist;;
+
+
+
+
+
+
+(* Gael's original topsort code*)
+
+
+(*
 let unordered_modules = [.md * A.md::tail]
 
 let ordered_modules =
@@ -47,4 +78,4 @@ let () =
 
 
 
-
+*)
