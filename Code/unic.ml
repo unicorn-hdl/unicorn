@@ -22,7 +22,7 @@ let () =
   
   let lexbuf = (* ignore (print_string "5"); *) Lexing.from_channel !channel in
   let ast = (* ignore (print_string "6"); *) Parser.program Scanner.token lexbuf in  
-  let hast = Semant.harden Modfill.fill ast in
+  let hast = Harden2.harden (Modfill.fill ast) in
 
   match !action with
     Ast -> (* ignore (print_string "7"); *) Printer.printAst ast

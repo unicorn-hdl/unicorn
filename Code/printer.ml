@@ -19,33 +19,35 @@ let rec getIntExpr = function
 
 let index = function | Range (a,b) ->  "[" ^ getIntExpr a ^ ":" ^ getIntExpr b ^ "]"
 
-let bindFn (b,c) =  "" ^ "thing " 
+let bindFn (b,c) = match b with 
+   Lit(x) -> c ^ "<" ^ string_of_int x ^ "> " 
+ | _ -> c ^ "<some expr> "
 let toStringBindlist blist = listToString bindFn blist
 
 let rec getBinExpr = function
    Buslit(x) -> x
  | BoolId(x) -> x
- | BoolBinop(a,b,c) -> (getBinExpr a) ^ (opToString b) ^ (getBinExpr c)
+ | BoolBinop(a,b,c) -> (getBinExpr a) ^ " " ^ (opToString b) ^ " " ^ (getBinExpr c)
  | Unop(Not,a) -> "~" ^ getBinExpr a
  | Noexpr -> ""
  | Index(expr, ind) -> getBinExpr expr ^ index ind
  | Assign(isReg, lval, rval, initval) -> if isReg
         then getBinExpr lval ^ ":= " ^ getBinExpr rval ^ " init " ^ string_of_bool initval
         else getBinExpr lval ^ "= " ^ getBinExpr rval
- | Call(id, arglist) -> id ^ "(" ^ toStringBinExprlist arglist ^ ")"
+ | Call(id, arglist) -> id ^ "(" ^ listToString (fun x-> getBinExpr x ^ ",") arglist ^ ")"
  | Print(id, x) -> "print " ^ id ^ ":  " ^ getBinExpr x ^ ";"
  | For(var, range, lines) -> "for(" ^ var ^ "){\n" ^ toStringBinExprlist lines
- | ModExpr(Module_decl(a,b,c,d), args, parent) -> "\n*" ^ b ^ "*{\n" ^ (toStringBinExprlist d) ^ "\n}"
+ | ModExpr(modz, args, parent) -> "\n\nin: " ^ listToString (fun x-> getBinExpr x ^ ",") args ^ "\n" ^ toStringMod modz
  | _ -> ""
 
- and semiColon x = x ^ ";\n"
- and toStringBinExprlist explist = listToString semiColon (List.map getBinExpr explist)
+ and makeline x = "\t" ^ x ^ ";\n"
+ and toStringBinExprlist explist = listToString makeline (List.map getBinExpr explist)
 
-let toStringMod = function
+ and toStringMod = function
         |Module_decl (outlist, name, formals, linelist) ->
         name ^ "(" ^ (toStringBindlist formals) ^ "){\n" ^ 
         toStringBinExprlist linelist ^ 
-        toStringBindlist outlist ^ "\n}\n\n"
+        "out: " ^ toStringBindlist outlist ^ "}\n\n"
 let toStringPgm pgm = List.map toStringMod pgm
 
 (*

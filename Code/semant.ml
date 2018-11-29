@@ -2,6 +2,7 @@ open Ast
 open Sast
 module StringMap = Map.Make(String)
 
+exception InvalidAssignment of string
 
 let rec evalInt = function
  | Lit(x) -> x
@@ -11,5 +12,9 @@ let rec evalInt = function
 
 let evalBind (a,b) = (string_of_int (evalInt a), b)
 
-let harden ast = ast;;
+let assignIsValid (Assign(a, lval, c, d)) = match lval with
+      BoolId(x) -> () (*valid*)
+    | Index(BoolId(x), a) -> () (*valid*)
+    | x -> raise(InvalidAssignment("\"" ^ Printer.getBinExpr x ^ "\" may not be assigned to"))
+
 let check hast = hast;;   

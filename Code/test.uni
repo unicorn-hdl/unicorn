@@ -1,11 +1,11 @@
-main(a<1>){
-	modB();
-	x = a or modA();
-	modA();
+main(a<1+1+1>){
+	x = a or modA(00b);
+	modA(11b);
 	out:x;
 }
 
-modA(){
+modA(z<2>){
+	modB();
 	y = 0b;
 	out: y;
 }

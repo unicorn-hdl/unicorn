@@ -1,12 +1,10 @@
 open Ast
 open Printer
-open Modfill
 module StringMap = Map.Make(String)
 
 let modzIntoTuples d m = List.map (fun d-> (d,m)) d
 
 (* make a table for which modules call a given module-------*)
-
 let rec isACall ls = function
     | Buslit(x) -> ls
     | BoolId(x) -> ls
@@ -16,7 +14,7 @@ let rec isACall ls = function
     | Index(e, r) -> isACall ls e @ ls
     | Print(s, e) -> isACall ls e @ ls
     | For(s, r, e) -> getlines e @ ls 
-    | ModExpr(Module_decl(o,name,f,exprs)) -> if List.mem name ls 
+    | ModExpr(Module_decl(o,name,f,exprs), args, par) -> if List.mem name ls 
                         then ls 
                         else name :: getlines exprs @  ls
     | Noexpr -> ls 
@@ -25,7 +23,6 @@ and getlines lines = List.fold_left isACall [] lines
 
 let buildTable m (Module_decl(out, name, formal, lines)) = StringMap.add name (getlines lines) m
 let makeModTable mdlist = List.fold_left buildTable StringMap.empty mdlist
-
 (*end-------------------------------------------------------*)
 
 (* make a table for varnames -------------------------------*)
@@ -86,13 +83,13 @@ let mdlistEx = [modA;
                 modB
                ]
 ;;
-let mdlistEx = call2 mdlistEx theMap;;
+let mdlistEx = [fill mdlistEx];;
 (*------------*)
 
 (*print hardened ast----------------------------------------*)
 print_endline("~~~PRINTING HAST~~~");;
 let toString (Module_decl(a,b,c,d)) = b ^ "\n" ^ toStringBinExprlist d;;
-List.iter (fun x -> print_endline (toString x)) (harden (call2 mdlistEx theMap));;
+List.iter (fun x -> print_endline (toString x) ) (harden mdlistEx);;
 (*----------------------------------------------------------*)
 
 (* print mod table------------------------------------------*)
@@ -109,5 +106,7 @@ let valtable = makeValTables mdlistEx (makeModTable mdlistEx);;
 let printfun key v = print_string(key ^ ": ");
                      List.iter (fun (a,v)->print_string(string_of_int v)) v;
                      print_endline "";;
+(*
 StringMap.iter printfun valtable
+*)
 (*---------------*)

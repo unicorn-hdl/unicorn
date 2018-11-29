@@ -96,6 +96,9 @@ let par = Module_decl([],"",[],[]);;
 let main nameMap = if StringMap.mem "main" nameMap 
     then StringMap.find "main" nameMap
     else raise(SyntaxError "There is no main function. Please create a main");;
+    (*
+    else par;;
+*)
 let fillHelper mdlist nameMap fillMap = replaceCalls ((main nameMap), par, nameMap, fillMap);;
 let genFill mdlist nameMap fillMap = (fun (a,b,c)-> a) (fillHelper mdlist nameMap fillMap);;
 
