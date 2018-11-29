@@ -6,6 +6,7 @@ exception InvalidAssignment of string
 exception UndeclaredVar of string 
 exception TypeMismatch of string
 exception InvalidRange of string
+exception InvalidCall of string
 
 let rec evalInt = function
  | Lit(x) -> x
@@ -124,13 +125,24 @@ let rec checkValidity map expr = match expr with
 
     (*Indexing has to check whether it contains a ModExpr. If so, it acts differenty*)
     (*When ModExpr has no index, it just returns its first out*)
-    | ModExpr(Module_decl(out,_,_,exprs), _, _) -> 
-        let foldfn (_,b) expr = (checkValidity b) expr in
-        List.fold_left foldfn (0,StringMap.empty) (List.rev exprs);
-        let getLit (Lit(x),_) = x in
-        if (List.length out = 0)
-        then (0, map)
-        else (getLit (List.hd out), map)
+    | ModExpr(Module_decl(out,name,fms,exprs), args, _) -> 
+        if List.length fms = List.length args
+        then
+            let fold2fn (_,m) ((Lit(x)), fm) arg = 
+                    if (fst(checkValidity m arg) = x)
+                    then (0, StringMap.add fm x m)
+                    else raise(TypeMismatch 
+                    ("You tried assigning argument " ^ Printer.getBinExpr arg
+                    ^ " to formal " ^ fm ^ "<" ^ string_of_int x ^ "> but these are of different sizes")) in
+            let initVarTable = List.fold_left2 fold2fn (0,StringMap.empty) fms args in
+            let foldfn (_,b) expr = (checkValidity b) expr in
+            List.fold_left foldfn initVarTable (List.rev exprs);
+            let getLit (Lit(x),_) = x in
+                if (List.length out = 0)
+                then (0, map)
+                else (getLit (List.hd out), map)
+        else raise(InvalidCall ("Call to " ^ name ^ " with " ^ string_of_int (List.length args)
+        ^ " arguments but " ^ name ^ " expects " ^ string_of_int (List.length fms) ^ " arguments."))
     | a -> print_endline("missing case in checkvalidities: " ^ getBinExpr a ^ "DONE\n") ; (0,map)
 
     (*
