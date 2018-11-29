@@ -35,7 +35,6 @@ and srange = SRange of sintExpr * sintExpr
 type smd = {outlist: hardBind list;
             name: string;
             formals: hardBind list;
-            locals: hardBind list;
             linelist: sbinExpr list}
 
 type sprogram = (*bind list *  *) smd list

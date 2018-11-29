@@ -33,5 +33,14 @@ and range = Range of intExpr * intExpr
 
 and md = Module_decl of bind list * string * bind list * binExpr list
                         (*outlist   name      formals     line list *)  
+let emptyMod = Module_decl([],"",[],[])
 
 type program = (*bind list *  *) md list
+
+let bOpToStr = function
+      And  -> "and"
+    | Or   -> "or"
+    | Nand -> "nand"
+    | Nor  -> "nor"
+    | Xor  -> "xor"
+    | Xnor -> "xnor"
