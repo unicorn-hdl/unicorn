@@ -26,25 +26,23 @@ the module to the netlist expression being sorted
 (*open netlist*)
 open Sast
 
-let orig_netlist = [("a","b"); ("a", "c")]
+let orig_netlist = [("e", "b", "c", "OR"); ("j", "f", "k", "NOT")]
 in
 let visited = []
 in
 (* successor function gives list of every direct successor to a node. Argument n is the node which the function will return the successor of*)
 let rec topsort orig_netlist visited = function
-        [] -> visited
-        |n::nodes ->
-        let visited' = if List.mem n visited then visited
-        else n:: topsort orig_netlist visited
-in topsort orig_netlist visited' nodes
-in
+         [] -> visited
+         |n::nodes ->
 let rec successors n = function
          [] -> visited
          |(s, t) :: orig_netlist ->
-                         if s = n then
+                       if s = n then
                                  t::successors n orig_netlist
-                         else successors n orig_netlist;;
-
+                         else successors n orig_netlist in         
+let visited' = if List.mem n visited then visited
+         else n::topsort orig_netlist visited(successors n orig_netlist)
+in topsort orig_netlist visited' nodes;;
 
 
 
