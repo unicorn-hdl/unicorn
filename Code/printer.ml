@@ -37,7 +37,7 @@ let rec getBinExpr = function
  | Call(id, arglist) -> id ^ "(" ^ listToString (fun x-> getBinExpr x ^ ",") arglist ^ ")"
  | Print(id, x) -> "print " ^ id ^ ":  " ^ getBinExpr x ^ ";"
  | For(var, range, lines) -> "for(" ^ var ^ "){\n" ^ toStringBinExprlist lines
- | ModExpr(modz, args, parent) -> "\n\nin: " ^ listToString (fun x-> getBinExpr x ^ ",") args ^ "\n" ^ toStringMod modz
+ | ModExpr(modz, args, parent) -> "\n\tin: " ^ listToString (fun x-> getBinExpr x ^ ",") args ^ "\n\t" ^ toStringMod modz
  | _ -> ""
 
  and makeline x = "\t" ^ x ^ ";\n"
@@ -47,7 +47,7 @@ let rec getBinExpr = function
         |Module_decl (outlist, name, formals, linelist) ->
         name ^ "(" ^ (toStringBindlist formals) ^ "){\n" ^ 
         toStringBinExprlist linelist ^ 
-        "out: " ^ toStringBindlist outlist ^ "}\n\n"
+        "\tout: " ^ toStringBindlist outlist ^ "\n}\n\n"
 let toStringPgm pgm = List.map toStringMod pgm
 
 (*
