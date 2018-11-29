@@ -2,7 +2,7 @@ open Ast
 open Printer
 module StringMap = Map.Make(String)
 
-exception SyntaxError of string
+exception MissingFunction of string
 
 let modzIntoTuples d par m m2 = List.map (fun d-> (d,par, m,m2)) d
 let fstM (Module_decl(a,b,c,d)) = a
@@ -25,6 +25,8 @@ and actOnline (line, par, m, m2) = match line with
     | Print(s, e) -> Print(s, actOnline (e,par,m, m2))
     | For(s, r, e) -> For(s, r, runThroughLines e par m m2)
     | Call(name, args) -> 
+               if StringMap.mem name m
+               then
                     let modz = StringMap.find name m in
                     let stringOf = toString modz in
                     let a = fstM modz in
@@ -32,6 +34,8 @@ and actOnline (line, par, m, m2) = match line with
                     let c = thdM modz in
                     let d = fthM modz in
                     ModExpr(Module_decl(a,b,c, runThroughLines d par m m2), args, par)
+               else raise( MissingFunction ("Module " ^ name ^ 
+               " not found! Make sure module is declared."))
 (*
 Call(name, args)
 *)
@@ -95,7 +99,7 @@ let theMap = createMapz mdlistEx;;
 let par = Module_decl([],"",[],[]);;
 let main nameMap = if StringMap.mem "main" nameMap 
     then StringMap.find "main" nameMap
-    else raise(SyntaxError "There is no main function. Please create a main");;
+    else raise(MissingFunction "There is no main function. Please create a main");;
     (*
     else par;;
 *)

@@ -31,7 +31,7 @@ let unwrap (a,b) = match a with
 *)
 
 let rec checkValidity map expr = match expr with  
-      Buslit(valz) -> (String.length valz, map)
+      Buslit(valz) -> (String.length valz -1, map)
     | BoolId(name) -> 
         print_endline ("printing map (" ^ name ^ ")");
         StringMap.iter (fun k v -> print_string(k ^ ", ")) map;
@@ -48,17 +48,16 @@ let rec checkValidity map expr = match expr with
             ^ " and " ^ Printer.getBinExpr r ^ " but these are of different sizes"))
     | Unop(op, expr) -> (checkValidity map expr)
     | Assign(isReg, lval, rval, init) ->
-        print_endline("in here");
         assignIsValid lval;
         let getLit (Lit(x)) = x in
         let rtyp = fst(checkValidity map rval) in
         (match lval with
               BoolId(x) -> 
                       print_endline ("printing in assign");
-                      let x = (rtyp, StringMap.add x rtyp map)
-                      in let _ = StringMap.iter (fun k v -> print_string(k ^ ", ")) (snd x)
+                      let ans = (rtyp, StringMap.add x rtyp map)
+                      in let _ = StringMap.iter (fun k v -> print_string(k ^ "["^ string_of_int v ^ "], ")) (snd ans)
                       in let _ = print_endline ("done printing")
-                      in x 
+                      in ans 
             | Index(BoolId(x), Range(a,b)) -> 
                 print_endline("in index");
                 let b' = getLit b in
@@ -67,14 +66,14 @@ let rec checkValidity map expr = match expr with
                 then 
                     if StringMap.mem x map
                     then
-                        if StringMap.find x map < b'
-                        then (rtyp, StringMap.add x b' map)
+                        if StringMap.find x map < b'+1
+                        then (rtyp, StringMap.add x (b'+1) map)
                         else (rtyp, map)
-                    else (rtyp, StringMap.add x b' map) 
+                    else (rtyp, StringMap.add x (b'+1) map) 
                 else raise(TypeMismatch 
                 ("You tried assigning " ^ Printer.getBinExpr rval
-                ^ " of size " ^ string_of_int rtyp ^ " to " ^ x 
-                ^ "on the range " ^ string_of_int a' ^ "-" ^ 
+                ^ " of size " ^ string_of_int rtyp ^ " to " ^  x 
+                ^ " on the range " ^ string_of_int a' ^ "-" ^ 
                 string_of_int b' ^ " but these are of different sizes"))
         )
 
