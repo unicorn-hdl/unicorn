@@ -43,7 +43,8 @@ let rec successors n = function
 let visited' = if List.mem n visited then visited
          else n::topsort orig_netlist visited(successors n orig_netlist)
 in topsort orig_netlist visited' nodes;;
-
+let myPrint (x,y,z,a) = print_endline x;;
+List.iter myPrint visited
 
 
 
