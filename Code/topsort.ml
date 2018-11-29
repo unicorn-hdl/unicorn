@@ -28,8 +28,6 @@ open Sast
 
 let orig_netlist = [("e", "b", "c", "OR"); ("j", "f", "k", "NOT")]
 in
-let visited = []
-in
 (* successor function gives list of every direct successor to a node. Argument n is the node which the function will return the successor of*)
 let rec topsort orig_netlist visited = function
          [] -> visited
@@ -42,8 +40,8 @@ let rec successors n = function
                          else successors n orig_netlist in         
 let visited' = if List.mem n visited then visited
          else n::topsort orig_netlist visited(successors n orig_netlist)
-in topsort orig_netlist visited' nodes;;
-let myPrint (x,y,z,a) = print_endline x;;
+in topsort orig_netlist visited' nodes
+let myPrint (x,y,z,a) = print_endline x
 List.iter myPrint visited
 
 
