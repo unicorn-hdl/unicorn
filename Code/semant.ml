@@ -26,16 +26,6 @@ let rangeIsValid a b =
     else raise(InvalidRange ("The range (" ^ string_of_int a ^ ", " ^ 
                                 string_of_int b ^ ") is invalid!"))
 
-    (*
-let rec semantify = function
-      Buslit(x) -> (String.length x, SBuslit(x))
-    | BoolId(x) -> (0, SBoolId(x)) (*TODO: need to do this for real*)
-
-let unwrap (a,b) = match a with
-      Lit (x) -> (x,b)
-    | _ -> print_endline("something is wrong in semant"); (0,b)  
-*)
-
 let rec checkValidity map expr = match expr with  
       Buslit(valz) -> (String.length valz -1, map)
     | BoolId(name) -> 
@@ -121,6 +111,16 @@ let rec checkValidity map expr = match expr with
                     (*TODO I think this accounts for every case, but haven't checked, run tests*)
         )        
     | Print(_, exp) -> checkValidity map exp
+    | Call(_) -> print_endline ("something is way wrong. Call is showing up in checkValidity");
+                 (0,map)
+    | For(str, Range(a,b), lines) ->
+         List.map (checkValidity map) lines;
+         let getLit (Lit(x)) = x in
+         let a' = getLit a in
+         let b' = getLit b in
+         let _ = rangeIsValid a' b' in
+         (*TODO need to include actual checking that compares indices to internal vals*)
+         (0, map)
 
     (*Indexing has to check whether it contains a ModExpr. If so, it acts differenty*)
     (*When ModExpr has no index, it just returns its first out*)
