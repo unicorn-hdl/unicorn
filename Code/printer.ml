@@ -58,5 +58,6 @@ let result = listToString (fun x->x) (toStringPgm pgm) in
 print_endline (result)
 *)
 
-let printAst pgm = print_endline (listToString (fun x->x) (toStringPgm pgm))
+let printAst pgm = print_endline ("\n\n~~PRINTING AST~~\n");
+                   print_endline (listToString (fun x->x) (toStringPgm pgm))
 

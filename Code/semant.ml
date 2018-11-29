@@ -6,6 +6,7 @@ module StringMap = Map.Make(String)
 exception InvalidAssignment of string
 exception UndeclaredVar of string 
 exception TypeMismatch of string
+exception InvalidRange of string
 
 let rec evalInt = function
  | Lit(x) -> x
@@ -19,6 +20,12 @@ let assignIsValid lval = match lval with
       BoolId(x) -> () (*valid*)
     | Index(BoolId(x), a) -> () (*valid*)
     | x -> raise(InvalidAssignment("\"" ^ Printer.getBinExpr x ^ "\" may not be assigned to"))
+
+let rangeIsValid a b = 
+    if (a<=b && a>=0)
+    then ()
+    else raise(InvalidRange ("The range (" ^ string_of_int a ^ ", " ^ 
+                                string_of_int b ^ ") is invalid!"))
 
     (*
 let rec semantify = function
@@ -35,6 +42,7 @@ let rec checkValidity map expr = match expr with
     | BoolId(name) -> 
         print_endline ("printing map (" ^ name ^ ")");
         StringMap.iter (fun k v -> print_string(k ^ ", ")) map;
+        print_endline ("");
         if StringMap.mem name map
         then (StringMap.find name map, map)
         else raise (UndeclaredVar ("Variable \"" ^ name ^ "\" is not defined!"))
@@ -76,6 +84,22 @@ let rec checkValidity map expr = match expr with
                 ^ " on the range " ^ string_of_int a' ^ "-" ^ 
                 string_of_int b' ^ " but these are of different sizes"))
         )
+    | Index(expr, Range(a,b)) -> 
+        let getLit (Lit(x)) = x in
+        let a' = getLit a in
+        let b' = getLit b in
+        let _ = rangeIsValid a' b' in
+        (match expr with
+            ModExpr(modz, args, par) -> (0, map) (*TODO this*)
+            | e -> 
+                let size = fst(checkValidity map e) in
+                    if (size<= b')
+                    then (b'-a'+1, map)
+                    else raise(TypeMismatch
+                    ("You tried accessing a number too big"))
+                    (*TODO write a better message*)
+                    (*TODO I think this accounts for every case, but haven't checked, run tests*)
+        )        
 
     (*Indexing has to check whether it contains a ModExpr. If so, it acts differenty*)
     (*When ModExpr has no index, it just returns its first out*)
