@@ -1,5 +1,17 @@
 main(a<1>){
-	bb[1222][3];
+	modB();
+	x = a or modA();
+	modA();
 	out:x;
+}
+
+modA(){
+	y = 0b;
+	out: y;
+}
+
+modB(){
+	make d;
+	out:;
 }
 🦄

@@ -26,7 +26,7 @@ and  binExpr =
     | Print of string * binExpr
     | Call of string * binExpr list
     | For of string * range * binExpr list
-    | ModExpr of md 
+    | ModExpr of md * binExpr list * md 
     | Noexpr
 
 and range = Range of intExpr * intExpr
@@ -35,6 +35,3 @@ and md = Module_decl of bind list * string * bind list * binExpr list
                         (*outlist   name      formals     line list *)  
 
 type program = (*bind list *  *) md list
-
-let string_of_program = function
-| _ -> "this"

@@ -35,7 +35,7 @@ let rec getBinExpr = function
  | Call(id, arglist) -> id ^ "(" ^ toStringBinExprlist arglist ^ ")"
  | Print(id, x) -> "print " ^ id ^ ":  " ^ getBinExpr x ^ ";"
  | For(var, range, lines) -> "for(" ^ var ^ "){\n" ^ toStringBinExprlist lines
- | ModExpr(Module_decl(a,b,c,d)) -> "*" ^ b
+ | ModExpr(Module_decl(a,b,c,d), args, parent) -> "\n*" ^ b ^ "*{\n" ^ (toStringBinExprlist d) ^ "\n}"
  | _ -> ""
 
  and semiColon x = x ^ ";\n"
@@ -55,3 +55,6 @@ let pgm = Parser.program Scanner.token lexbuf in
 let result = listToString (fun x->x) (toStringPgm pgm) in
 print_endline (result)
 *)
+
+let printAst pgm = print_endline (listToString (fun x->x) (toStringPgm pgm))
+

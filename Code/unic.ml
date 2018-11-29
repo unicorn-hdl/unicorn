@@ -3,13 +3,14 @@ module L = Llvm
    check the resulting AST and generate an SAST from it, generate LLVM IR,
    and dump the module *)
 
-type action = Ast | Sast | LLVM_IR | Compile
+type action = Ast | Sast | Mast | LLVM_IR | Compile
 
 let () =
   let action = (* ignore (print_string "1") ;*) ref Compile in
   let set_action a () = action := a in
   let speclist = (* ignore (print_string "2"); *) [
     ("-a", Arg.Unit (set_action Ast), "Print the AST");
+    ("-m", Arg.Unit (set_action Mast), "Print the modfilled Ast");
     ("-s", Arg.Unit (set_action Sast), "Print the SAST");
     ("-l", Arg.Unit (set_action LLVM_IR), "Print the generated LLVM IR");
     ("-c", Arg.Unit (set_action Compile),
@@ -21,14 +22,20 @@ let () =
   
   let lexbuf = (* ignore (print_string "5"); *) Lexing.from_channel !channel in
   let ast = (* ignore (print_string "6"); *) Parser.program Scanner.token lexbuf in  
+  let hast = Semant.harden Modfill.fill ast in
 
   match !action with
-    Ast -> (* ignore (print_string "7"); *) print_string (Ast.string_of_program ast)
-  | _ -> (* ignore (print_string "8"); *) let ssast = Semant.check ast in
+    Ast -> (* ignore (print_string "7"); *) Printer.printAst ast
+  | _ -> (* ignore (print_string "8"); *) let ssast = Semant.check hast in
       match !action with
         Ast     -> (* ignore (print_string "9"); *) ()
+      | Mast    -> Printer.printAst [hast]
       | Sast    ->  (* ignore (print_string "10 "); *) print_string (Sast.string_of_sprogram ssast)
+      | LLVM_IR -> ()
+      | Compile -> ()
+      (*
       | LLVM_IR -> (* ignore (print_string "11 "); *) print_string (L.string_of_llmodule (Codegen.translate ssast))
       | Compile -> (* ignore (print_string "12 "); *) let m = Codegen.translate ssast in
 	  Llvm_analysis.assert_valid_module m;
 	  print_string (L.string_of_llmodule m)
+*)

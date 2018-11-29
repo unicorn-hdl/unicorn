@@ -5,7 +5,7 @@ module StringMap = Map.Make(String)
 
 let modzIntoTuples d m = List.map (fun d-> (d,m)) d
 
-(* make a table for which modules call a given module*)
+(* make a table for which modules call a given module-------*)
 
 let rec isACall ls = function
     | Buslit(x) -> ls
@@ -21,17 +21,29 @@ let rec isACall ls = function
                         else name :: getlines exprs @  ls
     | Noexpr -> ls 
     | _ -> ls
-(*
-and isACallOnTuples (exprs, ls) = isACall ls exprs
-and runThroughLines ls exprs = List.fold_left isACallOnTuples (modzIntoTuples exprs ls)
-this is similar to get lines, but more complicated*)
 and getlines lines = List.fold_left isACall [] lines
 
 let buildTable m (Module_decl(out, name, formal, lines)) = StringMap.add name (getlines lines) m
-let table mdlist = List.fold_left buildTable StringMap.empty mdlist
+let makeModTable mdlist = List.fold_left buildTable StringMap.empty mdlist
 
-(*--------------------------------------------------*)
+(*end-------------------------------------------------------*)
 
+(* make a table for varnames -------------------------------*)
+
+let inline lines = StringMap.empty
+let lookup args = StringMap.empty
+
+(*have to make actual functions here*)
+let conflict1 key val1 val2 = Some val1 
+let conflict2 key val1 val2 = Some val1 
+(*----------------------------------*)
+
+let valsInMod (Module_decl(outs, name, formals, exprs), modTable) = 
+        (name, (StringMap.union conflict2 (StringMap.union conflict1 (lookup outs) (lookup formals)) (inline exprs)))
+let makeValTables mdlist modTable = List.map valsInMod (modzIntoTuples mdlist modTable) 
+(*end-------------------------------------------------------*)
+
+(*Harden ---------------------------------------------------*)
 let extract (Lit(x)) = x
 
 let rec eval = function
@@ -50,24 +62,52 @@ let hardenarg (expr, name) = (eval expr, name)
 
 let hardenmd (Module_decl(outs, name, formals, linelist)) =
 	Module_decl(List.map hardenarg outs, name, List.map hardenarg formals, List.map hardenline linelist)
+(*end-------------------------------------------------------*)
 
+
+(*THE function called---------------------------------------*)
 let harden ast = 
-	List.map hardenmd ast
+    let modTable = makeModTable ast in
+    let valTable = makeValTables ast modTable in
+    let hast = List.map hardenmd ast in 
+    hast
+(*end-------------------------------------------------------*)
 
-(*This is just for printing ---------------------------*)
-let callx x = ( Call(x, []) )
-let modA = Module_decl([], "modA", [], [])
+(*This is just for printing --------------------------------*)
+
+(*build an ast*)
+let callx x = ( Call(x, []) );;
+let modA = Module_decl([], "modA", [], []);;
 let bExprs = 
         [Index(Buslit("00100"), Range(IntBinop((Lit(4)), Sub, Lit(1)), Lit(3)));
-        Print("printname", callx "modA")]
-let modB = Module_decl([], "modB", [], bExprs)
+        Print("printname", callx "modA")];;
+let modB = Module_decl([], "modB", [], bExprs);;
 let mdlistEx = [modA;
                 modB
                ]
+;;
+let mdlistEx = call2 mdlistEx theMap;;
+(*------------*)
 
+(*print hardened ast----------------------------------------*)
+print_endline("~~~PRINTING HAST~~~");;
 let toString (Module_decl(a,b,c,d)) = b ^ "\n" ^ toStringBinExprlist d;;
-List.iter (fun x -> print_endline (toString x)) (harden mdlistEx);;
+List.iter (fun x -> print_endline (toString x)) (harden (call2 mdlistEx theMap));;
+(*----------------------------------------------------------*)
+
+(* print mod table------------------------------------------*)
+print_endline("~~~PRINTING MOD REF TABLE~~~");;
 let printfun key v = print_string(key ^ ": ");
-                     List.iter print_string v; print_endline "";;
-print_endline("table values");;
-StringMap.iter printfun (table (call2 mdlistEx theMap))
+                     List.iter print_string v;
+                     print_endline "";;
+StringMap.iter printfun (makeModTable mdlistEx);;
+(*end-------------------------------------------------------*)
+
+(*print val table*)
+print_endline ("\n~~~PRINTING VAL TABLE~~~");;
+let valtable = makeValTables mdlistEx (makeModTable mdlistEx);; 
+let printfun key v = print_string(key ^ ": ");
+                     List.iter (fun (a,v)->print_string(string_of_int v)) v;
+                     print_endline "";;
+StringMap.iter printfun valtable
+(*---------------*)

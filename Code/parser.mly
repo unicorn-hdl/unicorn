@@ -105,7 +105,7 @@ binExpr:
 
 assignment:
  | binExpr REGASSIGN binExpr boolval{ Assign(true, $1, $3, $4) }
- | binExpr ASSIGN binExpr { Assign(false, $1, $3, false) } 
+ | binExpr  ASSIGN binExpr { Assign(false, $1, $3, false) } 
 
 boolval:
  | ONE {true}
