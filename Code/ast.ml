@@ -38,9 +38,9 @@ let emptyMod = Module_decl([],"",[],[])
 type program = (*bind list *  *) md list
 
 let bOpToStr = function
-      And  -> "and"
-    | Or   -> "or"
-    | Nand -> "nand"
-    | Nor  -> "nor"
-    | Xor  -> "xor"
-    | Xnor -> "xnor"
+      And  -> "And"
+    | Or   -> "Or"
+    | Nand -> "Nand"
+    | Nor  -> "Nor"
+    | Xor  -> "Xor"
+    | Xnor -> "Xnor"
