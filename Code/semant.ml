@@ -1,5 +1,4 @@
 open Ast
-open Sast
 open Printer
 module StringMap = Map.Make(String)
 
@@ -10,15 +9,15 @@ exception InvalidRange of string
 
 let rec evalInt = function
  | Lit(x) -> x
- | IntId(x) -> 1 (*have to have evalInt x here, but really evalInt x depends on a values table (and will be hard to implement)*)
+ | IntId(_) -> 1 (*have to have evalInt x here, but really evalInt x depends on a values table (and will be hard to implement)*)
  | IntBinop(a,Add,b) -> evalInt a + evalInt b
  | IntBinop(a,Sub,b) -> evalInt a - evalInt b
 
 let evalBind (a,b) = (string_of_int (evalInt a), b)
 
 let assignIsValid lval = match lval with
-      BoolId(x) -> () (*valid*)
-    | Index(BoolId(x), a) -> () (*valid*)
+      BoolId(_) -> () (*valid*)
+    | Index(BoolId(_), _) -> () (*valid*)
     | x -> raise(InvalidAssignment("\"" ^ Printer.getBinExpr x ^ "\" may not be assigned to"))
 
 let rangeIsValid a b = 
@@ -41,7 +40,7 @@ let rec checkValidity map expr = match expr with
       Buslit(valz) -> (String.length valz -1, map)
     | BoolId(name) -> 
         print_endline ("printing map (" ^ name ^ ")");
-        StringMap.iter (fun k v -> print_string(k ^ ", ")) map;
+        StringMap.iter (fun k _ -> print_string(k ^ ", ")) map;
         print_endline ("");
         if StringMap.mem name map
         then (StringMap.find name map, map)
@@ -54,8 +53,9 @@ let rec checkValidity map expr = match expr with
         else raise(TypeMismatch 
             ("You tried performing " ^ bOpToStr op ^ " on " ^ Printer.getBinExpr l
             ^ " and " ^ Printer.getBinExpr r ^ " but these are of different sizes"))
-    | Unop(op, expr) -> (checkValidity map expr)
-    | Assign(isReg, lval, rval, init) ->
+    | Unop(_, expr) -> (checkValidity map expr)
+    | Assign(_, lval, rval, init) ->
+    (*TODO init should become a string so that we can check this stuff correctly*)
         assignIsValid lval;
         let getLit (Lit(x)) = x in
         let rtyp = fst(checkValidity map rval) in
@@ -85,13 +85,33 @@ let rec checkValidity map expr = match expr with
                 string_of_int b' ^ " but these are of different sizes"))
         )
     | Index(expr, Range(a,b)) -> 
-        let getLit (Lit(x)) = x in
-        let a' = getLit a in
-        let b' = getLit b in
-        let _ = rangeIsValid a' b' in
         (match expr with
-            ModExpr(modz, args, par) -> (0, map) (*TODO this*)
+            (*TODO note that harden will be weird and we actually need to account for this case*)
+(*I made this whole mess and then realized that this whole thing can (and should be taken care of in harden. Just check for out names in harden and return the appropriate ranges
+
+            ModExpr(Module_decl(outs,b,c,d), args, par) -> 
+                let isLit = function
+                            Lit(x) -> true
+                            _ -> false
+                in
+                if (isLit a && isLit b)
+                then 
+                    let getLit (Lit(x)) = x in
+                    let a' = getLit a in
+                    let b' = getLit b in
+                    let _ = rangeIsValid a' b' in
+                    if (a' = b')
+                    then 
+                    else raise(InvalidRange "You are trying to access mutiple 
+                     outputs of module " ^ b ^ "in the same call.")
+                else
+*)
+
             | e -> 
+                let getLit (Lit(x)) = x in
+                let a' = getLit a in
+                let b' = getLit b in
+                let _ = rangeIsValid a' b' in
                 let size = fst(checkValidity map e) in
                     if (size<= b')
                     then (b'-a'+1, map)
@@ -100,13 +120,14 @@ let rec checkValidity map expr = match expr with
                     (*TODO write a better message*)
                     (*TODO I think this accounts for every case, but haven't checked, run tests*)
         )        
+    | Print(_, exp) -> checkValidity map exp
 
     (*Indexing has to check whether it contains a ModExpr. If so, it acts differenty*)
     (*When ModExpr has no index, it just returns its first out*)
-    | ModExpr(Module_decl(out,nm,fm,exprs), args, par) -> 
-        let foldfn (a,b) expr = (checkValidity b) expr in
+    | ModExpr(Module_decl(out,_,_,exprs), _, _) -> 
+        let foldfn (_,b) expr = (checkValidity b) expr in
         List.fold_left foldfn (0,StringMap.empty) (List.rev exprs);
-        let getLit (Lit(x),str) = x in
+        let getLit (Lit(x),_) = x in
         if (List.length out = 0)
         then (0, map)
         else (getLit (List.hd out), map)
