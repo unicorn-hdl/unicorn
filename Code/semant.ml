@@ -8,6 +8,12 @@ exception TypeMismatch of string
 exception InvalidRange of string
 exception InvalidCall of string
 
+let printMap map name=
+        print_endline ("\nprinting map (" ^ name ^ ")");
+        StringMap.iter (fun k v -> print_string(k ^"<"^string_of_int v^">, ")) map;
+        print_endline ("\ndone printing map");;
+
+
 let rec evalInt = function
  | Lit(x) -> x
  | IntId(_) -> 1 (*have to have evalInt x here, but really evalInt x depends on a values table (and will be hard to implement)*)
@@ -30,9 +36,6 @@ let rangeIsValid a b =
 let rec checkValidity map expr = match expr with  
       Buslit(valz) -> (String.length valz -1, map)
     | BoolId(name) -> 
-        print_endline ("printing map (" ^ name ^ ")");
-        StringMap.iter (fun k _ -> print_string(k ^ ", ")) map;
-        print_endline ("");
         if StringMap.mem name map
         then (StringMap.find name map, map)
         else raise (UndeclaredVar ("Variable \"" ^ name ^ "\" is not defined!"))
@@ -48,17 +51,14 @@ let rec checkValidity map expr = match expr with
     | Assign(_, lval, rval, init) ->
     (*TODO init should become a string so that we can check this stuff correctly*)
         assignIsValid lval;
+        let _ = print_endline ("assigning to " ^ Printer.getBinExpr lval) in
         let getLit (Lit(x)) = x in
         let rtyp = fst(checkValidity map rval) in
         (match lval with
               BoolId(x) -> 
-                      print_endline ("printing in assign");
                       let ans = (rtyp, StringMap.add x rtyp map)
-                      in let _ = StringMap.iter (fun k v -> print_string(k ^ "["^ string_of_int v ^ "], ")) (snd ans)
-                      in let _ = print_endline ("done printing")
                       in ans 
             | Index(BoolId(x), Range(a,b)) -> 
-                print_endline("in index");
                 let b' = getLit b in
                 let a' = getLit a in
                 if (rtyp = (b'-a'+1))
@@ -128,13 +128,19 @@ let rec checkValidity map expr = match expr with
     | ModExpr(Module_decl(out,name,fms,exprs), args, _) -> 
         if List.length fms = List.length args
         then
-            let fold2fn (_,m) ((Lit(x)), fm) arg = 
-                    if (fst(checkValidity m arg) = x)
-                    then (0, StringMap.add fm x m)
+            let _ = print_endline ("checking mod " ^ name) in
+            let _ = print_endline ("args: " ^ Printer.toStringBinExprlist args) in
+            let oldMap = map in 
+            let map2fn map ((Lit(x)),fm) arg =
+                    if (fst(checkValidity map arg) = x)
+                    then (0, map)
                     else raise(TypeMismatch 
                     ("You tried assigning argument " ^ Printer.getBinExpr arg
                     ^ " to formal " ^ fm ^ "<" ^ string_of_int x ^ "> but these are of different sizes")) in
+            let checkArgs = List.map2 (map2fn map) fms args in
+            let fold2fn (_,m) ((Lit(x)), fm) arg = (0, StringMap.add fm x m) in
             let initVarTable = List.fold_left2 fold2fn (0,StringMap.empty) fms args in
+            let _ = printMap (snd initVarTable) (name^"#init#") in
             let foldfn (_,b) expr = (checkValidity b) expr in
             List.fold_left foldfn initVarTable (List.rev exprs);
             let getLit (Lit(x),_) = x in

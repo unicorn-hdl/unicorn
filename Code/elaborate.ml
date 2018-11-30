@@ -37,6 +37,7 @@ let rec collapseFn maps exp = match exp with
 *)
     | ModExpr(Module_decl(out,nm,fm,exps), args, par) -> 
         let fold2Fn map (sz,nm) arg = StringMap.add nm arg map in
+        let oldMap = maps in
         let argMap = List.fold_left2 fold2Fn StringMap.empty fm args in
         let maps = {name=nm; argMap=argMap; countMap=maps.countMap; net=maps.net} in
         let maps = 
@@ -60,7 +61,8 @@ let rec collapseFn maps exp = match exp with
                 if (List.length out >0)
                 then collapseFn maps (BoolId(snd (List.hd out)))
                 else (Noexpr, maps) in
-        getOut
+        let maps = {name=oldMap.name; argMap=oldMap.argMap; countMap=maps.countMap; net=maps.net} in
+        (fst getOut, maps)
     (*
     | Noexpr -> Noexpr
     *)
