@@ -132,23 +132,47 @@ let rec checkValidity map expr = match expr with
             let _ = print_endline ("args: " ^ Printer.toStringBinExprlist args) in
             let oldMap = map in 
             let map2fn map ((Lit(x)),fm) arg =
-                    if (fst(checkValidity map arg) = x)
+                    let fmVal = checkValidity map arg in
+                    if (fst fmVal = x)
                     then (0, map)
                     else raise(TypeMismatch 
-                    ("You tried assigning argument " ^ Printer.getBinExpr arg
+                    ("You tried assigning argument " ^ Printer.getBinExpr arg^ " of size "^ string_of_int (fst fmVal)
                     ^ " to formal " ^ fm ^ "<" ^ string_of_int x ^ "> but these are of different sizes")) in
             let checkArgs = List.map2 (map2fn map) fms args in
             let fold2fn (_,m) ((Lit(x)), fm) arg = (0, StringMap.add fm x m) in
             let initVarTable = List.fold_left2 fold2fn (0,StringMap.empty) fms args in
             let _ = printMap (snd initVarTable) (name^"#init#") in
             let foldfn (_,b) expr = (checkValidity b) expr in
-            List.fold_left foldfn initVarTable (List.rev exprs);
+            let result = List.fold_left foldfn initVarTable (List.rev exprs) in
+            let finalMap = snd result in 
             let getLit (Lit(x),_) = x in
-                if (List.length out = 0)
-                then (0, map)
-                else (getLit (List.hd out), map)
+            
+            (*TODO this actually needs to be declared recursively, for every binExpr but I don't feel like it rn*)
+            let listGen strmp expr = match expr with
+                 Assign(_, lval, rval, _) ->(match lval with
+                      BoolId(x) -> StringMap.add x (fst(checkValidity finalMap rval)) strmp
+                    | Index(BoolId(x),_) -> StringMap.add x (fst(checkValidity finalMap rval)) strmp
+                    | a -> strmp)
+               | a -> strmp in
+            let outVarMap = List.fold_left listGen StringMap.empty exprs in
+            let _ = outVarMap in
+            let checkOut outVarMap out = 
+                    if StringMap.mem (snd out) outVarMap
+                        then 
+                            let sz = StringMap.find (snd out) outVarMap in
+                            if (sz = getLit out)
+                            then ()
+                            else raise(TypeMismatch ("The output call "^ snd out ^"<"^ string_of_int (getLit out)^ ">"^
+                            "does not match assignment of size "^ string_of_int sz)) 
+                        else raise(UndeclaredVar ("The output call "^ snd out^ " is never defined")) in
+            let _ = List.iter (checkOut (*cart @Amazon*) outVarMap) out in
+            if (List.length out = 0)
+            then (0, map)
+            else (getLit (List.hd out), map)
+
         else raise(InvalidCall ("Call to " ^ name ^ " with " ^ string_of_int (List.length args)
         ^ " arguments but " ^ name ^ " expects " ^ string_of_int (List.length fms) ^ " arguments."))
+            
     | a -> print_endline("missing case in checkvalidities: " ^ getBinExpr a ^ "DONE\n") ; (0,map)
 
     (*
