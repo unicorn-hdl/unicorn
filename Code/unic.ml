@@ -3,15 +3,16 @@ module L = Llvm
    check the resulting AST and generate an SAST from it, generate LLVM IR,
    and dump the module *)
 
-type action = Ast | Sast | Mast | LLVM_IR | Compile
+type action = Ast | Sast | Mast | Netlist | LLVM_IR | Compile
 
 let () =
   let action = (* ignore (print_string "1") ;*) ref Compile in
   let set_action a () = action := a in
   let speclist = (* ignore (print_string "2"); *) [
     ("-a", Arg.Unit (set_action Ast), "Print the AST");
-    ("-m", Arg.Unit (set_action Mast), "Print the modfilled Ast");
+    ("-m", Arg.Unit (set_action Mast), "Print the modfilled AST");
     ("-s", Arg.Unit (set_action Sast), "Print the SAST");
+    ("-n", Arg.Unit (set_action Netlist), "Print Netlist");
     ("-l", Arg.Unit (set_action LLVM_IR), "Print the generated LLVM IR");
     ("-c", Arg.Unit (set_action Compile),
       "Check and print the generated LLVM IR (default)");
@@ -29,7 +30,10 @@ let () =
   | _ -> (* ignore (print_string "8"); *) let ssast = Semant.check hast in
       match !action with
         Ast     -> (* ignore (print_string "9"); *) ()
-      | Mast    -> Printer.printAst [hast]
+      | Mast    -> Printer.printMast hast
+      | Netlist -> 
+            let netlist = Elaborate.collapse hast in
+            Printer.printNet netlist
       | Sast    ->  (* ignore (print_string "10 "); *) print_string (Sast.string_of_sprogram ssast)
       | LLVM_IR -> ()
       | Compile -> ()

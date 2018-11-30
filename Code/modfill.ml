@@ -34,7 +34,7 @@ and actOnline (line, par, m, m2) = match line with
                     let b = sndM modz in
                     let c = thdM modz in
                     let d = fthM modz in
-                    ModExpr(Module_decl(a,b,c, runThroughLines d par m m2), args, par)
+                    ModExpr(Module_decl(a,b,c, (runThroughLines d par m m2)), args, par)
                else raise( MissingFunction ("Module " ^ name ^ 
                " not found! Make sure module is declared."))
 (*
@@ -45,6 +45,7 @@ Call(name, args)
             else ModExpr(Module_decl(a,b,c, runThroughLines d par m m2), args, parent)
             (*TODO actually make updates to m2*)
             (*TODO it seems like parent is never actually used. If unecessary, trash it*)
+            (*It also seems like ModExpr should never be called. Check that it isn't*)
     | Noexpr -> Noexpr
     | a -> print_endline("ERROR: Case not found!"); a
 
