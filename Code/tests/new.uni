@@ -1,0 +1,28 @@
+main(){
+	x = 00b;
+	y = 11b or x;
+	l = modA(x, y);
+	m = modA(l, l);
+	l or m;
+	;
+	out:;
+}
+
+modA(a<2>,b<2>){
+	d = 10b;
+	l = d and a;
+	a = 11b;
+	c = a or b;
+	out:c<2>;
+}
+🦄
+/**
+in:
+main_0_x = 00b;
+main_0_y = 11b;
+modA_0_d = 10b;
+modA_0_l = modA_0_d and main_0_x;
+modA_0_a = 11b;
+modA_0_c = modA_0_a and main_0_y;
+main_0_l = c;
+**/
