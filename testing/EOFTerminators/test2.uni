@@ -1,0 +1,8 @@
+main(){
+	bustwo = 1111b; 
+	print b: bustwo;
+	out:;
+}
+🦄
+
+//program should compile 
