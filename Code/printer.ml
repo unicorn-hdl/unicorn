@@ -66,3 +66,8 @@ let printMast pgm = print_endline ("\n\n~~PRINTING MAST~~\n");
 
 let printNet pgm = print_endline ("\n\n~~PRINTING NAST~~\n");
                     List.iter (fun x->print_endline ("{"^getBinExpr x^"}")) pgm
+
+let printNet2 pgm = print_endline ("\n\n~~PRINTING NAST2~~\n\n");
+                    List.iter (fun (a,b,c,d)->print_endline ("{"^ 
+                    a^ ", "^ b^ ", "^ c^ ", "^ d^"}")) 
+                    (fst pgm)

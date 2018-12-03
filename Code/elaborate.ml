@@ -67,6 +67,36 @@ let rec collapseFn maps exp = match exp with
     | Noexpr -> Noexpr
     *)
     | _ -> print_endline ("we missed a case in elaborate"); (Noexpr, maps)
+
+
 let collapse ast = 
         let strtMap = {name=""; argMap=StringMap.empty; countMap=StringMap.empty; net=[]} in
-        (snd (collapseFn strtMap (ModExpr(ast,[],emptyMod)))).net
+        (snd (collapseFn strtMap (ModExpr(ast,[],emptyMod)))).net;;
+
+
+(*-------------------collapse2-------------------*)
+let globs = [];;
+(*TODO generate these global vars in register step*)
+
+let getStrOrLit = function
+      Buslit(x) -> x
+    | BoolId(x) -> x
+
+let collapseFn2 = function
+    Assign(_,l,r,_) -> (match r with
+          BoolBinop(l2,op,r2) ->
+            (getStrOrLit(l), opToStr (B(op)), getStrOrLit(l2), getStrOrLit(r2))
+        | Unop(op, exp) ->
+            (getStrOrLit(l), opToStr (U(op)), getStrOrLit(exp), getStrOrLit(exp))
+        | Buslit(x) ->
+            (getStrOrLit(l), "Ident", x, x)
+        | BoolId(x) -> 
+            (getStrOrLit(l), "Ident", x, x)
+    )
+  | Print(nm, r) -> (nm, "Print", getStrOrLit(r), getStrOrLit(r))
+  | a -> print_endline ("something else!!"); 
+         print_endline (Printer.getBinExpr a);
+         ("","","","")
+
+let collapse2 prenet = 
+    (List.map collapseFn2 prenet, List.map collapseFn2 globs)

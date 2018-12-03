@@ -45,7 +45,7 @@ let rec checkValidity map expr = match expr with
         if (ltyp = rtyp)
         then (ltyp)
         else raise(TypeMismatch 
-            ("You tried performing " ^ bOpToStr op ^ " on " ^ Printer.getBinExpr l
+            ("You tried performing " ^ opToStr (B(op)) ^ " on " ^ Printer.getBinExpr l
             ^ " and " ^ Printer.getBinExpr r ^ " but these are of different sizes"))
     | Unop(_, expr) -> (checkValidity map expr)
     | Assign(_, lval, rval, init) ->

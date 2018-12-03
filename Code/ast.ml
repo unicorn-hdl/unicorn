@@ -1,8 +1,11 @@
 
 type intOp = Add | Sub
 type boolOp = And | Or | Nand | Nor | Xor | Xnor
-type unOp = Not
+type unOp = Not | Ident
 type boolval = One of bool | Zero of bool
+
+type genOp = B of boolOp 
+           | U of unOp
 
 type typ = Int | Bus of intExpr
 
@@ -37,10 +40,14 @@ let emptyMod = Module_decl([],"",[],[])
 
 type program = (*bind list *  *) md list
 
-let bOpToStr = function
-      And  -> "And"
-    | Or   -> "Or"
-    | Nand -> "Nand"
-    | Nor  -> "Nor"
-    | Xor  -> "Xor"
-    | Xnor -> "Xnor"
+let opToStr = function
+      B(x) -> (match x with
+            And  -> "And"
+          | Or   -> "Or"
+          | Nand -> "Nand"
+          | Nor  -> "Nor"
+          | Xor  -> "Xor"
+          | Xnor -> "Xnor" )
+    | U(x) -> (match x with
+          | Not -> "Not" 
+          | Ident -> "Ident")

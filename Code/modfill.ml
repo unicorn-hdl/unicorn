@@ -14,6 +14,7 @@ let toString (Module_decl(a,b,c,d)) = b ^ "\n" ^ toStringBinExprlist d
 (*replace calls in a mod with modules*)
 let rec runThroughLines d par m m2 = List.map actOnline (modzIntoTuples d par m m2)
 (*TODO change this to fold left, so as to pass on changes to m2*)
+        (*Perhaps not necessary? Seems like it's working ok as is. Run tests.*)
 
 (*replace calls in a line with the module*)
 and actOnline (line, par, m, m2) = match line with 
@@ -40,7 +41,9 @@ and actOnline (line, par, m, m2) = match line with
 (*
 Call(name, args)
 *)
-    | ModExpr(Module_decl(a,b,c,d), args, parent) -> if StringMap.find b m2
+    | ModExpr(Module_decl(a,b,c,d), args, parent) -> 
+            let _ = print_endline ("Something's wrong! modExpr called in modfill") in
+            if StringMap.find b m2
             then ModExpr(Module_decl(a,b,c,d), args, parent)
             else ModExpr(Module_decl(a,b,c, runThroughLines d par m m2), args, parent)
             (*TODO actually make updates to m2*)
