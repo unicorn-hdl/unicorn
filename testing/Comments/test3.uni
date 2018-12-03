@@ -1,0 +1,16 @@
+main() {
+	//print a : 110b;
+
+	/** 
+	print b : 101b;
+	hello there how are you today
+	hope at this point we're almost done with this project :) 
+	**/
+	
+	print c : 01011b;
+	out:;
+🦄
+}
+
+//program should print out 01011
+
