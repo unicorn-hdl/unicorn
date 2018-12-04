@@ -22,7 +22,9 @@ let rec collapseFn maps exp = match exp with
             let l2 = collapseFn maps lval in
             let r2 = collapseFn (snd l2) rval in
             (BoolBinop(fst l2, op, fst r2), snd r2)
-    | Unop(op, exp) -> (Unop(op, exp), maps)
+    | Unop(op, exp) -> 
+            let e = collapseFn maps exp in
+            (Unop(op, fst e), snd e)
 (*Remember not to collapse on lval of assign. If lval collides with an arg, remove arg from list*)
     | Assign(isReg, lval, rval, init) -> 
             let r2 = collapseFn maps  rval in
