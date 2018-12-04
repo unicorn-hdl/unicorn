@@ -38,7 +38,7 @@ let () =
       | Netlist2 -> 
             let netlist2 = Elaborate.collapse2 (Elaborate.collapse hast) in
             Printer.printNet2 netlist2
-      | Sast    ->  (* ignore (print_string "10 "); *) print_string (Sast.string_of_sprogram ssast)
+      | Sast    ->  (* ignore (print_string "10 "); *) print_string ("heyo")
       | LLVM_IR -> ()
       | Compile -> ()
       (*
