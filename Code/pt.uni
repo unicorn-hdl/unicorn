@@ -1,0 +1,9 @@
+main(){
+	x = not 1b;
+	w = not x;
+	z = x;
+	y = 1b and z;
+	print hereItIs: y;
+	out:;
+}
+🦄
