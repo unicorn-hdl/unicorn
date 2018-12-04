@@ -5,7 +5,7 @@ ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 unic.native
 
 touch print_test.ll
 
-./unic.native print_test.uni > print_test.ll
+./unic.native tests/new.uni > print_test.ll
 
 /usr/local/Cellar/llvm/7.0.0/bin/llc -relocation-model=pic print_test.ll
 

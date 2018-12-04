@@ -1,4 +1,3 @@
-
 type intOp = Add | Sub
 type boolOp = And | Or | Nand | Nor | Xor | Xnor
 type unOp = Not | Ident

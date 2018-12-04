@@ -35,6 +35,9 @@ let rec collapseFn maps exp = match exp with
                         Call(str, exp) 
     | For(str, rng, exp) -> For(str, rng, exp)
 *)
+    | Print(str, exp) -> 
+        let p = collapseFn maps exp in
+        (Print(str, fst p), snd p)
     | ModExpr(Module_decl(out,nm,fm,exps), args, par) -> 
         let fold2Fn map (sz,nm) arg = StringMap.add nm arg map in
         let oldMap = maps in
@@ -99,4 +102,4 @@ let collapseFn2 = function
          ("","","","")
 
 let collapse2 prenet = 
-    (List.map collapseFn2 prenet, List.map collapseFn2 globs)
+    (List.map collapseFn2 prenet, globs)

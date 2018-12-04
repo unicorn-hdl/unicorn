@@ -1,4 +1,5 @@
 module L = Llvm
+module C = Codegen
 (* Top-level of the MicroC compiler: scan & parse the input,
    check the resulting AST and generate an SAST from it, generate LLVM IR,
    and dump the module *)
@@ -25,6 +26,7 @@ let () =
   let lexbuf = (* ignore (print_string "5"); *) Lexing.from_channel !channel in
   let ast = (* ignore (print_string "6"); *) Parser.program Scanner.token lexbuf in  
   let hast = Harden2.harden (Modfill.fill ast) in
+  let netlist2 = Elaborate.collapse2 (Elaborate.collapse hast) in
 
   match !action with
     Ast -> (* ignore (print_string "7"); *) Printer.printAst ast
@@ -38,12 +40,8 @@ let () =
       | Netlist2 -> 
             let netlist2 = Elaborate.collapse2 (Elaborate.collapse hast) in
             Printer.printNet2 netlist2
-      | Sast    ->  (* ignore (print_string "10 "); *) print_string ("heyo")
-      | LLVM_IR -> ()
-      | Compile -> ()
-      (*
-      | LLVM_IR -> (* ignore (print_string "11 "); *) print_string (L.string_of_llmodule (Codegen.translate ssast))
-      | Compile -> (* ignore (print_string "12 "); *) let m = Codegen.translate ssast in
+      | Sast    ->  (* ignore (print_string "10 "); *) print_string ("")
+      | LLVM_IR -> (* ignore (print_string "11 "); *) print_string (L.string_of_llmodule (C.translate netlist2))
+      | Compile -> (* ignore (print_string "12 "); *) let m = C.translate netlist2 in
 	  Llvm_analysis.assert_valid_module m;
 	  print_string (L.string_of_llmodule m)
-*)

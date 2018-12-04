@@ -99,13 +99,13 @@ binExpr:
  /*note these other important things are exprs too: */
  | assignment {$1}
  | call {$1}
- | print {Buslit("0b")}
+ | print {$1}
  | declare {$1}
  | loop {$1}
 
 assignment:
  | binExpr REGASSIGN binExpr boolval{ Assign(true, $1, $3, $4) }
- | binExpr  ASSIGN binExpr { Assign(false, $1, $3, false) } 
+ | binExpr  ASSIGN   binExpr { Assign(false, $1, $3, false) } 
 
 boolval:
  | ONE {true}
