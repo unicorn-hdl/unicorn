@@ -3,7 +3,7 @@ main() {
 	//print b : 101b;
 	print c : 011b;
 	out:;
-🦄
 }
+🦄
 
 //program should print 011 

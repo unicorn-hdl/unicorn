@@ -1,0 +1,7 @@
+main(){
+	busOne = 100011b; //valid 
+	busTwo = 1111100000b; //valid 
+	sasakjjEWWW = 1001011; //valid
+
+}
+neigh 
