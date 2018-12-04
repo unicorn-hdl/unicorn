@@ -9,8 +9,9 @@ main() {
 	
 	print c : 01011b;
 	out:;
-🦄
 }
+🦄
+
 
 //program should print out 01011
 
