@@ -1,6 +1,8 @@
 module L = Llvm
 module C = Codegen
 module P = Printer
+module E = Elaborate
+module SL = Simplelines
 (* Top-level of the MicroC compiler: scan & parse the input,
    check the resulting AST and generate an SAST from it, generate LLVM IR,
    and dump the module *)
@@ -35,13 +37,13 @@ let () =
          match !action with
               Ast     -> ()
             | Mast    -> P.printMast hast
-            | _       -> let netlist = Elaborate.collapse hast in 
+            | _       -> let netlist = E.collapse hast in 
                 match !action with
                       Ast -> ()
                     | Mast-> ()
                     | Netlist -> P.printNet netlist
-                    | SimpleLines -> P.printNet (Simplelines.simplify netlist)
-                    | _ -> let netlist2 = Elaborate.collapse2 netlist in
+                    | SimpleLines -> P.printNet (SL.simplify netlist)
+                    | _ -> let netlist2 = E.collapse2 (SL.simplify netlist) in
                         match !action with
                               Ast -> ()
                             | Mast -> ()

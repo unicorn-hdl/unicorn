@@ -10,32 +10,24 @@ let isS = function
         | BoolId(_) -> true
         | _ -> false
 
-let isSA = function
-        | Buslit(_) -> true
-        | BoolId(_) -> true
-        | BoolBinop(a,_,b) -> (isS a) & (isS b)
-        | Unop(_,a) -> isS a
-        | _ -> false
-
 let toId x = BoolId("#"^ string_of_int x)
 
 let rec simpExp m = function
         | Buslit(x) -> {r=Buslit(x); o=m.o; n=m.n}
+        | BoolId(x) -> {r=BoolId(x); o=m.o; n=m.n}
         | Assign(isR, l, r, init) -> 
               let sr = simpExp m r in
-                        let newExpr = Assign(isR, l, sr.r, init) in
-                        {r=l; o=newExpr::sr.o; n=m.n}
-              (*
-                      if isSA sr.r
-                      then 
-                        let newExpr = Assign(isR, l, sr.r, init) in
-                        {r=l; o=newExpr::sr.o; n=m.n}
-                      else 
-                        let id = toId (sr.n) in
-                        let newExp = Assign(isR, l, id, init) in
-                        {r= id; o= newExp::sr.o; n=m.n}
-                        *)
-
+              let newExpr = Assign(isR, l, sr.r, init) in
+              {r=l; o=newExpr::sr.o; n=m.n}
+        | Unop(op,e) -> 
+              if isS e
+              then {r=Unop(op,e); o=m.o; n=m.n}
+              else 
+                let se = simpExp m e in
+                let id = toId se.n in
+                let o' = (Assign(false, id, se.r, false):: se.o) in
+                let newExp = Unop(op, se.r) in
+                {r=Unop(op,id); o=o'; n=m.n+1}
         | BoolBinop(l, op, r) ->
               let l' = 
                 if isS l

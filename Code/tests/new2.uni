@@ -1,7 +1,7 @@
 main(){
 	a = 1b;
 	b = 0b;
-	c = (b and b) or (a and a);
+	c = not (a and b);
 	out:;
 }
 🦄
