@@ -65,7 +65,7 @@ let printMast pgm = print_endline ("\n\n~~PRINTING MAST~~\n");
                     print_endline (getBinExpr (ModExpr(pgm,[],emptyMod)))
 
 let printNet pgm = print_endline ("\n\n~~PRINTING NAST~~\n");
-                    List.iter (fun x->print_endline ("{"^getBinExpr x^"}")) pgm
+                    List.iter (fun x->print_endline (getBinExpr x^";")) pgm
 
 let printNet2 pgm = print_endline ("\n\n~~PRINTING NAST2~~\n\n");
                     List.iter (fun (a,b,c,d)->print_endline ("{"^ 

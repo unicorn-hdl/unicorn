@@ -3,7 +3,7 @@ main(){
 	y = 11b or x;
 	l = modA(x, y);
 	m = modA(l, l);
-	print hereItIs: m;
+	l or m;
 	out:;
 }
 

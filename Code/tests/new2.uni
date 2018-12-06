@@ -1,0 +1,7 @@
+main(){
+	a = 1b;
+	b = 0b;
+	c = (b and b) or (a and a);
+	out:;
+}
+🦄

@@ -1,9 +1,17 @@
 main(){
-	x = not 1b;
-	w = not x;
-	z = x;
-	y = 1b and z;
-	print hereItIs: y;
+	x = 0b;
+	y = 1b or x;
+	l = modA(x, y);
+	m = modA(l, l);
+	print hereItIs: m;
 	out:;
+}
+
+modA(a,b<1>){
+	d = 1b;
+	l = d and a;
+	a = 1b;
+	c = a or b;
+	out:c;
 }
 🦄

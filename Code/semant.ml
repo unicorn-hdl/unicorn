@@ -42,7 +42,7 @@ let rec checkValidity map expr = match expr with
     | BoolBinop(l, op, r) -> 
         let ltyp = checkValidity map l in
         let rtyp = checkValidity map r in
-        if (ltyp = rtyp)
+        if (fst ltyp = fst rtyp)
         then (ltyp)
         else raise(TypeMismatch 
             ("You tried performing " ^ opToStr (B(op)) ^ " on " ^ Printer.getBinExpr l
@@ -51,13 +51,11 @@ let rec checkValidity map expr = match expr with
     | Assign(_, lval, rval, init) ->
     (*TODO init should become a string so that we can check this stuff correctly*)
         assignIsValid lval;
-        let _ = print_endline ("assigning to " ^ Printer.getBinExpr lval) in
         let getLit (Lit(x)) = x in
         let rtyp = fst(checkValidity map rval) in
         (match lval with
               BoolId(x) -> 
-                      let ans = (rtyp, StringMap.add x rtyp map)
-                      in ans 
+                      (rtyp, StringMap.add x rtyp map)
             | Index(BoolId(x), Range(a,b)) -> 
                 let b' = getLit b in
                 let a' = getLit a in
