@@ -30,16 +30,20 @@ let rec collapseFn maps exp = match exp with
             let r2 = collapseFn maps  rval in
             let l2 = collapseFn (snd r2) lval in
             (Assign(isReg, fst l2, fst r2, init), snd l2)
+    | Index (exp, rng) ->
+            let exp2 = collapseFn maps exp in
+            (Index(fst exp2, rng), snd exp2)
     (*
     | Index(exp, rng) -> Index(exp, rng)
-    | Print(str, exp) -> Print(str, exp)
-    | Call(str, exp) -> print_endline ("Something is wrong! Call called in elaborate");
                         Call(str, exp) 
     | For(str, rng, exp) -> For(str, rng, exp)
 *)
     | Print(str, exp) -> 
         let p = collapseFn maps exp in
         (Print(str, fst p), snd p)
+    | Call(str, exp) -> 
+        print_endline ("Something is wrong! Call called in elaborate");
+        (Noexpr, maps)
     | ModExpr(Module_decl(out,nm,fm,exps), args, par) -> 
         let fold2Fn map (sz,nm) arg = StringMap.add nm arg map in
         let oldMap = maps in
@@ -71,7 +75,7 @@ let rec collapseFn maps exp = match exp with
     (*
     | Noexpr -> Noexpr
     *)
-    | _ -> print_endline ("we missed a case in elaborate"); (Noexpr, maps)
+    | x -> print_endline ("we missed a case in elaborate: "^ Printer.getBinExpr x); (Noexpr, maps)
 
 
 let collapse ast = 

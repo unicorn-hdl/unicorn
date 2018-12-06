@@ -102,7 +102,7 @@ let rec checkValidity map expr = match expr with
                 let b' = getLit b in
                 let _ = rangeIsValid a' b' in
                 let size = fst(checkValidity map e) in
-                    if (size<= b')
+                    if (size > b')
                     then (b'-a'+1, map)
                     else raise(TypeMismatch
                     ("You tried accessing a number too big"))

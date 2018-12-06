@@ -15,19 +15,6 @@ let toId x = BoolId("#"^ string_of_int x)
 let rec simpExp m = function
         | Buslit(x) -> {r=Buslit(x); o=m.o; n=m.n}
         | BoolId(x) -> {r=BoolId(x); o=m.o; n=m.n}
-        | Assign(isR, l, r, init) -> 
-              let sr = simpExp m r in
-              let newExpr = Assign(isR, l, sr.r, init) in
-              {r=l; o=newExpr::sr.o; n=m.n}
-        | Unop(op,e) -> 
-              if isS e
-              then {r=Unop(op,e); o=m.o; n=m.n}
-              else 
-                let se = simpExp m e in
-                let id = toId se.n in
-                let o' = (Assign(false, id, se.r, false):: se.o) in
-                let newExp = Unop(op, se.r) in
-                {r=Unop(op,id); o=o'; n=m.n+1}
         | BoolBinop(l, op, r) ->
               let l' = 
                 if isS l
@@ -54,6 +41,28 @@ let rec simpExp m = function
               in
               let newExpr = BoolBinop(l'.r, op, r'.r) in
               {r=newExpr; o=r'.o; n=r'.n}
+        | Unop(op,e) -> 
+              if isS e
+              then {r=Unop(op,e); o=m.o; n=m.n}
+              else 
+                let se = simpExp m e in
+                let id = toId se.n in
+                let o' = (Assign(false, id, se.r, false):: se.o) in
+                let newExp = Unop(op, se.r) in
+                {r=Unop(op,id); o=o'; n=m.n+1}
+        | Assign(isR, l, r, init) -> 
+              let sr = simpExp m r in
+              let newExpr = Assign(isR, l, sr.r, init) in
+              {r=l; o=newExpr::sr.o; n=m.n}
+        | Index(ex, r) -> 
+              if isS ex
+              then {r=Index(ex,r); o=m.o; n=m.n}
+              else 
+                let sex = simpExp m ex in
+                let id = toId sex.n in
+                let o' = (Assign(false, id, sex.r, false)::sex.o) in
+                let newExp = Index(sex.r,r) in
+                {r=Index(id,r); o=o'; n=m.n+1}
 
         | a -> {r=m.r; o= a::m.o; n= m.n}
 
