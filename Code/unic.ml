@@ -3,24 +3,26 @@ module C = Codegen
 module P = Printer
 module E = Elaborate
 module SL = Simplelines
+module I = Indexing
 (* Top-level of the MicroC compiler: scan & parse the input,
    check the resulting AST and generate an SAST from it, generate LLVM IR,
    and dump the module *)
 
-type action = Ast | Sast | Mast | Netlist | SimpleLines | Netlist2 | LLVM_IR | Compile
+type action = Ast | Sast | Mast | Netlist | SimpleLines | Index | Netlist2 | LLVM_IR | Compile
 
 let () =
   let action = ref Compile in
   let set_action a () = action := a in
   let speclist = [
-    ("-a", Arg.Unit (set_action Ast), "Print the AST");
-    ("-m", Arg.Unit (set_action Mast), "Print the modfilled AST");
-    ("-s", Arg.Unit (set_action Sast), "Print the SAST");
-    ("-n", Arg.Unit (set_action Netlist), "Print Netlist");
+    ("-a",  Arg.Unit (set_action Ast), "Print the AST");
+    ("-m",  Arg.Unit (set_action Mast), "Print the modfilled AST");
+    ("-s",  Arg.Unit (set_action Sast), "Print the SAST");
+    ("-n",  Arg.Unit (set_action Netlist), "Print Netlist");
     ("-sl", Arg.Unit (set_action SimpleLines), "Print Netlist with Simplified Lines");
+    ("-i",  Arg.Unit (set_action Index), "Print Netlist with collapsed inidices");
     ("-n2", Arg.Unit (set_action Netlist2), "Print MoreSimplified Netlist");
-    ("-l", Arg.Unit (set_action LLVM_IR), "Print the generated LLVM IR");
-    ("-c", Arg.Unit (set_action Compile),
+    ("-l",  Arg.Unit (set_action LLVM_IR), "Print the generated LLVM IR");
+    ("-c",  Arg.Unit (set_action Compile),
       "Check and print the generated LLVM IR (default)");
   ] in  
   let usage_msg = "usage: ./microc.native [-a|-s|-l|-c] [file.mc]" in
@@ -43,6 +45,7 @@ let () =
                     | Mast-> ()
                     | Netlist -> P.printNet netlist
                     | SimpleLines -> P.printNet (SL.simplify netlist)
+                    | Index -> P.printNet (I.index (SL.simplify netlist))
                     | _ -> let netlist2 = E.collapse2 (SL.simplify netlist) in
                         match !action with
                               Ast -> ()

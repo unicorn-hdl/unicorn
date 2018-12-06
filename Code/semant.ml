@@ -73,9 +73,20 @@ let rec checkValidity map expr = match expr with
                 ^ " on the range " ^ string_of_int a' ^ "-" ^ 
                 string_of_int b' ^ " but these are of different sizes"))
         )
+    (*TODO note that harden will be weird and we actually need to account for this case*)
     | Index(expr, Range(a,b)) -> 
-        (match expr with
-            (*TODO note that harden will be weird and we actually need to account for this case*)
+            let getLit (Lit(x)) = x in
+            let a' = getLit a in
+            let b' = getLit b in
+            let _ = rangeIsValid a' b' in
+            let size = fst(checkValidity map expr) in
+                if (size > b')
+                then (b'-a'+1, map)
+                else raise(TypeMismatch
+                ("You tried accessing a number too big"))
+                (*TODO write a better message*)
+                (*TODO I think this accounts for every case, but haven't checked, run tests*)
+
 (*I made this whole mess and then realized that this whole thing can (and should be taken care of in harden. Just check for out names in harden and return the appropriate ranges
 
             ModExpr(Module_decl(outs,b,c,d), args, par) -> 
@@ -95,20 +106,6 @@ let rec checkValidity map expr = match expr with
                      outputs of module " ^ b ^ "in the same call.")
                 else
 *)
-
-            | e -> 
-                let getLit (Lit(x)) = x in
-                let a' = getLit a in
-                let b' = getLit b in
-                let _ = rangeIsValid a' b' in
-                let size = fst(checkValidity map e) in
-                    if (size > b')
-                    then (b'-a'+1, map)
-                    else raise(TypeMismatch
-                    ("You tried accessing a number too big"))
-                    (*TODO write a better message*)
-                    (*TODO I think this accounts for every case, but haven't checked, run tests*)
-        )        
     | Print(_, exp) -> checkValidity map exp
     | Call(_) -> print_endline ("something is way wrong. Call is showing up in checkValidity");
                  (0,map)

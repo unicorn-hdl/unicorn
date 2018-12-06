@@ -48,11 +48,11 @@ let rec simpExp m = function
                 let se = simpExp m e in
                 let id = toId se.n in
                 let o' = (Assign(false, id, se.r, false):: se.o) in
-                {r=Unop(op,id); o=o'; n=m.n+1}
+                {r=Unop(op,id); o=o'; n=se.n+1}
         | Assign(isR, l, r, init) -> 
               let sr = simpExp m r in
               let newExpr = Assign(isR, l, sr.r, init) in
-              {r=l; o=newExpr::sr.o; n=m.n}
+              {r=l; o=newExpr::sr.o; n=sr.n}
         | Index(ex, r) -> 
               if isS ex
               then {r=Index(ex,r); o=m.o; n=m.n}
@@ -60,7 +60,7 @@ let rec simpExp m = function
                 let sex = simpExp m ex in
                 let id = toId sex.n in
                 let o' = (Assign(false, id, sex.r, false)::sex.o) in
-                {r=Index(id,r); o=o'; n=m.n+1}
+                {r=Index(id,r); o=o'; n=sex.n+1}
         | Print(nm, ex) ->
               if isS ex
               then 
@@ -71,10 +71,11 @@ let rec simpExp m = function
                 let id = toId sex.n in
                 let o' = (Assign(false, id, sex.r, false)::sex.o) in
                 let newExp = Print(nm,id) in
-                {r=newExp; o=newExp::o'; n=m.n+1}
-               
-
-        | a -> {r=m.r; o= a::m.o; n= m.n}
+                {r=newExp; o=newExp::o'; n=sex.n+1}
+        | Call(str, exp) -> print_endline ("Something is wrong! Call called in simplelines");m
+        | For(_,_,_)     -> print_endline ("Something is wrong! For called in simplelines");m
+        | ModExpr(_,_,_) -> print_endline ("Something is wrong! ModExpr called in simplelines");m
+        | x -> print_endline ("we missed a case in elaborate: "^ Printer.getBinExpr x);m
 
 let nullmap = {r=Noexpr; o=[]; n=0};;
 let simplify nlist = List.rev (List.fold_left simpExp nullmap nlist).o
