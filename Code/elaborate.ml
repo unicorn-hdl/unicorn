@@ -33,17 +33,23 @@ let rec collapseFn maps exp = match exp with
     | Index (exp, rng) ->
             let exp2 = collapseFn maps exp in
             (Index(fst exp2, rng), snd exp2)
-    (*
-    | Index(exp, rng) -> Index(exp, rng)
-                        Call(str, exp) 
-    | For(str, rng, exp) -> For(str, rng, exp)
-*)
     | Print(str, exp) -> 
         let p = collapseFn maps exp in
         (Print(str, fst p), snd p)
     | Call(str, exp) -> 
         print_endline ("Something is wrong! Call called in elaborate");
         (Noexpr, maps)
+    | For(str,r,exprLst) -> 
+                    let forFn maps expr = 
+                            let cex = collapseFn maps expr in
+                            let maps' = snd cex in
+                            let cexp = fst cex in
+                            {name=maps.name; argMap=maps'.argMap; countMap=maps'.countMap; net=cexp::maps'.net} 
+                    in
+                    let maps = {name=maps.name; argMap=maps.argMap; countMap=maps.countMap; net=[]} in
+                    let exprLst = List.fold_left forFn maps exprLst in
+                    let maps = {name=maps.name; argMap=maps.argMap; countMap=exprLst.countMap; net=exprLst.net} in
+                    (For(str,r,exprLst.net), maps) 
     | ModExpr(Module_decl(out,nm,fm,exps), args, par) -> 
         let fold2Fn map (sz,nm) arg = StringMap.add nm arg map in
         let oldMap = maps in

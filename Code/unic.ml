@@ -2,13 +2,14 @@ module L = Llvm
 module C = Codegen
 module P = Printer
 module E = Elaborate
+module F = Noloop2
 module SL = Simplelines
 module I = Indexing
 (* Top-level of the MicroC compiler: scan & parse the input,
    check the resulting AST and generate an SAST from it, generate LLVM IR,
    and dump the module *)
 
-type action = Ast | Sast | Mast | Netlist | SimpleLines | Index | Netlist2 | LLVM_IR | Compile
+type action = Ast | Sast | Mast | Netlist | Forloops | SimpleLines | Index | Netlist2 | LLVM_IR | Compile
 
 let () =
   let action = ref Compile in
@@ -18,6 +19,7 @@ let () =
     ("-m",  Arg.Unit (set_action Mast), "Print the modfilled AST");
     ("-s",  Arg.Unit (set_action Sast), "Print the SAST");
     ("-n",  Arg.Unit (set_action Netlist), "Print Netlist");
+    ("-f",  Arg.Unit (set_action Forloops), "Print Netlist with collapsed for loops");
     ("-sl", Arg.Unit (set_action SimpleLines), "Print Netlist with Simplified Lines");
     ("-i",  Arg.Unit (set_action Index), "Print Netlist with collapsed inidices");
     ("-n2", Arg.Unit (set_action Netlist2), "Print MoreSimplified Netlist");
@@ -44,13 +46,15 @@ let () =
                       Ast -> ()
                     | Mast-> ()
                     | Netlist -> P.printNet netlist
-                    | SimpleLines -> P.printNet (SL.simplify netlist)
-                    | Index -> P.printNet (I.index (SL.simplify netlist))
-                    | _ -> let netlist2 = E.collapse2 (SL.simplify netlist) in
+                    | Forloops -> P.printNet (F.unloop netlist)
+                    | SimpleLines -> P.printNet (SL.simplify (F.unloop netlist))
+                    | Index -> P.printNet (I.index (SL.simplify (F.unloop netlist)))
+                    | _ -> let netlist2 = E.collapse2 (SL.simplify (F.unloop netlist)) in
                         match !action with
                               Ast -> ()
                             | Mast -> ()
                             | Netlist -> ()
+                            | Forloops -> ()
                             | SimpleLines -> ()
                             | Netlist2 -> P.printNet2 netlist2
                             | Sast    -> print_string ("")

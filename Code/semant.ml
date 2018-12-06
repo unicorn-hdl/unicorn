@@ -50,8 +50,10 @@ let rec checkValidity map expr = match expr with
     | Unop(_, expr) -> (checkValidity map expr)
     | Assign(_, lval, rval, init) ->
     (*TODO init should become a string so that we can check this stuff correctly*)
-        assignIsValid lval;
-        let getLit (Lit(x)) = x in
+        let _ = assignIsValid lval in
+        let getLit exp = (match exp with
+               Lit(x) -> x
+             | x -> print_endline("missed case: "^ Printer.getIntExpr x); 0) in
         let rtyp = fst(checkValidity map rval) in
         (match lval with
               BoolId(x) -> 
@@ -72,10 +74,13 @@ let rec checkValidity map expr = match expr with
                 ^ " of size " ^ string_of_int rtyp ^ " to " ^  x 
                 ^ " on the range " ^ string_of_int a' ^ "-" ^ 
                 string_of_int b' ^ " but these are of different sizes"))
+            | x -> print_endline("Missed case: "^ Printer.getBinExpr x); (rtyp, map)
         )
     (*TODO note that harden will be weird and we actually need to account for this case*)
     | Index(expr, Range(a,b)) -> 
-            let getLit (Lit(x)) = x in
+            let getLit exp = (match exp with
+                  Lit(x) -> x
+                | x -> print_endline("missed case: "^ Printer.getIntExpr x); 0) in
             let a' = getLit a in
             let b' = getLit b in
             let _ = rangeIsValid a' b' in
