@@ -48,7 +48,6 @@ let rec simpExp m = function
                 let se = simpExp m e in
                 let id = toId se.n in
                 let o' = (Assign(false, id, se.r, false):: se.o) in
-                let newExp = Unop(op, se.r) in
                 {r=Unop(op,id); o=o'; n=m.n+1}
         | Assign(isR, l, r, init) -> 
               let sr = simpExp m r in
@@ -61,8 +60,19 @@ let rec simpExp m = function
                 let sex = simpExp m ex in
                 let id = toId sex.n in
                 let o' = (Assign(false, id, sex.r, false)::sex.o) in
-                let newExp = Index(sex.r,r) in
                 {r=Index(id,r); o=o'; n=m.n+1}
+        | Print(nm, ex) ->
+              if isS ex
+              then 
+                let newExp = Print(nm,ex) in
+                {r=newExp; o=newExp::m.o; n=m.n}
+              else 
+                let sex = simpExp m ex in
+                let id = toId sex.n in
+                let o' = (Assign(false, id, sex.r, false)::sex.o) in
+                let newExp = Print(nm,id) in
+                {r=newExp; o=newExp::o'; n=m.n+1}
+               
 
         | a -> {r=m.r; o= a::m.o; n= m.n}
 
