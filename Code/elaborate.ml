@@ -30,30 +30,10 @@ let rec collapseFn maps exp = match exp with
             let r2 = collapseFn maps  rval in
             let l2 = collapseFn (snd r2) lval in
             (Assign(isReg, fst l2, fst r2, init), snd l2)
-    | Index (exp, rng) ->
-            let exp2 = collapseFn maps exp in
-            (Index(fst exp2, rng), snd exp2)
-    | Print(str, exp) -> 
-        let p = collapseFn maps exp in
-        (Print(str, fst p), snd p)
-    | Call(str, exp) -> 
-        print_endline ("Something is wrong! Call called in elaborate");
-        (Noexpr, maps)
-    | For(str,r,exprLst) -> 
-                    let forFn maps expr = 
-                            let cex = collapseFn maps expr in
-                            let maps' = snd cex in
-                            let cexp = fst cex in
-                            {name=maps.name; argMap=maps'.argMap; countMap=maps'.countMap; net=cexp::maps'.net} 
-                    in
-                    let maps = {name=maps.name; argMap=maps.argMap; countMap=maps.countMap; net=[]} in
-                    let exprLst = List.fold_left forFn maps exprLst in
-                    let maps = {name=maps.name; argMap=maps.argMap; countMap=exprLst.countMap; net=exprLst.net} in
-                    (For(str,r,exprLst.net), maps) 
-    | ModExpr(Module_decl(out,nm,fm,exps), args, par) -> 
-        let fold2Fn map (sz,nm) arg = StringMap.add nm arg map in
+    | Index(ModExpr(Module_decl(out,nm,fm,exps), args, par),Range(IntId(a),b)) ->
         let oldMap = maps in
-        let argMap = List.fold_left2 fold2Fn StringMap.empty fm args in
+        let argMapBuilder map (sz,nm) arg = StringMap.add nm arg map in
+        let argMap = List.fold_left2 argMapBuilder StringMap.empty fm args in
         let maps = {name=nm; argMap=argMap; countMap=maps.countMap; net=maps.net} in
         let maps = 
             if StringMap.mem maps.name maps.countMap 
@@ -69,7 +49,54 @@ let rec collapseFn maps exp = match exp with
         let foldFn maps exp = 
                 let collapsedEx = collapseFn maps exp in
                 let maps = snd collapsedEx in
-                {name=maps.name; argMap=maps.argMap; countMap=maps.countMap; net= fst collapsedEx :: maps.net} in
+                {name=maps.name; argMap=maps.argMap; countMap=maps.countMap; net=(fst collapsedEx)::maps.net} in
+        let maps = List.fold_left foldFn maps exps in
+
+        let getOut(*by Jordan Peele*)= 
+                let findFn nm (sz,bindName) = nm=bindName in
+                collapseFn maps (BoolId(snd (List.find (findFn a) out))) in
+        let maps = {name=oldMap.name; argMap=oldMap.argMap; countMap=maps.countMap; net=maps.net} in
+        (fst getOut, maps)
+    | Index (exp, rng) ->
+            let exp2 = collapseFn maps exp in
+            (Index(fst exp2, rng), snd exp2)
+    | Print (str, exp) -> 
+            let p = collapseFn maps exp in
+            (Print(str, fst p), snd p)
+    | Call(str, exp) -> 
+            print_endline ("Something is wrong! Call called in elaborate");
+            (Noexpr, maps)
+    | For(str,r,exprLst) -> 
+                    let forFn maps expr = 
+                            let cex = collapseFn maps expr in
+                            let maps' = snd cex in
+                            let cexp = fst cex in
+                            {name=maps.name; argMap=maps'.argMap; countMap=maps'.countMap; net=cexp::maps'.net} 
+                    in
+                    let maps = {name=maps.name; argMap=maps.argMap; countMap=maps.countMap; net=[]} in
+                    let exprLst = List.fold_left forFn maps exprLst in
+                    let maps = {name=maps.name; argMap=maps.argMap; countMap=exprLst.countMap; net=exprLst.net} in
+                    (For(str,r,exprLst.net), maps) 
+    | ModExpr(Module_decl(out,nm,fm,exps), args, par) -> 
+        let oldMap = maps in
+        let argMapBuilder map (sz,nm) arg = StringMap.add nm arg map in
+        let argMap = List.fold_left2 argMapBuilder StringMap.empty fm args in
+        let maps = {name=nm; argMap=argMap; countMap=maps.countMap; net=maps.net} in
+        let maps = 
+            if StringMap.mem maps.name maps.countMap 
+            then {name=maps.name;
+                  argMap=maps.argMap; 
+                  countMap=StringMap.add maps.name 
+                      ((StringMap.find maps.name maps.countMap)+1) maps.countMap;
+                  net = maps.net }
+            else {name=maps.name;
+                  argMap=maps.argMap; 
+                  countMap= StringMap.add maps.name 0 maps.countMap;
+                  net=maps.net} in
+        let foldFn maps exp = 
+                let collapsedEx = collapseFn maps exp in
+                let maps = snd collapsedEx in
+                {name=maps.name; argMap=maps.argMap; countMap=maps.countMap; net=(fst collapsedEx)::maps.net} in
         let maps = List.fold_left foldFn maps exps in
 
         let getOut(*by Jordan Peele*)= 
