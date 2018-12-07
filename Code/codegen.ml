@@ -120,8 +120,8 @@ let translate (netlist, globals) =
 
     (* Construct code for an expression; return its value *)
       let getVal = function
-        | "0" -> L.const_int i1_t 0
-        | "1" -> L.const_int i1_t 1
+        | "0" | "0b" -> L.const_int i1_t 0
+        | "1" | "1b" -> L.const_int i1_t 1
         |  x  -> L.build_load (lookup x) x builder
        in
 

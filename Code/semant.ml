@@ -115,13 +115,16 @@ let rec checkValidity map expr = match expr with
     | Call(_) -> print_endline ("something is way wrong. Call is showing up in checkValidity");
                  (0,map)
     | For(str, Range(a,b), lines) ->
-         List.map (checkValidity map) lines;
+         let maps = List.map (checkValidity map) lines in
          let getLit (Lit(x)) = x in
          let a' = getLit a in
          let b' = getLit b in
          let _ = rangeIsValid a' b' in
+         let f k v1 v2 = Some v1 in
+         let helper outMap (_,map) = StringMap.union f outMap map in 
+         let newMap = List.fold_left helper StringMap.empty maps in
          (*TODO need to include actual checking that compares indices to internal vals*)
-         (0, map)
+         (0, newMap)
 
     (*Indexing has to check whether it contains a ModExpr. If so, it acts differenty*)
     (*When ModExpr has no index, it just returns its first out*)
