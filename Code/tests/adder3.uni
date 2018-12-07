@@ -1,0 +1,29 @@
+main() {
+	a = 010b;
+	b = 011b;
+    print hi: rippleAdder(a, b);
+	out:;
+}
+
+fullAdder(a, b, carryIn){
+    x = a xor b;
+    y = a and b;
+    z = carryIn and x;
+    sum = x xor carryIn;
+    carryOut = y or z;
+	out: sum, carryOut;
+}
+
+ rippleAdder(a<3>, b<3>){
+    sumX[0] = fullAdder(a[0], b[0], 0b)[sum];
+	lastCarry[0] = 0b;
+
+    for (i from 1 to 3){
+		a = 0b;
+		b = not a;
+        lastCarry[i] = fullAdder(a[i-1], b[i-1], lastCarry[i-1])[carryOut];
+        sumX[i] = fullAdder(a[i], b[i], lastCarry[i])[sum];
+    };
+	out: sumX<3>;
+}
+🦄
