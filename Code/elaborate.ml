@@ -56,6 +56,11 @@ let rec collapseFn maps exp = match exp with
                 let findFn nm (sz,bindName) = nm=bindName in
                 collapseFn maps (BoolId(snd (List.find (findFn a) out))) in
         let maps = {name=oldMap.name; argMap=oldMap.argMap; countMap=maps.countMap; net=maps.net} in
+
+        let lst = List.hd (List.rev maps.net) in
+        let net = lst::List.rev (List.tl (List.rev maps.net)) in 
+
+        let maps = {name=maps.name; argMap=maps.argMap; countMap=maps.countMap; net=maps.net} in
         (fst getOut, maps)
     | Index (exp, rng) ->
             let exp2 = collapseFn maps exp in
@@ -67,6 +72,7 @@ let rec collapseFn maps exp = match exp with
             print_endline ("Something is wrong! Call called in elaborate");
             (Noexpr, maps)
     | For(str,r,exprLst) -> 
+                    let oldMap = maps in
                     let forFn maps expr = 
                             let cex = collapseFn maps expr in
                             let maps' = snd cex in
@@ -75,7 +81,7 @@ let rec collapseFn maps exp = match exp with
                     in
                     let maps = {name=maps.name; argMap=maps.argMap; countMap=maps.countMap; net=[]} in
                     let exprLst = List.fold_left forFn maps exprLst in
-                    let maps = {name=maps.name; argMap=maps.argMap; countMap=exprLst.countMap; net=exprLst.net} in
+                    let maps = {name=maps.name; argMap=maps.argMap; countMap=exprLst.countMap; net=oldMap.net} in
                     (For(str,r,exprLst.net), maps) 
     | ModExpr(Module_decl(out,nm,fm,exps), args, par) -> 
         let oldMap = maps in
@@ -113,7 +119,7 @@ let rec collapseFn maps exp = match exp with
 
 let collapse ast = 
         let strtMap = {name=""; argMap=StringMap.empty; countMap=StringMap.empty; net=[]} in
-        (snd (collapseFn strtMap (ModExpr(ast,[],emptyMod)))).net;;
+        List.rev (snd (collapseFn strtMap (ModExpr(ast,[],emptyMod)))).net;;
 
 
 (*-------------------collapse2-------------------*)
@@ -123,6 +129,7 @@ let globs = [];;
 let getStrOrLit = function
       Buslit(x) -> x
     | BoolId(x) -> x
+    | x -> print_endline("mc-getStrOrlit: "^Printer.getBinExpr x); ""
 
 let collapseFn2 = function
     Assign(_,l,r,_) -> (match r with
@@ -134,6 +141,8 @@ let collapseFn2 = function
             (getStrOrLit(l), "Ident", x, x)
         | BoolId(x) -> 
             (getStrOrLit(l), "Ident", x, x)
+        | x -> let _ = print_endline("missed case: "^ Printer.getBinExpr x)  in
+                    (getStrOrLit(l), "", "", "")
     )
   | Print(nm, r) -> (nm, "Print", getStrOrLit(r), getStrOrLit(r))
   | a -> print_endline ("something else!!"); 

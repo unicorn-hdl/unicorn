@@ -1,9 +1,7 @@
 open Ast
 open Printer
 module StringMap = Map.Make(String)
-
-exception MissingFunction of string
-
+exception MissingFunction of string 
 let modzIntoTuples d par m m2 = List.map (fun d-> (d,par, m,m2)) d
 let fstM (Module_decl(a,b,c,d)) = a
 let sndM (Module_decl(a,b,c,d)) = b
@@ -12,7 +10,7 @@ let fthM (Module_decl(a,b,c,d)) = d
 let toString (Module_decl(a,b,c,d)) = b ^ "\n" ^ toStringBinExprlist d
 
 (*replace calls in a mod with modules*)
-let rec runThroughLines d par m m2 = List.map actOnline (modzIntoTuples d par m m2)
+let rec runThroughLines d par m m2 = List.rev (List.map actOnline (modzIntoTuples d par m m2))
 (*TODO change this to fold left, so as to pass on changes to m2*)
         (*Perhaps not necessary? Seems like it's working ok as is. Run tests.*)
 
@@ -52,9 +50,9 @@ Call(name, args)
     | Noexpr -> Noexpr
     | a -> print_endline("ERROR: Case not found!"); a
 
-(*Helper method for fillHelper. Replaces d in some with d' where d' is lines where calls are replaced with mods*)
+(*Helper method for fillHelper. Replaces d in some mod with d' where d' is lines where calls are replaced with mods*)
 let replaceCalls (Module_decl(a, b, c, d), par, m, m2) =
-                        ((Module_decl(a, b, c, runThroughLines d par m m2)), m, m2)
+                        ((Module_decl(a, b, c, (runThroughLines d par m m2))), m, m2)
 
 (*create an example ast*)
 let callx x = ( Call(x, []) )

@@ -38,7 +38,7 @@ let rec getBinExpr = function
  | Print(id, x) -> "print " ^ id ^ ":  " ^ getBinExpr x ^ ";"
  | For(var, range, lines) -> "for(" ^ var ^ "){\n" ^ toStringBinExprlist lines
  | ModExpr(modz, args, parent) -> "\n\tin: " ^ listToString (fun x-> getBinExpr x ^ ",") args ^ "\n\t" ^ toStringMod modz
- | _ -> ""
+ | _ -> "?"
 
  and makeline x = "\t" ^ x ^ ";\n"
  and toStringBinExprlist explist = listToString makeline (List.map getBinExpr explist)

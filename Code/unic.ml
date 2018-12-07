@@ -49,7 +49,7 @@ let () =
                     | Forloops -> P.printNet (F.unloop netlist)
                     | SimpleLines -> P.printNet (SL.simplify (F.unloop netlist))
                     | Index -> P.printNet (I.index (SL.simplify (F.unloop netlist)))
-                    | _ -> let netlist2 = E.collapse2 (SL.simplify (F.unloop netlist)) in
+                    | _ -> let netlist2 = E.collapse2 (I.index (SL.simplify (F.unloop netlist))) in
                         match !action with
                               Ast -> ()
                             | Mast -> ()

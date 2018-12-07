@@ -76,7 +76,10 @@ and evalLine d expr=
 
 let dissolveLoop outlist = function
         For(index, Range(Lit(a),Lit(b)), expList) ->
+               let _ = print_endline("for loop called") in
                (loop index a b outlist expList).o
-      | x -> x::outlist
+      | x -> 
+           let _ = print_endline("x: "^ Printer.getBinExpr x) in
+           x::outlist
 
 let unloop netlist = List.rev (List.fold_left dissolveLoop [] netlist)

@@ -8,7 +8,22 @@ let id boolin digit = match boolin with
 
 let rec loop from1 until from2 outlist expr = match expr with
         Assign(isR,la,ra,init) -> (match ra with
-            BoolBinop(l,op,r) -> 
+          | Buslit(x) ->
+                if (from1 <= until)
+                then 
+                  let digit = String.make 1 (x.[String.length x - from2-2]) in
+                  let assig = (Assign(isR, id la from1, Buslit(digit), init)) in
+                  loop (from1+1) until (from2+1) (assig::outlist) (Assign(isR,la,ra,init))
+                else
+                  outlist
+          | BoolId(x) ->
+                if (from1 <= until)
+                then
+                  let assig = Assign(isR,id la from1, id ra from1, init) in
+                  loop (from1+1) until (from2+1) (assig::outlist) (Assign(isR,la,ra,init))
+                else
+                  outlist
+          | BoolBinop(l,op,r) -> 
                 if (from1 <= until)
                 then 
                   let binop = BoolBinop(id l from2, op, id r from2) in
@@ -40,34 +55,31 @@ let rec loop from1 until from2 outlist expr = match expr with
                   loop (from1+1) until (from2+1) (assig::outlist) (Assign(isR,la,ra,init))
                 else
                   outlist
-          | Buslit(x) ->
-                if (from1 <= until)
-                then 
-                  let digit = String.make 1 (x.[String.length x - from2-2]) in
-                  let assig = (Assign(isR, id la from1, Buslit(digit), init)) in
-                  loop (from1+1) until (from2+1) (assig::outlist) (Assign(isR,la,ra,init))
-                else
-                  outlist
           | a -> print_endline("missing case: "^ Printer.getBinExpr a); outlist
         ) 
 
 let indicize (outlist,slist) = function 
     Assign(isR,l,r,init) -> 
             let from2 = (match r with  
-            BoolBinop(l,op,r) -> 0
+            Buslit(x) -> 0
+          | BoolId(x) -> 0
+          | BoolBinop(l,op,r) -> 0
           | Unop(op,ex) -> 0
           | Index(Buslit(x),Range(Lit(a),Lit(b))) -> a
           | Index(ex,Range(Lit(a),Lit(b))) -> a
-          | Buslit(x) -> 0
+          | x -> print_endline ("MIssed case-indexingr: "^ Printer.getBinExpr x); 0
             ) in
             
             (match l with
-          Index(_,Range(Lit(a),Lit(b))) ->
+            Index(BoolId(x),Range(Lit(a),Lit(b))) ->
+              let _ = print_endline("inAssign: "^x^" "^string_of_int a^" "^string_of_int b^" "^string_of_int from2) in
               (loop a b from2 outlist (Assign(isR,l,r,init)), slist)
-        | BoolId(x) -> 
+          | BoolId(x) -> 
               let sz = StringMap.find x slist in
+              let _ = print_endline("inAssign: "^x^" "^string_of_int (sz-1)^" "^string_of_int from2) in
               (loop 0 (sz-1) from2 outlist (Assign(isR,l,r,init)), slist)
-    )
+          | x -> print_endline ("MIssed case-indexingl: "^ Printer.getBinExpr x); ([],slist)
+            )
   | Print(nm,ex) as x-> (x::outlist,slist)
 
   (*

@@ -143,7 +143,7 @@ let rec checkValidity map expr = match expr with
             let initVarTable = List.fold_left2 fold2fn (0,StringMap.empty) fms args in
             let _ = printMap (snd initVarTable) (name^"#init#") in
             let foldfn (_,b) expr = (checkValidity b) expr in
-            let result = List.fold_left foldfn initVarTable (List.rev exprs) in
+            let result = List.fold_left foldfn initVarTable (exprs) in
             let finalMap = snd result in 
             let getLit (Lit(x),_) = x in
             
@@ -175,20 +175,7 @@ let rec checkValidity map expr = match expr with
             
     | a -> print_endline("missing case in checkvalidities: " ^ getBinExpr a ^ "DONE\n") ; (0,map)
 
-    (*
-let buildSast (Module_decl(outs, name, forms, lines))= 
-        {outlist = List.map unwrap outs;
-         name = name;
-         formals = List.map unwrap forms;
-         linelist = List.map semantify lines}
-*)
-
-let initVarTable hast = StringMap.empty
 
 let check (Module_decl(out, nm, fm, binEx))= 
     let hast = Module_decl(out, nm, fm, binEx) in
-    (*
-    let sast = buildSast hast in
-*)
-    let table = initVarTable hast in
-    checkValidity table (ModExpr(hast,[], emptyMod));;
+    checkValidity StringMap.empty (ModExpr(hast,[], emptyMod));;
