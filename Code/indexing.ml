@@ -120,7 +120,7 @@ let indicize (outlist,slist) f = (f::outlist, slist)
 
 let rec semant (valz,map) = function
   | Buslit(x) -> (String.length x-1, map)
-  | BoolId(x) -> (StringMap.find x map, map)
+  | BoolId(x) -> print_endline("looking for: "^x); (StringMap.find x map, map)
   | BoolBinop(l,op,r) -> semant (valz,map) l
   | Unop(op,ex) -> semant (valz,map) ex
   | Assign(_,lval,rval,_) -> (match lval with
@@ -161,6 +161,7 @@ let indicize (outlist,slist) line =
                 let _ = print_endline("inAssign: "^x^" "^string_of_int a^" "^string_of_int b^" "^string_of_int from2) in
                 (loop a b from2 outlist (Assign(isR,l,r,init)), slist)
           | BoolId(x) -> 
+                let _ = print_endline("haaaaar") in
                 let sz = StringMap.find x slist in
                 let _ = print_endline("inAssign: "^x^" "^string_of_int (sz-1)^" "^string_of_int from2) in
                 (loop 0 (sz-1) from2 outlist (Assign(isR,l,r,init)), slist)

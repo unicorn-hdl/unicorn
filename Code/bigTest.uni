@@ -1,0 +1,15 @@
+main(){
+	print x: concat(0101b, 1111b);	
+	out:;
+}
+concat(a<4>,b<4>){
+	c = 00000000b;
+	for (i from 0 to 3){
+		c[i] = b[i];
+	};
+	for (i from 0 to 3){
+		c[i+4] = a[i];
+	};
+	out: c<8>;
+}
+🦄

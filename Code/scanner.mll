@@ -47,7 +47,7 @@ rule token = parse
 | boollist as lxm { BOOLLIT(lxm) }
 | eof { EOF }
 |"🦄" { UNICORN }
-| "neigh" { UNICORN2}
+| "neigh" { UNICORN2 }
 | _ as ch { raise (Failure("illegal character " ^ Char.escaped ch)) }
 and multi = parse
     "**/" { token lexbuf }
