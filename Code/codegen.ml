@@ -113,13 +113,15 @@ let translate (netlist, globals) =
     (* Return the value for a variable or formal argument.
        Check local names first, then global names *)
     let lookup n = try StringMap.find n local_vars
-                   with Not_found -> StringMap.find n (global_vars)
+                   with Not_found -> 
+                         try StringMap.find n (global_vars)
+                         with Not_found -> print_endline("couldn't find "^n); L.const_int i1_t 0
     in
 
     (* Construct code for an expression; return its value *)
       let getVal = function
-        | "0b" -> L.const_int i1_t 0
-        | "1b" -> L.const_int i1_t 1
+        | "0" -> L.const_int i1_t 0
+        | "1" -> L.const_int i1_t 1
         |  x  -> L.build_load (lookup x) x builder
        in
 
