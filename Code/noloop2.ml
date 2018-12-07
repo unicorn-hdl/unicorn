@@ -77,6 +77,6 @@ and evalLine d expr=
 let dissolveLoop outlist = function
         For(index, Range(Lit(a),Lit(b)), expList) ->
                (loop index a b outlist expList).o
-      | x -> outlist
+      | x -> x::outlist
 
 let unloop netlist = List.rev (List.fold_left dissolveLoop [] netlist)
