@@ -154,7 +154,8 @@ let indicize (outlist,slist) line =
           | x -> print_endline ("MIssed case-indexingr: "^ Printer.getBinExpr x); 0
             ) in
     match line with
-    Assign(isR,l,r,init) -> 
+    Buslit(x) -> (outlist,slist)
+  | Assign(isR,l,r,init) -> 
             let from2 = from2 r in
             (match l with
             Index(BoolId(x),Range(Lit(a),Lit(b))) ->
@@ -170,6 +171,7 @@ let indicize (outlist,slist) line =
             let from2 = from2 ex in
             let sz = semant (0,slist) ex in
             (loop 0 (fst sz-1) from2 outlist (Print(nm, ex)), slist)
+  | x -> print_endline("Missed case in indexing: "^ Printer.getBinExpr x); (outlist,slist)
 
 let printf k v = print_endline(k^ ": "^ (string_of_int v))
 
