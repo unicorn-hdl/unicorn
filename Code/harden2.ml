@@ -39,11 +39,13 @@ let rec hardenline (line, nameMap) = match line with
                 index, 
                 Range(eval a nameMap, eval b nameMap), 
                 List.map hardenline (modzIntoTuples exprs nameMap))
+    | ModExpr(a,b,c) -> 
+         ModExpr (hardenmd a, List.map hardenline (modzIntoTuples b nameMap), c)
 	| a -> a
 
-let hardenarg (expr, name, nameMap) = (eval expr nameMap, name)
+and hardenarg (expr, name, nameMap) = (eval expr nameMap, name)
 
-let hardenmd (Module_decl(outs, name, formals, linelist)) =
+and hardenmd (Module_decl(outs, name, formals, linelist)) =
     let table = StringMap.empty (*TODO: must generate table*) in
 	Module_decl(List.map hardenarg (bindsToMaps outs table),
                 name,
@@ -53,7 +55,7 @@ let hardenmd (Module_decl(outs, name, formals, linelist)) =
 
 
 (*THE function called---------------------------------------*)
-let harden ast = hardenmd ast
+let harden ast = hardenline (ast, StringMap.empty)
 (*end-------------------------------------------------------*)
 
 (*This is just for printing --------------------------------*)

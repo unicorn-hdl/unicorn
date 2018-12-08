@@ -161,7 +161,6 @@ let indicize (outlist,slist) line =
                 let _ = print_endline("inAssign: "^x^" "^string_of_int a^" "^string_of_int b^" "^string_of_int from2) in
                 (loop a b from2 outlist (Assign(isR,l,r,init)), slist)
           | BoolId(x) -> 
-                let _ = print_endline("haaaaar") in
                 let sz = StringMap.find x slist in
                 let _ = print_endline("inAssign: "^x^" "^string_of_int (sz-1)^" "^string_of_int from2) in
                 (loop 0 (sz-1) from2 outlist (Assign(isR,l,r,init)), slist)

@@ -4,12 +4,14 @@ module P = Printer
 module E = Elaborate
 module F = Noloop2
 module SL = Simplelines
+module T0 = Topsort5
+module T = Topsort4
 module I = Indexing
 (* Top-level of the MicroC compiler: scan & parse the input,
    check the resulting AST and generate an SAST from it, generate LLVM IR,
    and dump the module *)
 
-type action = Ast | Sast | Mast | Netlist | Forloops | SimpleLines | Index | Netlist2 | LLVM_IR | Compile
+type action = Ast | Sast | Mast | Netlist | Forloops | SimpleLines | SimpleLinesTop | Index | Netlist2 | Topsort | LLVM_IR | Compile
 
 let () =
   let action = ref Compile in
@@ -21,8 +23,10 @@ let () =
     ("-n",  Arg.Unit (set_action Netlist), "Print Netlist");
     ("-f",  Arg.Unit (set_action Forloops), "Print Netlist with collapsed for loops");
     ("-sl", Arg.Unit (set_action SimpleLines), "Print Netlist with Simplified Lines");
+    ("-st", Arg.Unit (set_action SimpleLinesTop), "Print Topsorted Netlist with Simplified Lines");
     ("-i",  Arg.Unit (set_action Index), "Print Netlist with collapsed inidices");
     ("-n2", Arg.Unit (set_action Netlist2), "Print MoreSimplified Netlist");
+    ("-t",  Arg.Unit (set_action Topsort), "Print Topsorted Netlist");
     ("-l",  Arg.Unit (set_action LLVM_IR), "Print the generated LLVM IR");
     ("-c",  Arg.Unit (set_action Compile),
       "Check and print the generated LLVM IR (default)");
@@ -37,7 +41,7 @@ let () =
 
   match !action with
       Ast -> P.printAst ast
-    | _ -> let ssast = Semant.check hast in
+    | _ -> (*let ssast = Semant.check hast in*)
          match !action with
               Ast     -> ()
             | Mast    -> P.printMast hast
@@ -48,16 +52,18 @@ let () =
                     | Netlist -> P.printNet netlist
                     | Forloops -> P.printNet (F.unloop netlist)
                     | SimpleLines -> P.printNet (SL.simplify (F.unloop netlist))
-                    | Index -> P.printNet (I.index (SL.simplify (F.unloop netlist)))
-                    | _ -> let netlist2 = E.collapse2 (I.index (SL.simplify (F.unloop netlist))) in
+                    | SimpleLinesTop -> P.printNet (T0.topsort (SL.simplify (F.unloop netlist)))
+                    | Index -> P.printNet (I.index (T0.topsort (SL.simplify (F.unloop netlist))))
+                    | _ -> let netlist2 = E.collapse2 (I.index (T0.topsort (SL.simplify (F.unloop netlist)))) in
                         match !action with
                               Ast -> ()
                             | Mast -> ()
+                            | Sast -> print_string ("")
                             | Netlist -> ()
                             | Forloops -> ()
                             | SimpleLines -> ()
                             | Netlist2 -> P.printNet2 netlist2
-                            | Sast    -> print_string ("")
+                            | Topsort -> P.printNet2 (T.topsort netlist2)
                             | LLVM_IR -> print_string (L.string_of_llmodule (C.translate netlist2))
                             | Compile -> let m = C.translate netlist2 in
 	                                Llvm_analysis.assert_valid_module m;

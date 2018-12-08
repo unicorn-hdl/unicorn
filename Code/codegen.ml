@@ -137,7 +137,7 @@ let translate (netlist, globals) =
         | "Not" ->
             L.build_store (L.build_not (getVal r1) (l^"'svalue") builder) (lookup l) builder; builder
         | a -> print_endline("ERROR: there is an unrecognized op in expr in codegen");
-            L.const_int i1_t 0; builder
+            builder
 
       in
     

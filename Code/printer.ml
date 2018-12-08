@@ -37,7 +37,12 @@ let rec getBinExpr = function
  | Call(id, arglist) -> id ^ "(" ^ listToString (fun x-> getBinExpr x ^ ",") arglist ^ ")"
  | Print(id, x) -> "print " ^ id ^ ":  " ^ getBinExpr x ^ ";"
  | For(var, range, lines) -> "for(" ^ var ^ "){\n" ^ toStringBinExprlist lines
- | ModExpr(modz, args, parent) -> "\n\tin: " ^ listToString (fun x-> getBinExpr x ^ ",") args ^ "\n\t" ^ toStringMod modz
+ | ModExpr(modz, args, parent) -> 
+                 let parNm = match parent with
+                    | Some(ModExpr(Module_decl(_,nm,_,_),_,_)) -> nm
+                    | None -> "noPar" in
+                 "\n\tin: " ^ listToString (fun x-> getBinExpr x ^ ",") args ^
+                 "\nof: " ^ parNm ^ "\n\t" ^ toStringMod modz
  | _ -> "?"
 
  and makeline x = "\t" ^ x ^ ";\n"
@@ -62,7 +67,7 @@ let printAst pgm = print_endline ("\n\n~~PRINTING AST~~\n");
                    print_endline (listToString (fun x->x) (toStringPgm pgm))
 
 let printMast pgm = print_endline ("\n\n~~PRINTING MAST~~\n");
-                    print_endline (getBinExpr (ModExpr(pgm,[],emptyMod)))
+                   print_endline (getBinExpr pgm)
 
 let printNet pgm = print_endline ("\n\n~~PRINTING NAST~~\n");
                     List.iter (fun x->print_endline (getBinExpr x^";")) pgm

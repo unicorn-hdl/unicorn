@@ -36,44 +36,50 @@ and actOnline (line, par, m, m2) = match line with
                     ModExpr(Module_decl(a,b,c, (runThroughLines d par m m2)), args, par)
                else raise( MissingFunction ("Module " ^ name ^ 
                " not found! Make sure module is declared."))
-(*
-Call(name, args)
-*)
     | ModExpr(Module_decl(a,b,c,d), args, parent) -> 
             let _ = print_endline ("Something's wrong! modExpr called in modfill") in
+            let this = ModExpr(Module_decl(a,b,c,d), args, None) in
             if StringMap.find b m2
-            then ModExpr(Module_decl(a,b,c,d), args, parent)
-            else ModExpr(Module_decl(a,b,c, runThroughLines d par m m2), args, parent)
+            then ModExpr(Module_decl(a,b,c,d), args, Some this)
+            else ModExpr(Module_decl(a,b,c, runThroughLines d par m m2), args, Some this)
             (*TODO actually make updates to m2*)
             (*TODO it seems like parent is never actually used. If unecessary, trash it*)
             (*It also seems like ModExpr should never be called. Check that it isn't*)
     | Noexpr -> Noexpr
     | a -> print_endline("ERROR: Case not found!"); a
 
+let rec setPars (line,par, m, m2) = match line with
+    | Buslit(x) -> Buslit(x)
+    | BoolId(x) -> BoolId(x)
+    | BoolBinop(l, op, r) -> BoolBinop(setPars (l,par, m, m2), op, setPars (r,par,m, m2))
+    | Unop(op, exp) -> Unop(op, setPars (exp,par,m,m2))
+    | Assign(a, e1, e2, b) -> Assign(a, setPars (e1,par,m,m2), setPars (e2,par,m,m2), b)
+    | Index(e, r) -> Index(setPars (e,par,m, m2), r)
+    | Print(s, e) -> Print(s, setPars (e,par,m, m2))
+    | For(s, r, e) -> For(s, r, List.map (fun x -> setPars(x,par,m,m2)) e)
+    | Call(name, args) -> 
+               let _ = print_endline ("Something's wrong! Call called in modfill setPars") in
+               Call(name,args)
+    | ModExpr(Module_decl(a,b,c,d), args, parent) -> 
+            if (par = None)
+            then ModExpr(Module_decl(a,b,c, List.map (fun x -> setPars(x,Some line,m,m2)) d), args, None)
+            else ModExpr(Module_decl(a,b,c, List.map (fun x -> setPars(x,Some line,m,m2)) d), args, par )
+    | Noexpr -> Noexpr
+    | a -> print_endline("ERROR: Case not found!"); a
+
+
 (*Helper method for fillHelper. Replaces d in some mod with d' where d' is lines where calls are replaced with mods*)
 let replaceCalls (Module_decl(a, b, c, d), par, m, m2) =
                         ((Module_decl(a, b, c, (runThroughLines d par m m2))), m, m2)
 
-(*create an example ast*)
-let callx x = ( Call(x, []) )
-let modA = Module_decl([], "modA", [], [])
-let bExprs = 
-        [Print("printname", callx "modA")]
-let modB = Module_decl([], "modB", [], bExprs)
-let e = StringMap.empty
-
-let mdlistEx = [modA;
-                modB
-               ]
-;;
 
 (*create map that links module names to the modules themselves*)
 let populateMap map (Module_decl(a,b,c,d)) = StringMap.add b (Module_decl(a,b,c,d)) map
-let createMapz mdlist = List.fold_left populateMap e mdlist;;
+let createMapz mdlist = List.fold_left populateMap StringMap.empty mdlist;;
 
 (*Make a string map that keeps track of whether a module has been "decompressed"*)
 let popIsFilledMap map (Module_decl(a,b,c,d)) = StringMap.add b false map
-let makeIsFilledMap mdlist = List.fold_left popIsFilledMap e mdlist;;
+let makeIsFilledMap mdlist = List.fold_left popIsFilledMap StringMap.empty mdlist;;
 
 (*print stuff*) 
 (*
@@ -99,20 +105,26 @@ printMap theMap
 *)
 
 (*general calls*)
+(*
 let fillMap = makeIsFilledMap mdlistEx;;
 let theMap = createMapz mdlistEx;;
-let par = Module_decl([],"",[],[]);;
+*)
 let main nameMap = if StringMap.mem "main" nameMap 
     then StringMap.find "main" nameMap
     else raise(MissingFunction "There is no main function. Please create a main");;
     (*
     else par;;
 *)
-let fillHelper mdlist nameMap fillMap = replaceCalls ((main nameMap), par, nameMap, fillMap);;
+let fillHelper mdlist nameMap fillMap = replaceCalls ((main nameMap), None, nameMap, fillMap);;
 let genFill mdlist nameMap fillMap = (fun (a,b,c)-> a) (fillHelper mdlist nameMap fillMap);;
 
 (*~fn called in unic~*)
 (*mdlist -> md*)
-let fill mdlist = genFill mdlist (createMapz mdlist) (makeIsFilledMap mdlist);;
+let fill mdlist = 
+        let filledMap =  fillHelper mdlist (createMapz mdlist) (makeIsFilledMap mdlist) in
+        let fst (a,_,_) = a in
+        let snd (_,b,_) = b in
+        let thd (_,_,c) = c in
+        setPars (ModExpr( (fst filledMap),[],None ), None, snd(filledMap), thd(filledMap))
 (*~fn called in unic~*)
 

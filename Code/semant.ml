@@ -144,7 +144,6 @@ let rec checkValidity map expr = match expr with
             let checkArgs = List.map2 (map2fn map) fms args in
             let fold2fn (_,m) ((Lit(x)), fm) arg = (0, StringMap.add fm x m) in
             let initVarTable = List.fold_left2 fold2fn (0,StringMap.empty) fms args in
-            let _ = printMap (snd initVarTable) (name^"#init#") in
             let foldfn (_,b) expr = (checkValidity b) expr in
             let result = List.fold_left foldfn initVarTable (exprs) in
             let finalMap = snd result in 
