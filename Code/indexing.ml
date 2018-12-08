@@ -23,7 +23,7 @@ let rec loop from1 until from2 outlist expr = match expr with
           | BoolId(x) ->
                 if (from1 <= until)
                 then
-                  let assig = Assign(isR,id la from1, id ra from1, init) in
+                  let assig = Assign(isR,id la from1, id ra from2, init) in
                   loop (from1+1) until (from2+1) (assig::outlist) expr
                 else
                   outlist
