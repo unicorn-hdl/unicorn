@@ -16,12 +16,13 @@ It is initially set to the following:
 
 2) Run test suite and view print statements:
 
-./testall.sh
+	1) ./make
+	2) ./unic.native l filename.uni > filename.ll
+	3) At this point a bunch of debug statements get mixed in with llvm code,
+		So go into filename.ll and delete the beginning up through the line
+		; ModuleID = 'Unic'
+	4) /usr/local/Cellar/llvm/7.0.0/bin/llc -relocation-model=pic filename.ll
+	5) CC -o filename filename.s
+	6) ./filename
 
-
-
-
-
-
-
-
+*Where obviously filename is the name of the file You want to compile
