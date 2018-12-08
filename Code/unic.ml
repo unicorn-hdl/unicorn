@@ -40,31 +40,32 @@ let () =
   let hast = Harden2.harden (Modfill.fill ast) in
 
   match !action with
-      Ast -> P.printAst ast
-    | _ -> let ssast = Semant.check hast in
-         match !action with
-              Ast     -> ()
-            | Mast    -> P.printMast hast
-            | _       -> let netlist = E.collapse hast in 
-                match !action with
-                      Ast -> ()
-                    | Mast-> ()
-                    | Netlist -> P.printNet netlist
-                    | Forloops -> P.printNet (F.unloop netlist)
-                    | SimpleLines -> P.printNet (SL.simplify (F.unloop netlist))
-                    | SimpleLinesTop -> P.printNet (T0.topsort (SL.simplify (F.unloop netlist)))
-                    | Index -> P.printNet (I.index (T0.topsort (SL.simplify (F.unloop netlist))))
-                    | _ -> let netlist2 = E.collapse2 (I.index (T0.topsort (SL.simplify (F.unloop netlist)))) in
-                        match !action with
-                              Ast -> ()
-                            | Mast -> ()
-                            | Sast -> print_string ("")
-                            | Netlist -> ()
-                            | Forloops -> ()
-                            | SimpleLines -> ()
-                            | Netlist2 -> P.printNet2 netlist2
-                            | Topsort -> P.printNet2 (T.topsort netlist2)
-                            | LLVM_IR -> print_string (L.string_of_llmodule (C.translate netlist2))
-                            | Compile -> let m = C.translate netlist2 in
-	                                Llvm_analysis.assert_valid_module m;
-	                                print_string (L.string_of_llmodule m)
+      Ast  -> P.printAst ast
+    | Mast -> P.printMast hast
+    | Sast -> Semant.check hast; ()
+    | _    -> 
+        let _ = Semant.check hast in
+        let netlist = E.collapse hast in 
+        match !action with
+            Ast -> ()
+          | Mast-> ()
+          | Sast-> ()
+          | Netlist -> P.printNet netlist
+          | Forloops -> P.printNet (F.unloop netlist)
+          | SimpleLines -> P.printNet (SL.simplify (F.unloop netlist))
+          | SimpleLinesTop -> P.printNet (T0.topsort (SL.simplify (F.unloop netlist)))
+          | Index -> P.printNet (I.index (T0.topsort (SL.simplify (F.unloop netlist))))
+          | _ -> let netlist2 = E.collapse2 (I.index (T0.topsort (SL.simplify (F.unloop netlist)))) in
+              match !action with
+                Ast -> ()
+              | Mast -> ()
+              | Sast -> () 
+              | Netlist -> ()
+              | Forloops -> ()
+              | SimpleLines -> ()
+              | Netlist2 -> P.printNet2 netlist2
+              | Topsort -> P.printNet2 (T.topsort netlist2)
+              | LLVM_IR -> print_string (L.string_of_llmodule (C.translate netlist2))
+              | Compile -> let m = C.translate netlist2 in
+	          Llvm_analysis.assert_valid_module m;
+	          print_string (L.string_of_llmodule m)

@@ -1,5 +1,7 @@
 main(){
-	print x: concat(0101b, 1111b);	
+	a = 0101b;
+	print x: concat(a, b);	
+	b = 1111b;
 	out:;
 }
 concat(a<4>,b<4>){

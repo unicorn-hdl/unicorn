@@ -34,11 +34,15 @@ let rec collapseFn maps exp = match exp with
             (Assign(isReg, fst l2, fst r2, init), snd l2)
     | Index(ModExpr(Module_decl(out,nm,fm,exps), args, par),Range(IntId(a),b)) ->
         let oldMap = maps in
-        let argMapBuilder map (sz,nm) arg = StringMap.add nm arg map in
+        let parMap =
+                 let getNm x = match x with
+                    (Some(ModExpr(Module_decl(_,nm,_,_),_,_))) -> nm
+                   | None -> ""
+                   | Some x -> print_endline("missed caseZ: "^Printer.getBinExpr x); "" in
+                 let tag =  if (nm="main") then "_" else getNm par in 
+                 {n=tag; argMap=oldMap.argMap; cMap=oldMap.cMap; net=maps.net} in
+        let argMapBuilder outmap (sz,nm) arg = StringMap.add nm (fst(collapseFn parMap arg)) outmap in
         let argMap = List.fold_left2 argMapBuilder StringMap.empty fm args in
-        let _ = print_endline("argMap: ") in
-        let _ = StringMap.iter (fun k v -> print_endline k) argMap in
-        let _ = print_endline("argMapDone") in
         let maps = {n=nm; argMap=argMap; cMap=maps.cMap; net=maps.net} in
         let maps = 
             if StringMap.mem maps.n maps.cMap 
@@ -99,9 +103,6 @@ let rec collapseFn maps exp = match exp with
                  {n=tag; argMap=oldMap.argMap; cMap=oldMap.cMap; net=maps.net} in
         let argMapBuilder outmap (sz,nm) arg = StringMap.add nm (fst(collapseFn parMap arg)) outmap in
         let argMap = List.fold_left2 argMapBuilder StringMap.empty fm args in
-        let _ = print_endline("argMap: ") in
-        let _ = StringMap.iter (fun k v -> print_endline (k^": "^ Printer.getBinExpr v)) argMap in
-        let _ = print_endline("argMapDone") in
         let maps = {n=nm; argMap=argMap; cMap=maps.cMap; net=maps.net} in
         let maps = 
             if StringMap.mem maps.n maps.cMap 

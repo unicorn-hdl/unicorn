@@ -33,7 +33,9 @@ let rangeIsValid a b =
     else raise(InvalidRange ("The range (" ^ string_of_int a ^ ", " ^ 
                                 string_of_int b ^ ") is invalid!"))
 
-let rec checkValidity map expr = match expr with  
+let rec checkValidity map expr = 
+        let _ = printMap map "" in
+        match expr with  
       Buslit(valz) -> (String.length valz -1, map)
     | BoolId(name) -> 
         if StringMap.mem name map
@@ -62,13 +64,11 @@ let rec checkValidity map expr = match expr with
                 let b' = getLit b in
                 let a' = getLit a in
                 if (rtyp = (b'-a'+1))
-                then 
-                    if StringMap.mem x map
-                    then
-                        if StringMap.find x map < b'+1
-                        then (rtyp, StringMap.add x (b'+1) map)
-                        else (rtyp, map)
-                    else (rtyp, StringMap.add x (b'+1) map) 
+                then if StringMap.mem x map
+                     then if StringMap.find x map < b'+1
+                          then (rtyp, StringMap.add x (b'+1) map)
+                          else (rtyp, map)
+                     else (rtyp, StringMap.add x (b'+1) map) 
                 else raise(TypeMismatch 
                 ("You tried assigning " ^ Printer.getBinExpr rval
                 ^ " of size " ^ string_of_int rtyp ^ " to " ^  x 
@@ -77,6 +77,21 @@ let rec checkValidity map expr = match expr with
             | x -> print_endline("Missed case: "^ Printer.getBinExpr x); (rtyp, map)
         )
     (*TODO note that harden will be weird and we actually need to account for this case*)
+    | Index(ModExpr(Module_decl(outs,nm,_,_),_,_), Range(a,b)) ->
+            if (a = b)
+            then match a with
+                Lit(x) -> 
+                    if (List.length outs > x)
+                    then (x,map)
+                    else raise (InvalidRange ("ERROR: You tried to access the "^string_of_int x^"th
+                    element of "^nm^" but it only has "^string_of_int (List.length outs)^" outputs!"))
+              | IntId(x) ->
+                    let getLit (Lit(x)) = x in
+                    if (List.exists (fun (_,a) -> a=x) outs)
+                    then (getLit (fst(List.find (fun (_,a) -> a=x) outs)),map)
+                    else raise(InvalidRange("ERROR: You tried to access "^x^" but "^nm^" has no such outputs!"))
+            else raise(InvalidRange ("You can only access one output from a module at a time!"))
+            
     | Index(expr, Range(a,b)) -> 
             let getLit exp = (match exp with
                   Lit(x) -> x
@@ -88,7 +103,7 @@ let rec checkValidity map expr = match expr with
                 if (size > b')
                 then (b'-a'+1, map)
                 else raise(TypeMismatch
-                ("You tried accessing a number too big"))
+                ("ERROR: You tried accessing a number too big"))
                 (*TODO write a better message*)
                 (*TODO I think this accounts for every case, but haven't checked, run tests*)
 
@@ -114,12 +129,11 @@ let rec checkValidity map expr = match expr with
     | Print(_, exp) -> checkValidity map exp
     | Call(_) -> print_endline ("something is way wrong. Call is showing up in checkValidity");
                  (0,map)
-    | For(str, Range(a,b), lines) ->
+    | For(str, Range(Lit(a),Lit(b)), lines) ->
+         let lines = List.map (Noloop2.replace str b) lines in
+         let _ = Printer.printNet lines in
          let maps = List.map (checkValidity map) lines in
-         let getLit (Lit(x)) = x in
-         let a' = getLit a in
-         let b' = getLit b in
-         let _ = rangeIsValid a' b' in
+         let _ = rangeIsValid a b in
          let f k v1 v2 = Some v1 in
          let helper outMap (_,map) = StringMap.union f outMap map in 
          let newMap = List.fold_left helper StringMap.empty maps in
@@ -150,6 +164,7 @@ let rec checkValidity map expr = match expr with
             let getLit (Lit(x),_) = x in
             
             (*TODO this actually needs to be declared recursively, for every binExpr but I don't feel like it rn*)
+            (*
             let listGen strmp expr = match expr with
                  Assign(_, lval, rval, _) ->(match lval with
                       BoolId(x) -> StringMap.add x (fst(checkValidity finalMap rval)) strmp
@@ -157,17 +172,18 @@ let rec checkValidity map expr = match expr with
                     | a -> strmp)
                | a -> strmp in
             let outVarMap = List.fold_left listGen StringMap.empty exprs in
-            let _ = outVarMap in
-            let checkOut outVarMap out = 
-                    if StringMap.mem (snd out) outVarMap
-                        then 
-                            let sz = StringMap.find (snd out) outVarMap in
-                            if (sz = getLit out)
-                            then ()
-                            else raise(TypeMismatch ("The output call "^ snd out ^"<"^ string_of_int (getLit out)^ ">"^
-                            "does not match assignment of size "^ string_of_int sz)) 
-                        else raise(UndeclaredVar ("The output call "^ snd out^ " is never defined")) in
-            let _ = List.iter (checkOut (*cart @Amazon*) outVarMap) out in
+*)
+            let checkOut out = 
+                if StringMap.mem (snd out) finalMap 
+                then 
+                    let _ = printMap finalMap "outvars" in
+                    let sz = StringMap.find (snd out) finalMap in
+                    if (sz = getLit out)
+                    then ()
+                    else raise(TypeMismatch ("The output call "^ snd out ^"<"^ string_of_int (getLit out)
+                       ^ ">"^ "does not match assignment of size "^ string_of_int sz)) 
+                else raise(UndeclaredVar ("The output call "^ snd out^ " is never defined")) in
+            let _ = List.iter checkOut (*cart @Amazon*) out in
             if (List.length out = 0)
             then (0, map)
             else (getLit (List.hd out), map)

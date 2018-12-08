@@ -132,12 +132,14 @@ let translate (netlist, globals) =
             L.build_store (L.build_and (getVal r1) (getVal r2) (l^"'svalue") builder) (lookup l) builder; builder
         | "Or" -> 
             L.build_store (L.build_or (getVal r1) (getVal r2) (l^"'svalue") builder) (lookup l) builder; builder
+        | "Xor" ->
+            L.build_store (L.build_xor (getVal r1) (getVal r2) (l^"'svalue") builder) (lookup l) builder; builder
         | "Ident" -> 
             L.build_store (getVal r1) (lookup l) builder; builder
         | "Not" ->
             L.build_store (L.build_not (getVal r1) (l^"'svalue") builder) (lookup l) builder; builder
-        | a -> print_endline("ERROR: there is an unrecognized op in expr in codegen");
-            builder
+        | a -> 
+            print_endline("ERROR: there is an unrecognized op in expr in codegen"); builder
 
       in
     

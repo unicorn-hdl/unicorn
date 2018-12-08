@@ -32,6 +32,7 @@ let rec replace str pos exp = match exp with
                     Assign(isR, l, replace str pos r, init)
           | BoolId(x) -> Assign(isR, l, replace str pos r, init)
        )
+      | Index(ModExpr(_,_,_),Range(_,_)) -> exp
       | Index(ex, Range(a,b)) -> Index(replace str pos ex, Range(intRep str pos a, intRep str pos b))
       | Print(nm,ex) -> Print(nm, replace str pos ex)
       | Call(_,_) -> print_endline("Error: Call got called in noloop."); Noexpr
