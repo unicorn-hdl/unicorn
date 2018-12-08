@@ -177,7 +177,5 @@ let rec checkValidity map expr = match expr with
             
     | a -> print_endline("missing case in checkvalidities: " ^ getBinExpr a ^ "DONE\n") ; (0,map)
 
-
-let check (Module_decl(out, nm, fm, binEx))= 
-    let hast = Module_decl(out, nm, fm, binEx) in
-    checkValidity StringMap.empty (ModExpr(hast,[], emptyMod));;
+let check hast =
+    checkValidity StringMap.empty hast

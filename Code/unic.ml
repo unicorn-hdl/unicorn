@@ -41,7 +41,7 @@ let () =
 
   match !action with
       Ast -> P.printAst ast
-    | _ -> (*let ssast = Semant.check hast in*)
+    | _ -> let ssast = Semant.check hast in
          match !action with
               Ast     -> ()
             | Mast    -> P.printMast hast

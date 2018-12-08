@@ -8,12 +8,21 @@ module StringMap = Map.Make(String)
 
 let topsort netlist = 
     let getStr = function
+        | Buslit(x) -> x
+        | BoolId(x) -> x 
+        | Index(Buslit(x),_) -> x
         | Index(BoolId(x),_) -> x
-        | BoolId(x) -> x in
+        | x -> print_endline("missed getStr case: "^ Printer.getBinExpr x); "" in
     let foldFn outMap expr = match expr with
         | Assign(_,x,_,_) -> StringMap.add (getStr x) expr outMap
         | Print(x,_) -> StringMap.add x expr outMap in
     let map = List.fold_left foldFn StringMap.empty netlist in
+    let lookup = function
+        | Buslit(x) -> Buslit(x)
+        | BoolId(x) -> StringMap.find x map in
+    let _ = print_endline ("\nA map!") in
+    let _ = StringMap.iter (fun k v -> print_string (k^", ") ) map in
+    let _ = print_endline ("end mapprint") in
     let dependencies expr = 
         let rval =
             match expr with
@@ -22,11 +31,10 @@ let topsort netlist =
         match rval with
         | Buslit(x) -> []
         | BoolId(x) -> print_endline("1: "^x); [StringMap.find x map]
-        | BoolBinop(l,op,r) -> print_endline("2"); [StringMap.find (getStr l) map; 
-                                StringMap.find (getStr r) map]
-        | Unop(op,ex) -> print_endline("3");[StringMap.find (getStr ex) map]
-        | Assign(_,_,_,_) -> print_endline("a thing should never happen did");[]
-        | Index(ex,_) -> print_endline("4: "^Printer.getBinExpr ex);[StringMap.find (getStr ex) map]
+        | BoolBinop(l,op,r) -> print_endline("2"); [lookup l ; lookup r]
+        | Unop(op,ex) -> print_endline("3");[lookup ex]
+        | Assign(_,_,_,_) -> print_endline("a thing that should never happen did");[]
+        | Index(ex,_) -> print_endline("4: "^Printer.getBinExpr ex);[lookup ex]
         | Print(_,_) -> print_endline("a thing that should never happen did");[]
         | Call(_,_) -> print_endline("a thing that should never happen did");[] 
         | For(_,_,_) -> print_endline("a thing that should never happen did");[]
