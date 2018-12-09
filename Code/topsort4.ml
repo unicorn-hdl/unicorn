@@ -23,6 +23,17 @@ let topsort netlist =
             else ((a,b,c,d), [lookup c; lookup d])::lst in
     let dep_libs = List.fold_left foldFn2 [] netlist in
 
+    let _ = print_endline("\n\n") in
+    let str4 (a,b,c,d) = ("("^a^", "^b^", "^c^", "^d^")") in
+    let str4 (a,b,c,d) = a in
+    let printf (a,lst) = 
+            let _ = print_string(str4 a^" -> ") in
+            let _ = List.iter (fun x->print_string(str4 x^"; ")) lst in
+            let _ = print_endline("") in
+            () 
+    in
+    let _ = List.iter printf dep_libs in
+
 
 (*Code here and beyond is not ours*)
 let dep_libs =

@@ -118,19 +118,25 @@ let rec loop from1 until from2 outlist expr = match expr with
 let indicize (outlist,slist) f = (f::outlist, slist)
 *)
 
-let rec semant (valz,map) = function
+let rec semant n (valz,map) = function
   | Buslit(x) -> (String.length x-1, map)
-  | BoolId(x) -> print_endline("looking for: "^x); (StringMap.find x map, map)
-  | BoolBinop(l,op,r) -> semant (valz,map) l
-  | Unop(op,ex) -> semant (valz,map) ex
+  | BoolId(x) -> 
+        let _ = print_endline("looking for: "^x) in
+        if StringMap.mem x map
+        then (StringMap.find x map, map)
+        else 
+          badSearch map n x
+          
+  | BoolBinop(l,op,r) -> semant n (valz,map) l
+  | Unop(op,ex) -> semant n (valz,map) ex
   | Assign(_,lval,rval,_) -> (match lval with
          BoolId(x) -> 
-                let s = semant (valz,map) rval in
+                let s = semant n (valz,map) rval in
                 (fst s, StringMap.add x (fst s) (snd s))
        | Index(BoolId(x),Range(_,Lit(b))) -> 
                       if StringMap.mem x map
                       then 
-                        let szx = semant (valz,map) rval in
+                        let szx = semant n (valz,map) rval in
                         let mx = max (fst szx) b+1 in
                         (mx, StringMap.add x mx map)
                       else ((b+1), StringMap.add x (b+1) map)
@@ -143,6 +149,35 @@ let rec semant (valz,map) = function
   | Noexpr -> print_endline ("Something is wrong. Noexpr should not be called in indexing");(valz,map)
   | x -> print_endline ("Missed case (indexing): "^ Printer.getBinExpr x); (valz,map)
                    
+and badSearch map n str =
+   let _ = print_endline("into badsearch") in
+   let badfold (valz,map) expr = match expr with
+   Assign(_,lval,rval,_) -> 
+        (match lval with
+        BoolId(x) ->
+                if (x=str)
+                then 
+                  let s = semant n (valz,map) rval in
+                  (fst s, StringMap.add x (fst s) (snd s))
+                else
+                  (valz,map)
+      | Index(BoolId(x),Range(_,Lit(b))) ->
+                if (x=str)
+                then 
+                  if StringMap.mem x map
+                  then 
+                    let szx = semant n (0,map) rval in
+                    let mx = max (fst szx) b+1 in
+                    (mx, StringMap.add x mx map)
+                  else ((b+1), StringMap.add x (b+1) map)
+                else
+                  (valz,map)
+        )
+  | x -> (valz,map)
+         
+    in
+   List.fold_left badfold (0,map) n
+
 let indicize (outlist,slist) line = 
             let from2 x = (match x with  
             Buslit(x) -> 0
@@ -169,13 +204,15 @@ let indicize (outlist,slist) line =
             )
   | Print(nm,ex) -> 
             let from2 = from2 ex in
-            let sz = semant (0,slist) ex in
+            let sz = semant [] (0,slist) ex in
             (loop 0 (fst sz-1) from2 outlist (Print(nm, ex)), slist)
   | x -> print_endline("Missed case in indexing: "^ Printer.getBinExpr x); (outlist,slist)
 
 let printf k v = print_endline(k^ ": "^ (string_of_int v))
 
 let index netlist = 
-        let slist = snd(List.fold_left semant (0, StringMap.empty) netlist) in
+        let slist = snd(List.fold_left (semant netlist) (0, StringMap.empty) netlist) in
+        let _ = print_endline ("printing slist") in
         let _ = StringMap.iter printf (slist) in
+        let _ = print_endline ("donedone  printing slist") in
         List.rev (fst(List.fold_left indicize ([],slist) netlist))

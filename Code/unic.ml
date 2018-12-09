@@ -11,7 +11,7 @@ module I = Indexing
    check the resulting AST and generate an SAST from it, generate LLVM IR,
    and dump the module *)
 
-type action = Ast | Sast | Mast | Netlist | Forloops | SimpleLines | SimpleLinesTop | Index | Netlist2 | Topsort | LLVM_IR | Compile
+type action = Ast | Sast | Mast | Hast | Netlist | Forloops | SimpleLines | SimpleLinesTop | Index | Netlist2 | Topsort | LLVM_IR | Compile
 
 let () =
   let action = ref Compile in
@@ -19,6 +19,7 @@ let () =
   let speclist = [
     ("-a",  Arg.Unit (set_action Ast), "Print the AST");
     ("-m",  Arg.Unit (set_action Mast), "Print the modfilled AST");
+    ("-h",  Arg.Unit (set_action Hast), "Print the hardened AST");
     ("-s",  Arg.Unit (set_action Sast), "Print the SAST");
     ("-n",  Arg.Unit (set_action Netlist), "Print Netlist");
     ("-f",  Arg.Unit (set_action Forloops), "Print Netlist with collapsed for loops");
@@ -37,11 +38,13 @@ let () =
   
   let lexbuf = Lexing.from_channel !channel in
   let ast = Parser.program Scanner.token lexbuf in  
-  let hast = Harden2.harden (Modfill.fill ast) in
+  let hast = Harden2.harden (F.unloop (Modfill.fill ast)) in
 
   match !action with
       Ast  -> P.printAst ast
-    | Mast -> P.printMast hast
+    | Mast -> P.printMast (Modfill.fill ast)
+    | Forloops -> P.printMast (F.unloop (Modfill.fill ast))
+    | Hast -> P.printMast hast
     | Sast -> Semant.check hast; ()
     | _    -> 
         let _ = Semant.check hast in
@@ -50,12 +53,17 @@ let () =
             Ast -> ()
           | Mast-> ()
           | Sast-> ()
+          | Forloops -> () 
           | Netlist -> P.printNet netlist
-          | Forloops -> P.printNet (F.unloop netlist)
-          | SimpleLines -> P.printNet (SL.simplify (F.unloop netlist))
+          | SimpleLines -> P.printNet (SL.simplify (netlist))
+          (*
           | SimpleLinesTop -> P.printNet (T0.topsort (SL.simplify (F.unloop netlist)))
           | Index -> P.printNet (I.index (T0.topsort (SL.simplify (F.unloop netlist))))
           | _ -> let netlist2 = E.collapse2 (I.index (T0.topsort (SL.simplify (F.unloop netlist)))) in
+*)
+          | SimpleLinesTop -> P.printNet ( (SL.simplify netlist))
+          | Index -> P.printNet (I.index ( (SL.simplify netlist)))
+          | _ -> let netlist2 = E.collapse2 (I.index ( (SL.simplify netlist))) in
               match !action with
                 Ast -> ()
               | Mast -> ()

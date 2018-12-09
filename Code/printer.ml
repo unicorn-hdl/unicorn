@@ -29,7 +29,7 @@ let rec getBinExpr = function
  | BoolId(x) -> x
  | BoolBinop(a,b,c) -> (getBinExpr a) ^ " " ^ (opToString b) ^ " " ^ (getBinExpr c)
  | Unop(Not,a) -> "~" ^ getBinExpr a
- | Noexpr -> ""
+ | Noexpr -> "noexpr"
  | Index(expr, ind) -> getBinExpr expr ^ index ind
  | Assign(isReg, lval, rval, initval) -> if isReg
         then getBinExpr lval ^ ":= " ^ getBinExpr rval ^ " init " ^ string_of_bool initval

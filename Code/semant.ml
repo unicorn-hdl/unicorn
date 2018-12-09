@@ -13,6 +13,9 @@ let printMap map name=
         StringMap.iter (fun k v -> print_string(k ^"<"^string_of_int v^">, ")) map;
         print_endline ("\ndone printing map");;
 
+let lookup str map =
+       StringMap.find str map
+
 
 let rec evalInt = function
  | Lit(x) -> x
@@ -39,7 +42,7 @@ let rec checkValidity map expr =
       Buslit(valz) -> (String.length valz -1, map)
     | BoolId(name) -> 
         if StringMap.mem name map
-        then (StringMap.find name map, map)
+        then (lookup name map, map)
         else raise (UndeclaredVar ("Variable \"" ^ name ^ "\" is not defined!"))
     | BoolBinop(l, op, r) -> 
         let ltyp = checkValidity map l in
@@ -65,7 +68,7 @@ let rec checkValidity map expr =
                 let a' = getLit a in
                 if (rtyp = (b'-a'+1))
                 then if StringMap.mem x map
-                     then if StringMap.find x map < b'+1
+                     then if (lookup x map < b'+1)
                           then (rtyp, StringMap.add x (b'+1) map)
                           else (rtyp, map)
                      else (rtyp, StringMap.add x (b'+1) map) 
@@ -87,6 +90,7 @@ let rec checkValidity map expr =
                     element of "^nm^" but it only has "^string_of_int (List.length outs)^" outputs!"))
               | IntId(x) ->
                     let getLit (Lit(x)) = x in
+                    let _ = print_endline("here last") in
                     if (List.exists (fun (_,a) -> a=x) outs)
                     then (getLit (fst(List.find (fun (_,a) -> a=x) outs)),map)
                     else raise(InvalidRange("ERROR: You tried to access "^x^" but "^nm^" has no such outputs!"))
@@ -130,6 +134,7 @@ let rec checkValidity map expr =
     | Call(_) -> print_endline ("something is way wrong. Call is showing up in checkValidity");
                  (0,map)
     | For(str, Range(Lit(a),Lit(b)), lines) ->
+         let _ = print_endline ("Is the problem here?") in
          let lines = List.map (Noloop2.replace str b) lines in
          let _ = Printer.printNet lines in
          let maps = List.map (checkValidity map) lines in
@@ -177,7 +182,7 @@ let rec checkValidity map expr =
                 if StringMap.mem (snd out) finalMap 
                 then 
                     let _ = printMap finalMap "outvars" in
-                    let sz = StringMap.find (snd out) finalMap in
+                    let sz = lookup (snd out) finalMap in
                     if (sz = getLit out)
                     then ()
                     else raise(TypeMismatch ("The output call "^ snd out ^"<"^ string_of_int (getLit out)
