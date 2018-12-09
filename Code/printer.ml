@@ -1,6 +1,9 @@
 open Ast
 module StringMap = Map.Make(String)
 
+let p x = print_endline x
+let sOfI x = string_of_int x
+
 let concat a b = a ^ b
 let listToString fn thinglist = List.fold_left concat "" (List.map fn thinglist)
 

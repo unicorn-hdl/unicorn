@@ -1,4 +1,5 @@
 open Ast
+open Printer
 module StringMap = Map.Make(String)
 
 let id boolin digit = match boolin with
@@ -126,7 +127,6 @@ let rec semant n (valz,map) = function
         then (StringMap.find x map, map)
         else 
           badSearch map n x
-          
   | BoolBinop(l,op,r) -> semant n (valz,map) l
   | Unop(op,ex) -> semant n (valz,map) ex
   | Assign(_,lval,rval,_) -> (match lval with
@@ -136,23 +136,26 @@ let rec semant n (valz,map) = function
        | Index(BoolId(x),Range(_,Lit(b))) -> 
                       if StringMap.mem x map
                       then 
-                        let szx = semant n (valz,map) rval in
-                        let mx = max (fst szx) b+1 in
-                        (mx, StringMap.add x mx map)
-                      else ((b+1), StringMap.add x (b+1) map)
-  )
+                        let szx = StringMap.find x map in
+                        let mx = max szx (b+1) in
+                        let map = StringMap.add x mx map in
+                        (mx, map) 
+                      else 
+                        let map = StringMap.add x (b+1) map in
+                        ((b+1), map)
+        )
   | Print(_,_) -> (valz,map)
   | Index(_,Range(Lit(a),Lit(b))) -> (b-a+1,map)
-  | Call(_,_)  -> print_endline ("Something is wrong. Call should not be called in indexing");(valz,map)
-  | For(_,_,_) -> print_endline ("Something is wrong. For should not be called in indexing");(valz,map)
-  | ModExpr(_,_,_) -> print_endline ("Something is wrong. ModExpr should not be called in indexing");(valz,map)
-  | Noexpr -> print_endline ("Something is wrong. Noexpr should not be called in indexing");(valz,map)
-  | x -> print_endline ("Missed case (indexing): "^ Printer.getBinExpr x); (valz,map)
+  | Call(_,_)  -> p ("Something is wrong. Call should not be called in indexing");(valz,map)
+  | For(_,_,_) -> p ("Something is wrong. For should not be called in indexing");(valz,map)
+  | ModExpr(_,_,_) -> p ("Something is wrong. ModExpr should not be called in indexing");(valz,map)
+  | Noexpr -> p ("Something is wrong. Noexpr should not be called in indexing");(valz,map)
+  | x -> p ("Missed case (indexing): "^ Printer.getBinExpr x); (valz,map)
                    
 and badSearch map n str =
-   let _ = print_endline("into badsearch") in
+   let _ = print_endline("\n\n\ninto badsearch\n\n") in
    let badfold (valz,map) expr = match expr with
-   Assign(_,lval,rval,_) -> 
+     Assign(_,lval,rval,_) -> 
         (match lval with
         BoolId(x) ->
                 if (x=str)
@@ -162,21 +165,20 @@ and badSearch map n str =
                 else
                   (valz,map)
       | Index(BoolId(x),Range(_,Lit(b))) ->
+                let _ = p ("here?") in
                 if (x=str)
                 then 
                   if StringMap.mem x map
                   then 
                     let szx = semant n (0,map) rval in
-                    let mx = max (fst szx) b+1 in
+                    let mx = max (fst szx) (b+1) in
                     (mx, StringMap.add x mx map)
                   else ((b+1), StringMap.add x (b+1) map)
                 else
                   (valz,map)
         )
-  | x -> (valz,map)
-         
-    in
-   List.fold_left badfold (0,map) n
+  | x -> (valz,map) in
+  List.fold_left badfold (0,map) n
 
 let indicize (outlist,slist) line = 
             let from2 x = (match x with  
@@ -212,7 +214,5 @@ let printf k v = print_endline(k^ ": "^ (string_of_int v))
 
 let index netlist = 
         let slist = snd(List.fold_left (semant netlist) (0, StringMap.empty) netlist) in
-        let _ = print_endline ("printing slist") in
-        let _ = StringMap.iter printf (slist) in
-        let _ = print_endline ("donedone  printing slist") in
+        let _ = Semant.printMap slist "semant" in
         List.rev (fst(List.fold_left indicize ([],slist) netlist))

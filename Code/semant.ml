@@ -37,7 +37,6 @@ let rangeIsValid a b =
                                 string_of_int b ^ ") is invalid!"))
 
 let rec checkValidity map expr = 
-        let _ = printMap map "" in
         match expr with  
       Buslit(valz) -> (String.length valz -1, map)
     | BoolId(name) -> 
@@ -90,7 +89,6 @@ let rec checkValidity map expr =
                     element of "^nm^" but it only has "^string_of_int (List.length outs)^" outputs!"))
               | IntId(x) ->
                     let getLit (Lit(x)) = x in
-                    let _ = print_endline("here last") in
                     if (List.exists (fun (_,a) -> a=x) outs)
                     then (getLit (fst(List.find (fun (_,a) -> a=x) outs)),map)
                     else raise(InvalidRange("ERROR: You tried to access "^x^" but "^nm^" has no such outputs!"))
@@ -134,9 +132,7 @@ let rec checkValidity map expr =
     | Call(_) -> print_endline ("something is way wrong. Call is showing up in checkValidity");
                  (0,map)
     | For(str, Range(Lit(a),Lit(b)), lines) ->
-         let _ = print_endline ("Is the problem here?") in
          let lines = List.map (Noloop2.replace str b) lines in
-         let _ = Printer.printNet lines in
          let maps = List.map (checkValidity map) lines in
          let _ = rangeIsValid a b in
          let f k v1 v2 = Some v1 in
@@ -150,8 +146,6 @@ let rec checkValidity map expr =
     | ModExpr(Module_decl(out,name,fms,exprs), args, _) -> 
         if List.length fms = List.length args
         then
-            let _ = print_endline ("checking mod " ^ name) in
-            let _ = print_endline ("args: " ^ Printer.toStringBinExprlist args) in
             let oldMap = map in 
             let map2fn map ((Lit(x)),fm) arg =
                     let fmVal = checkValidity map arg in
@@ -181,7 +175,6 @@ let rec checkValidity map expr =
             let checkOut out = 
                 if StringMap.mem (snd out) finalMap 
                 then 
-                    let _ = printMap finalMap "outvars" in
                     let sz = lookup (snd out) finalMap in
                     if (sz = getLit out)
                     then ()
