@@ -32,7 +32,7 @@ let topsort netlist =
             let _ = print_endline("") in
             () 
     in
-    let _ = List.iter printf dep_libs in
+    (*let _ = List.iter printf dep_libs in*)
 
 
 (*Code here and beyond is not ours*)

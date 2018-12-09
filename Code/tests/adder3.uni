@@ -1,29 +1,26 @@
 main() {
-	a = 010b;
-	b = 011b;
-    print hi: rippleAdder(a, b);
+	a = 01101101b;
+	b = 01010101b;
+    print sum: rippleAdder(a,b)[sum];
+	print overflow: rippleAdder(a,b)[overflow];
 	out:;
 }
 
-fullAdder(a, b, carryIn){
-    x = a xor b;
-    y = a and b;
-    z = carryIn and x;
-    sum = x xor carryIn;
-    carryOut = y or z;
-	out: sum, carryOut;
+fA(a, b, carryIn){
+	axb = a xor b;
+    sum = axb xor carryIn;
+    carry = (axb and carryIn) or (a and b);
+	out: sum, carry;
 }
 
- rippleAdder(a<3>, b<3>){
-    sumX[0] = fullAdder(a[0], b[0], 0b)[sum];
-	lastCarry[0] = 0b;
+rippleAdder(a<8>, b<8>){
+	c[0] = 0b;
 
-    for (i from 1 to 3){
-		a = 0b;
-		b = not a;
-        lastCarry[i] = fullAdder(a[i-1], b[i-1], lastCarry[i-1])[carryOut];
-        sumX[i] = fullAdder(a[i], b[i], lastCarry[i])[sum];
+    for (i from 0 to 7){
+		sum[i] = fA(a[i], b[i], c[i])[sum];
+		c[i+1] = fA(a[i], b[i], c[i])[carry];
     };
-	out: sumX<3>;
+	overflow = c[8];
+	out: sum<8>, overflow;
 }
 🦄

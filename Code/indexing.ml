@@ -5,7 +5,7 @@ module StringMap = Map.Make(String)
 let id boolin digit = match boolin with
        BoolId(nm) -> BoolId(nm^"["^(string_of_int digit)^"]")
      | Index(BoolId(nm),r) -> BoolId(nm^"["^(string_of_int digit)^"]")
-     | x -> print_endline("Missed case in id(indx): "^ Printer.getBinExpr x); x
+     | x -> p("Missed case in id(indx): "^ Printer.getBinExpr x); x
 
 let id2 boolin digit = 
         let x = id boolin digit in
@@ -60,7 +60,7 @@ let rec loop from1 until from2 outlist expr = match expr with
                   loop (from1+1) until (from2+1) (assig::outlist) expr
                 else
                   outlist
-          | a -> print_endline("missing case: "^ Printer.getBinExpr a); outlist
+          | a -> p("missing case: "^ Printer.getBinExpr a); outlist
         ) 
       | Print(nm, ex) -> 
           let nm = BoolId(nm) in
@@ -112,7 +112,7 @@ let rec loop from1 until from2 outlist expr = match expr with
                   loop (from1+1) until (from2+1) (prt::outlist) expr
                 else
                   outlist
-          | a -> print_endline("missing case: "^ Printer.getBinExpr a); outlist
+          | a -> p("missing case: "^ Printer.getBinExpr a); outlist
         ) 
 
   (*
@@ -122,7 +122,6 @@ let indicize (outlist,slist) f = (f::outlist, slist)
 let rec semant n (valz,map) = function
   | Buslit(x) -> (String.length x-1, map)
   | BoolId(x) -> 
-        let _ = print_endline("looking for: "^x) in
         if StringMap.mem x map
         then (StringMap.find x map, map)
         else 
@@ -153,7 +152,6 @@ let rec semant n (valz,map) = function
   | x -> p ("Missed case (indexing): "^ Printer.getBinExpr x); (valz,map)
                    
 and badSearch map n str =
-   let _ = print_endline("\n\n\ninto badsearch\n\n") in
    let badfold (valz,map) expr = match expr with
      Assign(_,lval,rval,_) -> 
         (match lval with
@@ -188,7 +186,7 @@ let indicize (outlist,slist) line =
           | Unop(op,ex) -> 0
           | Index(Buslit(x),Range(Lit(a),Lit(b))) -> a
           | Index(ex,Range(Lit(a),Lit(b))) -> a
-          | x -> print_endline ("MIssed case-indexingr: "^ Printer.getBinExpr x); 0
+          | x -> p ("MIssed case-indexingr: "^ Printer.getBinExpr x); 0
             ) in
     match line with
     Buslit(x) -> (outlist,slist)
@@ -196,23 +194,20 @@ let indicize (outlist,slist) line =
             let from2 = from2 r in
             (match l with
             Index(BoolId(x),Range(Lit(a),Lit(b))) ->
-                let _ = print_endline("inAssign: "^x^" "^string_of_int a^" "^string_of_int b^" "^string_of_int from2) in
                 (loop a b from2 outlist (Assign(isR,l,r,init)), slist)
           | BoolId(x) -> 
                 let sz = StringMap.find x slist in
-                let _ = print_endline("inAssign: "^x^" "^string_of_int (sz-1)^" "^string_of_int from2) in
                 (loop 0 (sz-1) from2 outlist (Assign(isR,l,r,init)), slist)
-          | x -> print_endline ("MIssed case-indexingl: "^ Printer.getBinExpr x); ([],slist)
+          | x -> p ("MIssed case-indexingl: "^ Printer.getBinExpr x); ([],slist)
             )
   | Print(nm,ex) -> 
             let from2 = from2 ex in
             let sz = semant [] (0,slist) ex in
             (loop 0 (fst sz-1) from2 outlist (Print(nm, ex)), slist)
-  | x -> print_endline("Missed case in indexing: "^ Printer.getBinExpr x); (outlist,slist)
+  | x -> p("Missed case in indexing: "^ Printer.getBinExpr x); (outlist,slist)
 
-let printf k v = print_endline(k^ ": "^ (string_of_int v))
+let printf k v = p(k^ ": "^ (string_of_int v))
 
 let index netlist = 
         let slist = snd(List.fold_left (semant netlist) (0, StringMap.empty) netlist) in
-        let _ = Semant.printMap slist "semant" in
         List.rev (fst(List.fold_left indicize ([],slist) netlist))

@@ -17,6 +17,8 @@ module A = Ast
 
 module StringMap = Map.Make(String)
 
+exception UndeclaredVar of string 
+
 (* translate : Sast.program -> Llvm.module *)
   let context    = L.global_context ();;
   
@@ -115,7 +117,7 @@ let translate (netlist, globals) =
     let lookup n = try StringMap.find n local_vars
                    with Not_found -> 
                          try StringMap.find n (global_vars)
-                         with Not_found -> print_endline("couldn't find "^n); L.const_int i1_t 0
+                         with Not_found -> raise (UndeclaredVar ("ERROR: The value of "^n^" was never defined!"))
     in
 
     (* Construct code for an expression; return its value *)
@@ -138,8 +140,9 @@ let translate (netlist, globals) =
             L.build_store (getVal r1) (lookup l) builder; builder
         | "Not" ->
             L.build_store (L.build_not (getVal r1) (l^"'svalue") builder) (lookup l) builder; builder
+        | "" -> builder
         | a -> 
-            print_endline("ERROR: there is an unrecognized op in expr in codegen"); builder
+            print_endline("ERROR: there is an unrecognized op ("^op^ ") in expr in codegen"); builder
 
       in
     
@@ -153,7 +156,6 @@ let translate (netlist, globals) =
 
 
     let add_terminal builder instr =
-      ignore(print_endline ("yoyoyo"));
       match L.block_terminator (L.insertion_block builder) with
 	    Some _ -> ()
       | None -> ignore (instr builder) in

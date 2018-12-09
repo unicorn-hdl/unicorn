@@ -73,7 +73,7 @@ let () =
               | SimpleLines -> ()
               | Netlist2 -> P.printNet2 netlist2
               | Topsort -> P.printNet2 (T.topsort netlist2)
-              | LLVM_IR -> print_string (L.string_of_llmodule (C.translate netlist2))
+              | LLVM_IR -> print_string (L.string_of_llmodule (C.translate (T.topsort netlist2)))
               | Compile -> let m = C.translate netlist2 in
 	          Llvm_analysis.assert_valid_module m;
 	          print_string (L.string_of_llmodule m)
