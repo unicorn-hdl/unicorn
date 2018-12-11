@@ -36,6 +36,28 @@ let rangeIsValid a b =
     else raise(InvalidRange ("The range (" ^ string_of_int a ^ ", " ^ 
                                 string_of_int b ^ ") is invalid!"))
 
+let rec findRegs outMap expr = 
+    let foldFn map ex = findRegs map ex in
+    match expr with
+    | Buslit(x) -> outMap
+    | BoolId(x) -> outMap
+    | BoolBinop(l,_,r) ->
+            let rmap = findRegs outMap r in
+            findRegs rmap l 
+    | Unop(_,x) -> findRegs outMap x 
+    | Assign(true,BoolId(x),r,init) ->
+            let rmap = findRegs outMap r in
+            StringMap.add x (String.length init -1) outMap
+    | Assign(false,_,r,_) -> findRegs outMap r
+    | Index(x,_) ->findRegs outMap x
+    | Print(_,x) -> findRegs outMap x
+    | Call(_,_) -> print_endline("Call got called in semant"); outMap
+    | For(_,_,exprs) -> List.fold_left foldFn outMap exprs
+    | ModExpr(Module_decl(_,_,_,exprs),args,_) -> 
+            let argMap = List.fold_left foldFn outMap args in 
+            List.fold_left foldFn argMap exprs
+    | Noexpr -> outMap
+
 let rec checkValidity map expr = 
         match expr with  
       Buslit(valz) -> (String.length valz -1, map)
@@ -156,14 +178,16 @@ let rec checkValidity map expr =
                     ("You tried assigning argument " ^ Printer.getBinExpr arg^ " of size "^ string_of_int (fst fmVal)
                     ^ " to formal " ^ fm ^ "<" ^ string_of_int x ^ "> but these are of different sizes")) in
             let checkArgs = List.map2 (map2fn map) fms args in
+
+            let regs = List.fold_left findRegs map exprs in
             let fold2fn (_,m) ((Lit(x)), fm) arg = (0, StringMap.add fm x m) in
-            let initVarTable = List.fold_left2 fold2fn (0,StringMap.empty) fms args in
+            let initVarTable = List.fold_left2 fold2fn (0,regs) fms args in
             let foldfn (_,b) expr = (checkValidity b) expr in
             let result = List.fold_left foldfn initVarTable (exprs) in
             let finalMap = snd result in 
             let getLit (Lit(x),_) = x in
             
-            (*TODO this actually needs to be declared recursively, for every binExpr but I don't feel like it rn*)
+            (*TODO this actually needs to be declared recursively for every binExpr but I don't feel like it rn*)
             (*
             let listGen strmp expr = match expr with
                  Assign(_, lval, rval, _) ->(match lval with

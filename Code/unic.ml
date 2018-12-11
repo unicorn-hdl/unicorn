@@ -47,7 +47,7 @@ let () =
     | Hast -> P.printMast hast
     | Sast -> Semant.check hast; ()
     | _    -> 
-        (*let _ = Semant.check hast in*)
+        let _ = Semant.check hast in
         let netlist = E.collapse hast in 
         match !action with
             Ast -> ()
