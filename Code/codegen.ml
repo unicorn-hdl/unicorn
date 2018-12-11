@@ -38,8 +38,8 @@ let translate (netlist, globals) =
   (* Create a map of global variables after creating each *)
 (*make global vars*)
   let global_vars : L.llvalue StringMap.t =
-    let global_var m n = 
-      let init = L.const_int (i1_t) 0
+    let global_var m (n,_,i) = 
+      let init = L.const_int (i1_t) i
       in StringMap.add n (L.define_global n init the_module) m in
     List.fold_left global_var StringMap.empty globals in
     (*TODO: Add real support for globs*)
@@ -61,7 +61,7 @@ let translate (netlist, globals) =
   
   let function_decls functions: (L.llvalue ) StringMap.t =
     let function_decl m =
-      let name = "main"
+      let name = "tick"
       and formal_types = 
 
                 Array.init 0 (fun x-> i1_t) 
@@ -75,7 +75,7 @@ let translate (netlist, globals) =
 (* Fill in the body of the given function *) 
   let build_function_body fdecl =
          
-    let the_function = StringMap.find "main"(function_decls netlist) in
+    let the_function = StringMap.find "tick"(function_decls netlist) in
     let builder = L.builder_at_end context (L.entry_block the_function) in
 
     let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder
@@ -95,7 +95,9 @@ let translate (netlist, globals) =
        * resulting registers to our map *) 
         and add_local m (t, n) =
 	        let local_var = L.build_alloca (i1_t) n builder in
-	        StringMap.add n local_var m in
+            if StringMap.mem n global_vars
+            then m
+            else StringMap.add n local_var m in
 
       let isAssig (l,op,r1,r2) = match op with
              "Print" -> false

@@ -63,7 +63,7 @@ let () =
 *)
           | SimpleLinesTop -> P.printNet ( (SL.simplify netlist))
           | Index -> P.printNet (I.index ( (SL.simplify netlist)))
-          | _ -> let netlist2 = E.collapse2 (I.index ( (SL.simplify netlist))) in
+          | _ -> let netlist2 = (E.collapse2 (E.regs (I.index ( (SL.simplify netlist))))) in
               match !action with
                 Ast -> ()
               | Mast -> ()
@@ -72,8 +72,8 @@ let () =
               | Forloops -> ()
               | SimpleLines -> ()
               | Netlist2 -> P.printNet2 netlist2
-              | Topsort -> P.printNet2 (T.topsort netlist2)
-              | LLVM_IR -> print_string (L.string_of_llmodule (C.translate (T.topsort netlist2)))
+              | Topsort -> P.printNet2 (E.r2 (T.topsort netlist2))
+              | LLVM_IR -> print_string (L.string_of_llmodule (C.translate (E.r2 (T.topsort netlist2))))
               | Compile -> let m = C.translate netlist2 in
 	          Llvm_analysis.assert_valid_module m;
 	          print_string (L.string_of_llmodule m)

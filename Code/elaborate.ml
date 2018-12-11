@@ -1,4 +1,5 @@
 open Ast
+open Printer
 module StringMap = Map.Make(String)
 
 let p str = print_endline str
@@ -139,8 +140,6 @@ let collapse ast =
 
 
 (*-------------------collapse2-------------------*)
-let globs = [];;
-(*TODO generate these global vars in register step*)
 
 let getStrOrLit = function
       Buslit(x) -> x
@@ -165,5 +164,31 @@ let collapseFn2 = function
          print_endline (Printer.getBinExpr a);
          ("","","","")
 
-let collapse2 prenet = 
+let collapse2 (prenet, globs) = 
     (List.map collapseFn2 prenet, globs)
+
+
+(*REGISTERS*)
+let fst (a,_,_) = a
+let snd (_,b,_) = b
+
+let regFn (netout, globs, count) x = match x with 
+       Assign(true,BoolId(lval),rval,init) -> 
+            let sOfb x = if x then 1 else 0 in
+            let x = Assign(true,BoolId("u_"^ sOfI count),rval,init) in
+            let g = (lval, "u_"^ sOfI count, sOfb init) in
+            (x::netout, g::globs, count+1)
+     | x -> (x::netout, globs, count) 
+
+let regs netlist =
+    let lst = List.fold_left regFn ([],[],0) netlist in
+    (List.rev (fst lst), snd lst) 
+
+(*ADD REGASSIGNS AT BOTTOM*)
+
+let r2 (netlist, globs) =
+        let assFn (l,r,_) = (l,"Ident",r,r) in
+        let assgs = List.map assFn globs in
+        let fn outlist expr = expr::outlist in  
+        let netlist = List.rev (List.fold_left fn (List.rev netlist) assgs) in
+        (netlist, globs)
