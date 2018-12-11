@@ -4,7 +4,6 @@ module P = Printer
 module E = Elaborate
 module F = Noloop2
 module SL = Simplelines
-module T0 = Topsort5
 module T = Topsort4
 module I = Indexing
 (* Top-level of the MicroC compiler: scan & parse the input,
@@ -56,11 +55,6 @@ let () =
           | Forloops -> () 
           | Netlist -> P.printNet netlist
           | SimpleLines -> P.printNet (SL.simplify (netlist))
-          (*
-          | SimpleLinesTop -> P.printNet (T0.topsort (SL.simplify (F.unloop netlist)))
-          | Index -> P.printNet (I.index (T0.topsort (SL.simplify (F.unloop netlist))))
-          | _ -> let netlist2 = E.collapse2 (I.index (T0.topsort (SL.simplify (F.unloop netlist)))) in
-*)
           | SimpleLinesTop -> P.printNet ( (SL.simplify netlist))
           | Index -> P.printNet (I.index ( (SL.simplify netlist)))
           | _ -> let netlist2 = (E.collapse2 (E.regs (I.index ( (SL.simplify netlist))))) in
