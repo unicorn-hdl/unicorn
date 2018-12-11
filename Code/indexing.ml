@@ -11,8 +11,15 @@ let id2 boolin digit =
         let x = id boolin digit in
         match x with BoolId(x) -> x
 
+let getI pos str =
+        if (String.length str > pos)
+        then String.make 1 str.[pos]
+        else "0"
+
 let rec loop from1 until from2 outlist expr = match expr with
-        Assign(isR,la,ra,init) -> (match ra with
+        Assign(isR,la,ra,init) -> 
+          let init = getI from1 init in
+          (match ra with
           | Buslit(x) ->
                 if (from1 <= until)
                 then 
@@ -128,7 +135,7 @@ let rec semant n (valz,map) = function
           badSearch map n x
   | BoolBinop(l,op,r) -> semant n (valz,map) l
   | Unop(op,ex) -> semant n (valz,map) ex
-  | Assign(_,lval,rval,_) -> (match lval with
+  | Assign(isR,lval,rval,init) -> (match lval with
          BoolId(x) -> 
                 let s = semant n (valz,map) rval in
                 (fst s, StringMap.add x (fst s) (snd s))
@@ -163,7 +170,6 @@ and badSearch map n str =
                 else
                   (valz,map)
       | Index(BoolId(x),Range(_,Lit(b))) ->
-                let _ = p ("here?") in
                 if (x=str)
                 then 
                   if StringMap.mem x map
@@ -208,6 +214,12 @@ let indicize (outlist,slist) line =
 
 let printf k v = p(k^ ": "^ (string_of_int v))
 
+let presemant outmap = function
+            Assign(true,BoolId(x),_,init) -> 
+                    StringMap.add x (String.length init) outmap
+          | x -> outmap
+
 let index netlist = 
-        let slist = snd(List.fold_left (semant netlist) (0, StringMap.empty) netlist) in
+        let slist = List.fold_left presemant StringMap.empty netlist in
+        let slist = snd(List.fold_left (semant netlist) (0, slist) netlist) in
         List.rev (fst(List.fold_left indicize ([],slist) netlist))

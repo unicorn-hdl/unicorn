@@ -35,7 +35,7 @@ let rec getBinExpr = function
  | Noexpr -> "noexpr"
  | Index(expr, ind) -> getBinExpr expr ^ index ind
  | Assign(isReg, lval, rval, initval) -> if isReg
-        then getBinExpr lval ^ ":= " ^ getBinExpr rval ^ " init " ^ string_of_bool initval
+        then getBinExpr lval ^ ":= " ^ getBinExpr rval ^ " init " ^ initval
         else getBinExpr lval ^ "= " ^ getBinExpr rval
  | Call(id, arglist) -> id ^ "(" ^ listToString (fun x-> getBinExpr x ^ ",") arglist ^ ")"
  | Print(id, x) -> "print " ^ id ^ ":  " ^ getBinExpr x ^ ";"

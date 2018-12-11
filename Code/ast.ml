@@ -20,7 +20,7 @@ and  binExpr =
     | BoolId of string
     | BoolBinop of binExpr * boolOp * binExpr
     | Unop of unOp * binExpr
-    | Assign of bool * binExpr * binExpr * bool
+    | Assign of bool * binExpr * binExpr * string 
     (*final int is size of lval*)
     | Index of binExpr * range
     (*when bool = false, normal; bool = true, register*)

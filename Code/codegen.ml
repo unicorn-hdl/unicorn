@@ -39,7 +39,7 @@ let translate (netlist, globals) =
 (*make global vars*)
   let global_vars : L.llvalue StringMap.t =
     let global_var m (n,_,i) = 
-      let init = L.const_int (i1_t) i
+      let init = L.const_int i1_t (int_of_string i)
       in StringMap.add n (L.define_global n init the_module) m in
     List.fold_left global_var StringMap.empty globals in
     (*TODO: Add real support for globs*)

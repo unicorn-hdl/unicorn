@@ -42,6 +42,7 @@ let rec checkValidity map expr =
     | BoolId(name) -> 
         if StringMap.mem name map
         then (lookup name map, map)
+        (*TODO: Need a "badsearch" in case var hasn't been decl'd yet*)
         else raise (UndeclaredVar ("Variable \"" ^ name ^ "\" is not defined!"))
     | BoolBinop(l, op, r) -> 
         let ltyp = checkValidity map l in

@@ -22,7 +22,7 @@ let rec simpExp m = function
                 else 
                   let sl = simpExp m l in
                   let id = toId sl.n in
-                  let o' = (Assign(false, id, sl.r, false):: sl.o) in
+                  let o' = (Assign(false, id, sl.r, "0"):: sl.o) in
                   let n' = (sl.n)+1 in
                   {r=id; o=o'; n=n'}
 
@@ -34,7 +34,7 @@ let rec simpExp m = function
                 else 
                   let sr = simpExp m' r in
                   let id = toId sr.n in
-                  let o' = Assign(false, toId sr.n, sr.r, false):: sr.o in
+                  let o' = Assign(false, toId sr.n, sr.r, "0"):: sr.o in
                   let n' = sr.n+1 in
                   {r=id; o=o'; n=n'}
 
@@ -47,10 +47,14 @@ let rec simpExp m = function
               else 
                 let se = simpExp m e in
                 let id = toId se.n in
-                let o' = (Assign(false, id, se.r, false):: se.o) in
+                let o' = (Assign(false, id, se.r, "0"):: se.o) in
                 {r=Unop(op,id); o=o'; n=se.n+1}
         | Assign(isR, l, r, init) -> 
               let sr = simpExp m r in
+              let init =
+                   if isR
+                   then String.sub init 0 ((String.length init)-1)
+                   else init in
               let newExpr = Assign(isR, l, sr.r, init) in
               {r=l; o=newExpr::sr.o; n=sr.n}
         | Index(ex, r) -> 
@@ -59,7 +63,7 @@ let rec simpExp m = function
               else 
                 let sex = simpExp m ex in
                 let id = toId sex.n in
-                let o' = (Assign(false, id, sex.r, false)::sex.o) in
+                let o' = (Assign(false, id, sex.r, "0")::sex.o) in
                 {r=Index(id,r); o=o'; n=sex.n+1}
         | Print(nm, ex) ->
               if isS ex
@@ -69,7 +73,7 @@ let rec simpExp m = function
               else 
                 let sex = simpExp m ex in
                 let id = toId sex.n in
-                let o' = (Assign(false, id, sex.r, false)::sex.o) in
+                let o' = (Assign(false, id, sex.r, "0")::sex.o) in
                 let newExp = Print(nm,id) in
                 {r=newExp; o=newExp::o'; n=sex.n+1}
         | Call(str, exp) -> print_endline ("Something is wrong! Call called in simplelines");m

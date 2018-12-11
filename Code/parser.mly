@@ -8,14 +8,13 @@ open Ast
 %token COMMA COLON
 %token SEMI UNICORN UNICORN2 EOF 
 %token OGENERIC CGENERIC 
-%token ASSIGN REGASSIGN 
+%token ASSIGN REGASSIGN STAR
 %token PLUS MINUS
 %token PLUSDOT TIMESDOT
 %token FOR TO FROM
 %token OUT INIT
 %token AND OR NOT NAND NOR XOR XNOR
 %token PRINT MAKE 
-%token ONE ZERO
 %token <int> LITERAL
 %token <string> BOOLLIT
 %token <string> ID
@@ -105,11 +104,11 @@ binExpr:
 
 assignment:
  | binExpr REGASSIGN binExpr boolval{ Assign(true, $1, $3, $4) }
- | binExpr  ASSIGN   binExpr { Assign(false, $1, $3, false) } 
+ | binExpr  ASSIGN   binExpr { Assign(false, $1, $3, "0") } 
 
 boolval:
- | ONE {true}
- | ZERO {false}
+ | STAR BOOLLIT STAR {$2}
+ | STAR BOOLLIT STAR {$2}
 
 call:
  | ID OPAREN argList CPAREN {Call($1, $3)}

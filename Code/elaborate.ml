@@ -174,9 +174,8 @@ let snd (_,b,_) = b
 
 let regFn (netout, globs, count) x = match x with 
        Assign(true,BoolId(lval),rval,init) -> 
-            let sOfb x = if x then 1 else 0 in
             let x = Assign(true,BoolId("u_"^ sOfI count),rval,init) in
-            let g = (lval, "u_"^ sOfI count, sOfb init) in
+            let g = (lval, "u_"^ sOfI count, init) in
             (x::netout, g::globs, count+1)
      | x -> (x::netout, globs, count) 
 
