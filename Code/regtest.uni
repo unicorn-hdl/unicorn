@@ -1,0 +1,9 @@
+main() {
+	a := b *0b*;
+	print a: a;
+    print b: b; 
+	b := a *1b*;
+	out:;
+}
+🦄
+
