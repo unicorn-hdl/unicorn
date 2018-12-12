@@ -109,7 +109,7 @@ let rec dissolveLoop exp = match exp with
                *)
                [ModExpr(MD(o,nm,f,d),a,par)]
       | Noexpr -> [exp] 
-      | x -> let _ = print_endline("x: "^ Printer.getBinExpr x) in [exp]
+      | x -> let _ = print_endline("no match in loop: "^ Printer.getBinExpr x^"ENDDD") in [exp]
 
 let unloop mast =
         let exps = dissolveLoop mast in

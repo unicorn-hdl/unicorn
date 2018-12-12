@@ -29,7 +29,7 @@ let rec eval nameMap expr = match expr with
             let name = "*"^name in
             if StringMap.mem name nameMap 
             then Lit(StringMap.find name nameMap)
-            else raise (UndeclaredVar ("Variable \"" ^ name ^ "\" is not defined!"))
+            else raise (UndeclaredVar ("Variable \"" ^ name ^ "\" is not defined!!"))
 (*
 let rec hardenline m line = 
     match line with
@@ -64,6 +64,7 @@ let rec hardenline m line =
     *)
 let hardenline m line = 
     match line with
+    | Index(ModExpr(_,_,_),_) -> line
 	| Index(expr, Range(a,b)) -> 
             Index(expr, Range(eval m a, eval m b))
 	| For(index, Range(a,b), exprs) -> 

@@ -133,7 +133,7 @@ let rec check d x =
           ) in
         let x = Assign(isR,lval,List.hd rd.x,init) in
         {m=d.m; x=[x]; s=d.s}
-    | Index(ModExpr(MD(outs,nm,_,_),_,_), Range(a,b)) ->
+    | Index(ModExpr(MD(outs,nm,fm,lns),args,par), Range(a,b)) ->
         let _ = 
            if (a = b)
            then ()
@@ -148,7 +148,10 @@ let rec check d x =
                 if (List.exists (fun (_,a) -> a=x) outs)
                 then x
                 else raise(InvalidRange("ERROR: You tried to access "^x^" but "^nm^" has no such outputs!")) in
-        checkMod x d selected
+        let x = ModExpr(MD(outs,nm,fm,lns),args,par) in
+        let d = checkMod x d selected in
+        let x = Index(List.hd d.x,Range(a,b)) in
+        {m=d.m; x=[x]; s=d.s}
     | Index(x, Range(a,b)) -> 
         let a' = getLit (eval d.m a) in
         let b' = getLit (eval d.m b) in
@@ -206,7 +209,6 @@ and checkMod (ModExpr(MD(out,name,fms,exprs), args, par)) d selected=
         let d = {m=m; x=[]; s=d.s} in
 
         let foldFn d line = 
-                let line = hardenline d.m line in
                 let d2 = check d line in
                 {m=d2.m; x=d.x@d2.x; s=d2.s} in
         let d = List.fold_left foldFn d exprs in
