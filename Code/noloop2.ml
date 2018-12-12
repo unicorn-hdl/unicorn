@@ -99,7 +99,7 @@ let rec dissolveLoop exp = match exp with
       | Call(_,_) -> let _=p ("this shouldn't happen") in [exp]
       | For(index, Range(Lit(a),Lit(b)), expList) ->
                (loop index a b [] expList).o
-      | ModExpr(Module_decl(o,nm,f,d),a,par) -> 
+      | ModExpr(MD(o,nm,f,d),a,par) -> 
                let foldFn outlist line = outlist@(dissolveLoop line)in
                let d = List.fold_left foldFn [] d in
                (*
@@ -107,7 +107,7 @@ let rec dissolveLoop exp = match exp with
                let _ = List.iter (fun x-> p (Printer.getBinExpr x)) d in
                let _ = p ("Doen Printing "^nm) in
                *)
-               [ModExpr(Module_decl(o,nm,f,d),a,par)]
+               [ModExpr(MD(o,nm,f,d),a,par)]
       | Noexpr -> [exp] 
       | x -> let _ = print_endline("x: "^ Printer.getBinExpr x) in [exp]
 

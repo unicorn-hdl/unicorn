@@ -43,7 +43,7 @@ modulezList:
  
 modulez:
  | ID OPAREN formalsList CPAREN OCURL lineList outlist CCURL 
-            { Module_decl($7, $1, $3, $6) }
+            { MD($7, $1, $3, $6) }
 
 formalsList:
  | /* Nothing */ { [] }

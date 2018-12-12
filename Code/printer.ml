@@ -24,7 +24,7 @@ let index = function | Range (a,b) ->  "[" ^ getIntExpr a ^ ":" ^ getIntExpr b ^
 
 let bindFn (b,c) = match b with 
    Lit(x) -> c ^ "<" ^ string_of_int x ^ "> " 
- | _ -> c ^ "<some expr> "
+ | _ -> c ^ "<"^getIntExpr b^"> "
 let toStringBindlist blist = listToString bindFn blist
 
 let rec getBinExpr = function
@@ -39,10 +39,10 @@ let rec getBinExpr = function
         else getBinExpr lval ^ "= " ^ getBinExpr rval
  | Call(id, arglist) -> id ^ "(" ^ listToString (fun x-> getBinExpr x ^ ",") arglist ^ ")"
  | Print(id, x) -> "print " ^ id ^ ":  " ^ getBinExpr x ^ ";"
- | For(var, range, lines) -> "for(" ^ var ^ "){\n" ^ toStringBinExprlist lines
+ | For(var, Range(a,b), lines) -> "for(" ^ var ^ " from "^ (getIntExpr a)^ " to "^ (getIntExpr b)^ "){\n" ^ toStringBinExprlist lines
  | ModExpr(modz, args, parent) -> 
                  let parNm = match parent with
-                    | Some(ModExpr(Module_decl(_,nm,_,_),_,_)) -> nm
+                    | Some(ModExpr(MD(_,nm,_,_),_,_)) -> nm
                     | None -> "noPar" in
                  "\n\tin: " ^ listToString (fun x-> getBinExpr x ^ ",") args ^
                  "\nof: " ^ parNm ^ "\n\t" ^ toStringMod modz
@@ -52,7 +52,7 @@ let rec getBinExpr = function
  and toStringBinExprlist explist = listToString makeline (List.map getBinExpr explist)
 
  and toStringMod = function
-        |Module_decl (outlist, name, formals, linelist) ->
+        |MD (outlist, name, formals, linelist) ->
         name ^ "(" ^ (toStringBindlist formals) ^ "){\n" ^ 
         toStringBinExprlist linelist ^ 
         "\tout: " ^ toStringBindlist outlist ^ "\n}\n\n"

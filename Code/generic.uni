@@ -1,0 +1,17 @@
+main() {
+	z = 101b;
+	b = 101b;
+	m = modA(z);
+	print m: m;
+	out:;
+}
+
+modA(a<n>){
+	for (i from 0 to n-1){
+		m[i] = a[i] and (not a[i]);	
+	};
+	out:m<n>;
+}
+🦄
+
+

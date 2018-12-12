@@ -1,6 +1,8 @@
 module L = Llvm
 module C = Codegen
 module P = Printer
+module H = Harden2
+module S = Semant2
 module E = Elaborate
 module F = Noloop2
 module SL = Simplelines
@@ -37,17 +39,14 @@ let () =
   
   let lexbuf = Lexing.from_channel !channel in
   let ast = Parser.program Scanner.token lexbuf in  
-  let hast = Harden2.harden (F.unloop (Modfill.fill ast)) in
 
   match !action with
       Ast  -> P.printAst ast
     | Mast -> P.printMast (Modfill.fill ast)
-    | Forloops -> P.printMast (F.unloop (Modfill.fill ast))
-    | Hast -> P.printMast hast
-    | Sast -> Semant.check hast; ()
+    | Sast -> P.printMast (S.semant (Modfill.fill ast))
+    | Forloops -> P.printMast (F.unloop (S.semant (Modfill.fill ast)))
     | _    -> 
-        let _ = Semant.check hast in
-        let netlist = E.collapse hast in 
+        let netlist = E.collapse (F.unloop (S.semant (Modfill.fill ast))) in 
         match !action with
             Ast -> ()
           | Mast-> ()

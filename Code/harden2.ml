@@ -4,91 +4,105 @@ module StringMap = Map.Make(String)
 
 exception UndeclaredVar of string 
 
-let modzIntoTuples d m = List.map (fun d-> (d,m)) d
-let bindsToMaps binds m = List.map (fun (a,b)->(a,b,m)) binds
-
-(* make a table for varnames -------------------------------*)
-
-let inline lines = StringMap.empty
-let lookup args = StringMap.empty
-
-(*have to make actual functions here*)
-let conflict1 key val1 val2 = Some val1 
-let conflict2 key val1 val2 = Some val1 
-(*----------------------------------*)
-
-let valsInMod (Module_decl(outs, name, formals, exprs)) = 
-        (name, (StringMap.union conflict2 (StringMap.union conflict1 (lookup outs) (lookup formals)) (inline exprs)))
-(*end-------------------------------------------------------*)
-
-(*Harden ---------------------------------------------------*)
 let extract (Lit(x)) = x
 
-let rec eval expr nameMap = match expr with
+(*
+let tableFn inmap outmap (fmX,nm) arg = match fmX with
+     | IntId(x) -> 
+            let sz = Semant.size outmap arg in
+            let outmap = snd sz in
+            let nm = "*"^nm in
+            if StringMap.mem nm outmap
+            then if (StringMap.find nm outmap = fst sz)
+                then outmap
+                else let _ = p ("error") in outmap
+            else StringMap.add nm (fst sz) outmap
+     | x -> outmap
+*)
+
+let rec eval nameMap expr = match expr with
 	 | Lit(x) -> Lit(x)
 	 | IntBinop(lval, op, rval) -> if op = Add 
-	 		then Lit(extract (eval lval nameMap) + extract (eval rval nameMap))
-			else Lit(extract (eval lval nameMap) - extract (eval rval nameMap))
-	 | IntId(name) -> if StringMap.mem name nameMap 
+	 		then Lit(extract (eval nameMap lval) + extract (eval nameMap rval))
+			else Lit(extract (eval nameMap lval) - extract (eval nameMap rval))
+	 | IntId(name) -> 
+            let name = "*"^name in
+            if StringMap.mem name nameMap 
             then Lit(StringMap.find name nameMap)
             else raise (UndeclaredVar ("Variable \"" ^ name ^ "\" is not defined!"))
-
-let rec hardenline (line, nameMap) = match line with
-	| Index(expr, Range(a,b)) -> Index(expr, Range(eval a nameMap, eval b nameMap))
-	| For(index, Range(a,b), exprs) -> For(
-                index, 
-                Range(eval a nameMap, eval b nameMap), 
-                List.map hardenline (modzIntoTuples exprs nameMap))
-    | ModExpr(a,b,c) -> 
-         ModExpr (hardenmd a, List.map hardenline (modzIntoTuples b nameMap), c)
+(*
+let rec hardenline m line = 
+    match line with
+    | Buslit(x) -> line
+    | BoolId(x) -> line
+    | BoolBinop(l,op,r) ->
+            let r = hardenline m r in 
+            let l = hardenline m l in
+            BoolBinop(l,op,r)
+    | Unop(op,x) -> 
+            Unop(op, hardenline m x)
+    | Assign(isR, l, r, init) ->
+            let r = hardenline m r in
+            let l = hardenline m l in
+            Assign(isR, l, r, init)
+	| Index(expr, Range(a,b)) -> 
+            let expr = hardenline m expr in
+            Index(expr, Range(eval m a, eval m b))
+    | Print(nm,x) -> 
+            let x = hardenline m x in
+            Print(nm, x)
+    | Call(_,_) -> p ("Call in harden"); (m, Noexpr)
+	| For(index, Range(a,b), exprs) -> 
+            let exprs = List.map (hardenline m) exprs  in
+            let r = Range(eval m a, eval m b) in
+            For(index, r, exprs)
+    | ModExpr( MD(out,nm,fm,lns), args, par) -> 
+            let foldFn (intEx, nm) = (eval m intEx, nm) 
+            let args = List.map foldFn args 
+            ModExpr( MD(out,nm,fm,lns), args, par) 
 	| a -> a
+    *)
+let hardenline m line = 
+    match line with
+	| Index(expr, Range(a,b)) -> 
+            Index(expr, Range(eval m a, eval m b))
+	| For(index, Range(a,b), exprs) -> 
+            let r = Range(eval m a, eval m b) in
+            For(index, r, exprs)
+	| _ -> line
 
-and hardenarg (expr, name, nameMap) = (eval expr nameMap, name)
+    (*
+let hardenMd m = function
+    ModExpr(MD(out, nm, fm, lns), args, par) -> 
+        let modMap = List.fold_left2 tableFn m fm args in
 
-and hardenmd (Module_decl(outs, name, formals, linelist)) =
-    let table = StringMap.empty (*TODO: must generate table*) in
-	Module_decl(List.map hardenarg (bindsToMaps outs table),
-                name,
-                List.map hardenarg (bindsToMaps formals table),
-                List.map hardenline (modzIntoTuples linelist table))
-(*end-------------------------------------------------------*)
+        let foldFn ((map,prev)::tl) ln = (hardenline map ln)::(map,prev)::tl in
+        let lns = List.fold_left foldFn [(modMap,Noexpr)] lns in
 
+        let mapFn (mp,ex) = ex in
+        let lns = List.map mapFn lns in
 
-(*THE function called---------------------------------------*)
-let harden ast = hardenline (ast, StringMap.empty)
-(*end-------------------------------------------------------*)
+        let mapFn (intEx,nm) = (eval modMap intEx,nm) in
+        let out  = List.map mapFn out in
 
-(*This is just for printing --------------------------------*)
-
-(*build an ast*)
-let callx x = ( Call(x, []) );;
-let modA = Module_decl([], "modA", [], []);;
-let bExprs = 
-        [Index(Buslit("00100"), Range(IntBinop((Lit(4)), Sub, Lit(1)), Lit(3)));
-        Print("printname", callx "modA")];;
-let modB = Module_decl([], "modB", [], bExprs);;
-let mdlistEx = [modA;
-                modB
-               ]
-;;
-(*
-let mdlistEx = fill mdlistEx;;
-(*------------*)
-
-(*print hardened ast----------------------------------------*)
-print_endline("~~~PRINTING HAST~~~");;
-let toString (Module_decl(a,b,c,d)) = b ^ "\n" ^ toStringBinExprlist d;;
-print_endline (toString (harden mdlistEx));;
-(*----------------------------------------------------------*)
-
-(*print val table*)
-print_endline ("\n~~~PRINTING VAL TABLE~~~");;
-let valtable = valsInMod mdlistEx;; 
-let printfun key v = print_string(key ^ ": ");
-                     List.iter (fun (a,v)->print_string(string_of_int v)) v;
-                     print_endline "";;
-(*
-StringMap.iter printfun valtable
+        (m, ModExpr(MD(out,nm,fm,lns),args,par))
 *)
-(*---------------*)
+(*end of harden md*)
+(*
+let rec check m line = 
+   match line with
+   | Buslit(x) -> (m, line)
+   | BoolId(x) -> (m, line)
+   | BoolBinop(l,op,r) -> 
+         let l = hardenline m l in
+         let r = hardenline m r  in
+         
+   | Unop(op,x) ->
+   | Assign(isR,l,r,init) ->
+   | Index(x,r) ->
+   | Print(nm,x) ->
+   | Call(nm,x) ->
+   | For(n,r,xs) ->
+   | ModExpr(md,args,par) ->
+   | Noexpr ->
 *)
