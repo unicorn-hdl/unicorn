@@ -1,13 +1,12 @@
 #include <stdio.h>
 
 int main(){
-	printf("\ntick 1\n");
+	printf("tick1\n");
 	tick();
-	printf("\ntick 2\n");
+	printf("\ntick2\n");
 	tick();
-	printf("\ntick 3\n");
+	printf("\ntick3\n");
 	tick();
-	printf("\ntick 4\n");
+	printf("\ntick4\n");
 	tick();
-	return 0;
 }

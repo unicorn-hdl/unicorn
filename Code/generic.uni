@@ -8,7 +8,7 @@ main() {
 
 modA(a<n>){
 	for (i from 0 to n-1){
-		m[i] = a[i] and (not a[i]);	
+		m[i] = a[i] or (not a[i]);	
 	};
 	out:m<n>;
 }

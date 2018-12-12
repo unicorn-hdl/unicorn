@@ -161,7 +161,7 @@ let rec check d x =
         let s = 
             if (d.s > b')
             then b'-a'+1
-            else raise(TypeMismatch ("ERROR: You tried accessing a number too big")) in
+            else raise(TypeMismatch ("ERROR: You tried accessing the "^sOfI b'^"th element of a "^sOfI d.s^"-bit bus")) in
         let x = Index(x, Range(Lit(a'),Lit(b'))) in
         {m=d.m; x=[x]; s=s}
     | Print(nm, x) -> 
@@ -176,15 +176,21 @@ let rec check d x =
         let b = eval d.m b in
         let _ = rangeIsValid a b in
 
-        let linesMax = List.map (Noloop2.replace str (getLit b)) lines in
-        let linesMin = List.map (Noloop2.replace str (getLit a)) lines in
+        let a = getLit a in
+        let b = getLit b in 
+        let linesFn x = List.map (Noloop2.replace str x) lines in
         let foldFn d line = 
                 let line = hardenline d.m line in
                 let d2 = check d line in
                 {m=d2.m; x=d.x@d2.x; s=d2.s} in
-        let d = List.fold_left foldFn d linesMin in (*checking low end doesn't break*)
-        let d = List.fold_left foldFn d linesMax in
-        let x = For(str, Range(a,b), lines) in
+        let rec loop a b d = 
+                if (a <=b) 
+                then
+                   let d = List.fold_left foldFn d (linesFn a) in
+                   loop (a+1) b d 
+                else d in
+        let d = loop a b d in
+        let x = For(str, Range(Lit(a),Lit(b)), lines) in
         {m=d.m; x=[x]; s=0}
     | ModExpr(MD(out,_,_,_), _, _) -> 
         (*When ModExpr has no index, it just returns its first out*)
