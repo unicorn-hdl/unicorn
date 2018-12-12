@@ -2,19 +2,20 @@ open Ast
 open Printer
 module StringMap = Map.Make(String)
 
+let getI pos str =
+        if (String.length str > pos)
+        then String.make 1 str.[pos]
+        else "0"
+
 let id boolin digit = match boolin with
        BoolId(nm) -> BoolId(nm^"["^(string_of_int digit)^"]")
      | Index(BoolId(nm),r) -> BoolId(nm^"["^(string_of_int digit)^"]")
+     | Buslit(x) -> Buslit(getI digit x) 
      | x -> p("Missed case in id(indx): "^ Printer.getBinExpr x); x
 
 let id2 boolin digit = 
         let x = id boolin digit in
         match x with BoolId(x) -> x
-
-let getI pos str =
-        if (String.length str > pos)
-        then String.make 1 str.[pos]
-        else "0"
 
 let rec loop from1 until from2 outlist expr = match expr with
         Assign(isR,la,ra,init) -> 
