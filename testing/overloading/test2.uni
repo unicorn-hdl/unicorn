@@ -1,0 +1,8 @@
+main(){
+
+	a = 101b; 
+	a = 10101010101b; //invalid because of overloading 
+	out: a ; 
+}		
+neigh	
+//error 
