@@ -1,0 +1,12 @@
+main(){
+	
+	a = 10101b; 
+	b = 11111b; 
+
+	c = a and b; 
+	
+	print printedItem: c; 
+	out: ; 
+
+}
+neigh
