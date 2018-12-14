@@ -1,0 +1,11 @@
+main(){
+
+	a = 111b; 
+	b = 101010100b; 
+	
+
+	c = a and b; //error because a and b are different sizes 
+	out: c<3>; 
+
+}
+neigh

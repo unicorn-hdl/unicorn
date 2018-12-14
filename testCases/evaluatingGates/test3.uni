@@ -1,0 +1,10 @@
+main(){
+
+	bOne = 1100b; 
+	bTwo = 1101b; 
+
+	bRes = bOne nor bTwo; 
+	out: bRes<4>; 
+}
+neigh 
+//program should output 0010

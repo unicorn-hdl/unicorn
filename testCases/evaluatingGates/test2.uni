@@ -1,0 +1,12 @@
+main(){
+	
+	bOne = 10101b;
+	bTwo = 11100b;
+
+	bThree = bOne or bTwo; 
+
+	out: bThree<5>; 
+
+}
+neigh
+//program should print 11101

@@ -1,0 +1,8 @@
+main(){
+
+	print a : 10111111b; 
+	print x : 10111b; 
+	out: ; 
+}
+neigh
+//this should print out 1011111 and 10111

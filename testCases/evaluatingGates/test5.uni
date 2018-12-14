@@ -1,0 +1,10 @@
+main(){
+
+	bOne = 101010b; 
+	bTwo = 111110b;
+
+	bThr= bOne nand bTwo;
+	out: bThr<6>; 
+}
+neigh 
+//should print 010101

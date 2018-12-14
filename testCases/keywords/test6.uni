@@ -1,0 +1,6 @@
+main(){
+
+	busExpr = 100111b; //valid 
+	for = 11111100b; //error
+}
+neigh

@@ -1,0 +1,9 @@
+main(){
+
+	a= 111111b; 
+	b=101b;
+
+	c= a or b;   //error because of different size 
+	out: c<3>; 
+}
+neigh

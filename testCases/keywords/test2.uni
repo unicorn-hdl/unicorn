@@ -1,0 +1,6 @@
+main(){
+	busTwo = 1000b; //valid 	
+	print = 1111b; //error
+
+}
+neigh

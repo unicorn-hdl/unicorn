@@ -1,0 +1,8 @@
+main() {
+	busOne = 11101b; //valid
+	make = 110b; //error 
+	
+	print a : busOne;
+	
+}
+neigh 
