@@ -20,7 +20,7 @@ and  binExpr =
     | BoolId of string
     | BoolBinop of binExpr * boolOp * binExpr
     | Unop of unOp * binExpr
-    | Assign of bool * binExpr * binExpr * bool
+    | Assign of bool * binExpr * binExpr * string 
     (*final int is size of lval*)
     | Index of binExpr * range
     (*when bool = false, normal; bool = true, register*)
@@ -34,7 +34,7 @@ and  binExpr =
 
 and range = Range of intExpr * intExpr
 
-and md = Module_decl of bind list * string * bind list * binExpr list
+and md = MD of bind list * string * bind list * binExpr list
                         (*outlist   name      formals     line list *)  
 
 type program = (*bind list *  *) md list

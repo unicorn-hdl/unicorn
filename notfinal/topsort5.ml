@@ -68,7 +68,7 @@ let res =
   | [], _ ->
       if progress
       then aux acc [] later false
-      else invalid_arg "un-orderable data"
+      else let _ = print_endline("un-orderable data5") in netlist
   | x::xs, _ ->
       let deps = get_deps x in
       let ok = List.for_all (fun dep -> List.mem dep acc) deps in

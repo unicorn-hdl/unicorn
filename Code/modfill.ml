@@ -3,11 +3,11 @@ open Printer
 module StringMap = Map.Make(String)
 exception MissingFunction of string 
 let modzIntoTuples d par m m2 = List.map (fun d-> (d,par, m,m2)) d
-let fstM (Module_decl(a,b,c,d)) = a
-let sndM (Module_decl(a,b,c,d)) = b
-let thdM (Module_decl(a,b,c,d)) = c
-let fthM (Module_decl(a,b,c,d)) = d
-let toString (Module_decl(a,b,c,d)) = b ^ "\n" ^ toStringBinExprlist d
+let fstM (MD(a,b,c,d)) = a
+let sndM (MD(a,b,c,d)) = b
+let thdM (MD(a,b,c,d)) = c
+let fthM (MD(a,b,c,d)) = d
+let toString (MD(a,b,c,d)) = b ^ "\n" ^ toStringBinExprlist d
 
 (*replace calls in a mod with modules*)
 let rec runThroughLines d par m m2 = List.rev (List.map actOnline (modzIntoTuples d par m m2))
@@ -33,15 +33,15 @@ and actOnline (line, par, m, m2) = match line with
                     let b = sndM modz in
                     let c = thdM modz in
                     let d = fthM modz in
-                    ModExpr(Module_decl(a,b,c, (runThroughLines d par m m2)), args, par)
+                    ModExpr(MD(a,b,c, (runThroughLines d par m m2)), args, par)
                else raise( MissingFunction ("Module " ^ name ^ 
                " not found! Make sure module is declared."))
-    | ModExpr(Module_decl(a,b,c,d), args, parent) -> 
+    | ModExpr(MD(a,b,c,d), args, parent) -> 
             let _ = print_endline ("Something's wrong! modExpr called in modfill") in
-            let this = ModExpr(Module_decl(a,b,c,d), args, None) in
+            let this = ModExpr(MD(a,b,c,d), args, None) in
             if StringMap.find b m2
-            then ModExpr(Module_decl(a,b,c,d), args, Some this)
-            else ModExpr(Module_decl(a,b,c, runThroughLines d par m m2), args, Some this)
+            then ModExpr(MD(a,b,c,d), args, Some this)
+            else ModExpr(MD(a,b,c, runThroughLines d par m m2), args, Some this)
             (*TODO actually make updates to m2*)
             (*TODO it seems like parent is never actually used. If unecessary, trash it*)
             (*It also seems like ModExpr should never be called. Check that it isn't*)
@@ -60,32 +60,32 @@ let rec setPars (line,par, m, m2) = match line with
     | Call(name, args) -> 
                let _ = print_endline ("Something's wrong! Call called in modfill setPars") in
                Call(name,args)
-    | ModExpr(Module_decl(a,b,c,d), args, parent) -> 
+    | ModExpr(MD(a,b,c,d), args, parent) -> 
             if (par = None)
-            then ModExpr(Module_decl(a,b,c, List.map (fun x -> setPars(x,Some line,m,m2)) d), args, None)
-            else ModExpr(Module_decl(a,b,c, List.map (fun x -> setPars(x,Some line,m,m2)) d), args, par )
+            then ModExpr(MD(a,b,c, List.map (fun x -> setPars(x,Some line,m,m2)) d), args, None)
+            else ModExpr(MD(a,b,c, List.map (fun x -> setPars(x,Some line,m,m2)) d), args, par )
     | Noexpr -> Noexpr
     | a -> print_endline("ERROR: Case not found!"); a
 
 
 (*Helper method for fillHelper. Replaces d in some mod with d' where d' is lines where calls are replaced with mods*)
-let replaceCalls (Module_decl(a, b, c, d), par, m, m2) =
-                        ((Module_decl(a, b, c, (runThroughLines d par m m2))), m, m2)
+let replaceCalls (MD(a, b, c, d), par, m, m2) =
+                        ((MD(a, b, c, (runThroughLines d par m m2))), m, m2)
 
 
 (*create map that links module names to the modules themselves*)
-let populateMap map (Module_decl(a,b,c,d)) = StringMap.add b (Module_decl(a,b,c,d)) map
+let populateMap map (MD(a,b,c,d)) = StringMap.add b (MD(a,b,c,d)) map
 let createMapz mdlist = List.fold_left populateMap StringMap.empty mdlist;;
 
 (*Make a string map that keeps track of whether a module has been "decompressed"*)
-let popIsFilledMap map (Module_decl(a,b,c,d)) = StringMap.add b false map
+let popIsFilledMap map (MD(a,b,c,d)) = StringMap.add b false map
 let makeIsFilledMap mdlist = List.fold_left popIsFilledMap StringMap.empty mdlist;;
 
 (*print stuff*) 
 (*
 let spitOut = fillHelper mdlistEx theMap fillMap;;
 *)
-let toString (Module_decl(a,b,c,d)) = b ^ "\n" ^ toStringBinExprlist d
+let toString (MD(a,b,c,d)) = b ^ "\n" ^ toStringBinExprlist d
 let printx (x,y,z) = print_endline(toString x)
 let printz x = printx x;;
 
