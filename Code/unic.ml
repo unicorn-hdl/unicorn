@@ -1,18 +1,19 @@
+module P = Printer
+module M = Modfill
+module S = Semant2
+module F = Noloop2
+module E = Elaborate
+module SL = Simplelines
 module L = Llvm
 module C = Codegen
-module P = Printer
 module H = Harden2
-module S = Semant2
-module E = Elaborate
-module F = Noloop2
-module SL = Simplelines
 module T = Topsort4
 module I = Indexing
 (* Top-level of the MicroC compiler: scan & parse the input,
    check the resulting AST and generate an SAST from it, generate LLVM IR,
    and dump the module *)
 
-type action = Ast | Sast | Mast | Hast | Netlist | Forloops | SimpleLines | SimpleLinesTop | Index | Netlist2 | Topsort | LLVM_IR | Compile
+type action = Ast | Sast | Mast | Hast | Netlist | Forloops | SimpleLines | Index | Netlist2 | Topsort | LLVM_IR | Compile
 
 let () =
   let action = ref Compile in
@@ -25,7 +26,6 @@ let () =
     ("-n",  Arg.Unit (set_action Netlist), "Print Netlist");
     ("-f",  Arg.Unit (set_action Forloops), "Print Netlist with collapsed for loops");
     ("-sl", Arg.Unit (set_action SimpleLines), "Print Netlist with Simplified Lines");
-    ("-st", Arg.Unit (set_action SimpleLinesTop), "Print Topsorted Netlist with Simplified Lines");
     ("-i",  Arg.Unit (set_action Index), "Print Netlist with collapsed inidices");
     ("-n2", Arg.Unit (set_action Netlist2), "Print MoreSimplified Netlist");
     ("-t",  Arg.Unit (set_action Topsort), "Print Topsorted Netlist");
@@ -42,11 +42,12 @@ let () =
 
   match !action with
       Ast  -> P.printAst ast
-    | Mast -> P.printMast (Modfill.fill ast)
-    | Sast -> P.printMast (S.semant (Modfill.fill ast))
-    | Forloops -> P.printMast (F.unloop (S.semant (Modfill.fill ast)))
+    | Mast -> P.printMast (M.fill ast)
+    | Sast -> P.printMast (S.semant (M.fill ast))
+    | Hast -> P.printMast (S.semant (M.fill ast))
+    | Forloops -> P.printMast (F.unloop (S.semant (M.fill ast)))
     | _    -> 
-        let netlist = E.collapse (F.unloop (S.semant (Modfill.fill ast))) in 
+        let netlist = E.collapse (F.unloop (S.semant (M.fill ast))) in 
         match !action with
             Ast -> ()
           | Mast-> ()
@@ -54,7 +55,6 @@ let () =
           | Forloops -> () 
           | Netlist -> P.printNet netlist
           | SimpleLines -> P.printNet (SL.simplify (netlist))
-          | SimpleLinesTop -> P.printNet ( (SL.simplify netlist))
           | Index -> P.printNet (I.index ( (SL.simplify netlist)))
           | _ -> let netlist2 = (E.collapse2 (E.regs (I.index ( (SL.simplify netlist))))) in
               match !action with
