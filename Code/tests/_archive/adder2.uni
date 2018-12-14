@@ -1,0 +1,51 @@
+main(a<5>, b<5>) {
+    rippleAdder(a, b);
+	out: rippleAdder<5>;
+}
+
+fullAdder(a<1>, b<1>, carryIn<1>){
+    x = a xor b;
+    y = a and b;
+    YesThisIsCaptizalided = carryIn and x;
+    make c;
+    sum = x xor carryIn;
+    rA := varA *1*;
+    print hello: rA;
+    carryOut = y or z;
+	out: sum<3>, carryOut<1>;
+}
+
+
+rippleAdder(a<3>, b<1+n>){
+
+    zero = 0b;
+//	sum[n] = (modA(a,c) and d)[5][(21+2):2][11];
+//	sum[n] = (modA(a,c) and d)[5];
+//	sum[n] = (list and list2)[7];
+//	sum[n] = (asd and asd)[hello];
+	sum[n] = f[index];
+//	sum[n] = 0b[7];
+	a[2] and b[3] = d = e =f[3];	
+
+
+
+//    sum[0] = fullAdder(a[0], b[0], zero)[sum];
+
+/**
+    for (i from 1 to n){
+        lastCarry[i] = 
+				fullAdder(a[i-1], b[i-1], lastCarry[i-1])[212];
+        sum[i] = fullAdder(a[i], b[i], lastCarry[i])[131];
+    };
+
+	for (i from 1 to n){
+		a = 000b;
+		a = 000b;
+		a = 000b;
+		a = 000b;
+	};
+**/
+	out: sum<2>;
+}
+
+🦄

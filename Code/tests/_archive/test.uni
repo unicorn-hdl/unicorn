@@ -1,0 +1,7 @@
+main(){
+	a = 101b;
+	b = 110b;
+	print x: a or b;	
+	out:;
+}
+🦄

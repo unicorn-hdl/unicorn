@@ -1,0 +1,18 @@
+main(){
+	r = 0101b;
+	l = 1111b;
+	print x: concat(r,l);	
+	out:;
+}
+concat(a<4>,b<4>){
+	for (i from 0 to 3){
+		p[i] = 0b;
+	};
+	y = p[3];
+	out: p<4>;
+}
+
+modB(){
+	out:;
+}
+🦄

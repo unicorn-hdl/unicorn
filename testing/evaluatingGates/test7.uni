@@ -1,0 +1,11 @@
+main(){
+
+	bOne = 10101b; 
+	bTwo = 11110b; 
+	
+	bThr = bOne xnor bTwo; 
+	
+	out: bThr; 
+}
+neigh
+//should print 10100

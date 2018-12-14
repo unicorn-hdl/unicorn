@@ -1,0 +1,11 @@
+main(){
+
+	busOne = 1110b; 
+	busTwo = 1011b;
+	busThree = busOne and busTwo; 
+	
+	out: busThree; 
+}
+neigh
+
+//program should print 1010 
