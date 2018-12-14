@@ -4,7 +4,7 @@ main(){
 	bTwo = 111110b;
 
 	bThr= bOne nand bTwo;
-	out: bThr; 
+	out: bThr<6>; 
 }
 neigh 
 //should print 010101

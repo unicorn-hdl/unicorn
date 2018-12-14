@@ -2,7 +2,7 @@ main(){
 	a = 1011b;
 	b = 11111b; 
 	a = 1111b; // should be invalid because its overloading 
-	out: a; 
+	out: a<4>; 
 }
 neigh
 //error 

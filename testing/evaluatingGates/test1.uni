@@ -4,7 +4,7 @@ main(){
 	busTwo = 1011b;
 	busThree = busOne and busTwo; 
 	
-	out: busThree; 
+	out: busThree<4>; 
 }
 neigh
 

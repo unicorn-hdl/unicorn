@@ -3,7 +3,7 @@ main(){
 	bTwo = 101111b; 
 
 	bThr = bOne xor bTwo ; 
-	out: bThr; 
+	out: bThr<6>; 
 
 }
 neigh

@@ -4,6 +4,6 @@ main(){
 	b=101b;
 
 	c= a or b;   //error because of different size 
-	out: c; 
+	out: c<3>; 
 }
 neigh
