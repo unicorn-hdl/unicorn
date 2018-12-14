@@ -16,7 +16,7 @@ It is initially set to the following:
 
 2) Run test suite and view print statements:
 
-	1) ./make
+	1) ./make.sh
 	2) ./unic.native l filename.uni > filename.ll
 	3) At this point a bunch of debug statements get mixed in with llvm code,
 		So go into filename.ll and delete the beginning up through the line
