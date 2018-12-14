@@ -1,0 +1,9 @@
+main(){
+
+	one = 10111b; 
+	two = not one;
+
+	out: two; 
+
+neigh
+//should print 01000
