@@ -1,0 +1,14 @@
+halfAdder() {
+    a = 101b;
+    b = 100b;
+    sum = a xor b;
+    carry = a and b;
+    
+    out: sum<3>, carry<3>;
+}
+  
+main() {
+    print ha: halfAdder();
+    out:;
+}
+🦄
