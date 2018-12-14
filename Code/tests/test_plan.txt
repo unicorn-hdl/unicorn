@@ -1,0 +1,65 @@
+TEST SUITE STRUCTURE
+--------------------
+
+The test suite is divided into three main categories:
+
+1) ./code/tests/syntax-grammar: 
+
+   checks that every aspect of the Uni-Corn language 
+   reference manual produces the expected output
+
+
+
+2) ./code/tests/algo-modules:
+
+   tests key individual algorithms for the Uni-Corn
+   program, such as running a half adder, full adder,
+   ripple-carry adder, etc.
+
+
+
+3) ./code/tests/programs:
+
+   contrived example programs with multiple modules 
+   and standard library components working together to 
+   build more complex circuit logic.
+
+
+
+Structure is as follows:
+
+./code/tests/
+--syntax-grammar/
+----comments/
+----buses/
+----eof-terminators/
+----gates/
+----indexing/
+----keywords/
+----loops/
+----main/
+----print/
+----registers/
+----syntactic-sugar/
+----type-checking/
+--algo-modules/
+----combinational-logic/
+------arithmetic/
+--------half_adder.uni
+--------full_adder.uni
+--------ripple_carry_adder.uni
+--------carry-lookahead_adder.uni
+--------subtractor.uni
+--------comparator.uni
+------data-transmission/
+--------4-chan-multiplexer.uni
+--------4-chan-demultiplexer.uni
+----sequential-logic/
+------sr-flipflop.uni
+------jk-flipflop.uni
+------shift-register.uni
+------mealy.uni
+--programs/
+----huffman.uni
+
+

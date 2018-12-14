@@ -1,0 +1,8 @@
+main(){
+	e = 0b;
+	for (i from 0 to 4){
+		b[i] = 10101b[i];
+	};
+	out:;
+}
+🦄

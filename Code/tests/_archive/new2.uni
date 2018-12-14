@@ -1,0 +1,7 @@
+main(){
+	a = 1b;
+	b = 0b;
+	c = not (a and b);
+	out:;
+}
+🦄
