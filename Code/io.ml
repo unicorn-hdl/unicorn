@@ -6,22 +6,44 @@ module S = String
 
 exception InvalidCall of string
 
+let simple str = 
+        let str0 = str in
+        let a = (S.index str '_')+1 in
+        let b = (S.length str) - a in
+        let str = S.sub str a b in
+        let a = (S.index str '_')+1 in
+        let b = (S.length str) - a in
+        let str = S.sub str a b in
+        let str' = S.sub str 0 (S.index str '[') in
+        let endX = S.length str0 - S.index str0 ']' in
+        let ix = S.sub str0 (S.index str0 '['+1) endX in
+        str'^"_"^ix
+
+let simple2 str = 
+        let str0 = str in
+        let a = (S.index str '_')+1 in
+        let b = (S.length str) - a in
+        let str = S.sub str a b in
+        let a = (S.index str '_')+1 in
+        let b = (S.length str) - a in
+        let str = S.sub str a b in
+        let str' = S.sub str 0 (S.index str '[') in
+        let endX = S.length str0 - S.index str0 ']' in
+        let ix = S.sub str0 (S.index str0 '['+1) endX in
+        str'
+
+let rec indxLoop a b globs nm =
+        if (a < b)
+        then  
+           let newG = (nm^"_"^(P.sOfI a),"","0") in
+           indxLoop (a+1) b (newG::globs) nm
+        else
+           globs
 
 
 let iostuff (nlist,globs) fms outs = 
-        let simple str = 
-            let str0 = str in
-            let a = (S.index str '_')+1 in
-            let b = (S.length str) - a in
-            let str = S.sub str a b in
-            let a = (S.index str '_')+1 in
-            let b = (S.length str) - a in
-            let str = S.sub str a b in
-            let str' = S.sub str 0 (S.index str '[') in
-            let endX = S.length str0 - S.index str0 ']' in
-            let ix = S.sub str0 (S.index str0 '['+1) endX in
-            str'^"_"^ix in
         let rep str = 
+                let str = 
                 if S.contains str '~'
                 then 
                   let str0 = str in
@@ -39,18 +61,33 @@ let iostuff (nlist,globs) fms outs =
                   then str'^"_"^ix 
                   else str0
                 else str in
+                if (S.length str > 7)
+                then if (S.sub str 0 8 = ".main_0_")
+                then simple str 
+                else str 
+                else str in
         let editFn (a,b,c,d) = 
+                let p (_,nm) = (nm = simple2 a) in
                 let (a,b,c,d) =
                     if S.contains a '~'
+                    then 
+                            if (List.exists p fms)
                     then ("","","","")
+                    else (a,b,c,d) 
                     else (a,b,c,d) in
                 (rep a, rep b, rep c, rep d) in
         let globs = 
-                let globFn globs (a,b,c,d) =
-                        if S.contains a '~'
-                        then (simple a,"","0")::globs
-                        else globs in
-                List.fold_left globFn globs nlist in
+                let addFm globs (a,b,c,d) =
+                    if S.contains a '~'
+                    then (simple a,"","0")::globs
+                    else globs in
+                List.fold_left addFm globs nlist in
+        let globs =
+                let addOut globs (Lit(x),nm) = indxLoop 0 x globs nm in
+                List.fold_left addOut globs outs in
+        (*
+        let _ = List.iter (fun (a,b,c) -> P.p (a^","^b^","^c)) globs in
+*)
         (List.map editFn nlist, globs)
 
 let getFms (ModExpr(MD(_,_,_,lns),_)) = match (List.rev lns) with
