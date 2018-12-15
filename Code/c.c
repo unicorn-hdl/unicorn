@@ -1,12 +1,14 @@
 #include <stdio.h>
 
+void tick();
+
+extern int a_1;
+extern int a_0;
+
 int main(){
-	printf("tick1\n");
+	a_1 = 1;	
 	tick();
-	printf("\ntick2\n");
-	tick();
-	printf("\ntick3\n");
-	tick();
-	printf("\ntick4\n");
+	a_0 = 1;
+	a_1 = 0;
 	tick();
 }

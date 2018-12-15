@@ -15,7 +15,12 @@ let rec runThroughLines d par m m2 = List.rev (List.map actOnline (modzIntoTuple
         (*Perhaps not necessary? Seems like it's working ok as is. Run tests.*)
 
 (*replace calls in a line with the module*)
-and actOnline (line, par, m, m2) = match line with 
+and actOnline (line, par, m, m2) = 
+        (*TODO use this to see if we can kill par*)
+    let _ = (match par with
+        None -> (*p ("none")*) ()
+       | _ -> p "something!!!!") in
+        match line with 
     | Buslit(x) -> Buslit(x)
     | BoolId(x) -> BoolId(x)
     | BoolBinop(l, op, r) -> BoolBinop(actOnline (l,par, m, m2), op, actOnline (r,par,m, m2))
@@ -43,8 +48,6 @@ and actOnline (line, par, m, m2) = match line with
             then ModExpr(MD(a,b,c,d), args)
             else ModExpr(MD(a,b,c, runThroughLines d par m m2), args)
             (*TODO actually make updates to m2*)
-            (*TODO it seems like parent is never actually used. If unecessary, trash it*)
-            (*It also seems like ModExpr should never be called. Check that it isn't*)
     | Noexpr -> Noexpr
     | a -> print_endline("ERROR: Case not found!"); a
 
@@ -97,20 +100,6 @@ let printMap m = StringMap.iter printMapEl m;;
 let printMapEl2 key v = print_endline(key ^ ": " ^ (string_of_bool v));;
 let printMap2 m = StringMap. iter printMapEl2 m;;
 
-(*
-printz spitOut;;
-
-print_endline("PRINTING THE FILL MAP");;
-printMap2 (makeIsFilledMap mdlistEx);;
-
-printMap theMap 
-*)
-
-(*general calls*)
-(*
-let fillMap = makeIsFilledMap mdlistEx;;
-let theMap = createMapz mdlistEx;;
-*)
 let main nameMap = if StringMap.mem "main" nameMap 
     then StringMap.find "main" nameMap
     else raise(MissingFunction "There is no main function. Please create a main");;
@@ -127,7 +116,9 @@ let fill mdlist =
         let fst (a,_,_) = a in
         let snd (_,b,_) = b in
         let thd (_,_,c) = c in
-        (*setPars (ModExpr( (fst filledMap),[]None ), None, snd(filledMap), thd(filledMap))*)
-        ModExpr(fst filledMap, []) 
+        let mainDec = fst filledMap in
+        let mainCall = ModExpr(mainDec, Io.getMainArgs mainDec) in 
+        let supermainDec = MD([],"~",[],List.rev (mainCall::(Io.makeVars mainDec))) in
+        ModExpr(supermainDec, [])
 (*~fn called in unic~*)
 
