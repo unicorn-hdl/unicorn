@@ -1,0 +1,7 @@
+main(){
+
+	busTwooo= 10011101b; //valid
+	neigh = 11001b; //error 
+
+}
+neigh

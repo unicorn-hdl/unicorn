@@ -1,0 +1,11 @@
+main(){
+
+	a = 1100b; 
+	b = 1010b;
+	
+	x:= a or b *1111*; 
+	print asasa: x;  
+
+}
+neigh
+//should print 1110

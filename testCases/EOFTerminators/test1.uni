@@ -1,0 +1,8 @@
+main(){
+	busone = 101b; 
+	print a : busone; 
+	out:;
+}
+neigh 
+
+//program should compile 

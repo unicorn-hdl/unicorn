@@ -1,0 +1,7 @@
+method1(a[2], b[2]){
+	print a: 1011b; 
+	out: ; 
+}
+neigh
+//program should give an error because there is no main in this program 
+

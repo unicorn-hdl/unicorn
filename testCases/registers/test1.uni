@@ -1,0 +1,13 @@
+main(){
+
+	a = 111b;
+	b =101b; 
+
+	c = a or b; 
+
+	x:=c *000*; 
+	print xyc: x;
+
+}
+🦄
+//should output 111
