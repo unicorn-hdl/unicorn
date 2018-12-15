@@ -78,7 +78,7 @@ let rec simpExp m = function
                 {r=newExp; o=newExp::o'; n=sex.n+1}
         | Call(str, exp) -> print_endline ("Something is wrong! Call called in simplelines");m
         | For(_,_,_)     -> print_endline ("Something is wrong! For called in simplelines");m
-        | ModExpr(_,_,_) -> print_endline ("Something is wrong! ModExpr called in simplelines");m
+        | ModExpr(_,_) -> print_endline ("Something is wrong! ModExpr called in simplelines");m
         | Noexpr -> {r=Noexpr; o=m.o; n=m.n}
         | x -> print_endline ("we missed a case in simplelines: "^ Printer.getBinExpr x);m
 

@@ -78,7 +78,7 @@ let rec findRegs outMap expr =
     | Print(_,x) -> findRegs outMap x
     | Call(_,_) -> print_endline("Call got called in semant"); outMap
     | For(_,_,exprs) -> List.fold_left foldFn outMap exprs
-    | ModExpr(MD(_,_,_,exprs),args,_) -> 
+    | ModExpr(MD(_,_,_,exprs),args) -> 
             let argMap = List.fold_left foldFn outMap args in 
             List.fold_left foldFn argMap exprs
     | Noexpr -> outMap
@@ -133,7 +133,7 @@ let rec check d x =
           ) in
         let x = Assign(isR,lval,List.hd rd.x,init) in
         {m=d.m; x=[x]; s=d.s}
-    | Index(ModExpr(MD(outs,nm,fm,lns),args,par), Range(a,b)) ->
+    | Index(ModExpr(MD(outs,nm,fm,lns),args), Range(a,b)) ->
         let _ = 
            if (a = b)
            then ()
@@ -148,7 +148,7 @@ let rec check d x =
                 if (List.exists (fun (_,a) -> a=x) outs)
                 then x
                 else raise(InvalidRange("ERROR: You tried to access "^x^" but "^nm^" has no such outputs!")) in
-        let x = ModExpr(MD(outs,nm,fm,lns),args,par) in
+        let x = ModExpr(MD(outs,nm,fm,lns),args) in
         let d = checkMod x d selected in
         let x = Index(List.hd d.x,Range(a,b)) in
         {m=d.m; x=[x]; s=d.s}
@@ -192,7 +192,7 @@ let rec check d x =
         let d = loop a b d in
         let x = For(str, Range(Lit(a),Lit(b)), lines) in
         {m=d.m; x=[x]; s=0}
-    | ModExpr(MD(out,_,_,_), _, _) -> 
+    | ModExpr(MD(out,_,_,_), _) -> 
         (*When ModExpr has no index, it just returns its first out*)
         let selected = 
             if (List.length out> 0)
@@ -203,7 +203,7 @@ let rec check d x =
     | a -> print_endline("missing case in checkvalidities: " ^ getBinExpr a ^ "DONE\n") ; d
 
 
-and checkMod (ModExpr(MD(out,name,fms,exprs), args, par)) d selected= 
+and checkMod (ModExpr(MD(out,name,fms,exprs), args)) d selected= 
         let oldD = d in
         let _ = 
             if List.length fms = List.length args
@@ -234,7 +234,7 @@ and checkMod (ModExpr(MD(out,name,fms,exprs), args, par)) d selected=
         let out = List.map checkOut out in
         let s = lookup selected d.m in
 
-        let x = ModExpr(MD(out,name,fms,d.x),args, par) in
+        let x = ModExpr(MD(out,name,fms,d.x),args) in
         {m=d.m; x=[x]; s=s}
 
 and tableFn oldD m (fmX,nm) arg = 

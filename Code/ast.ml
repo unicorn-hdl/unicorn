@@ -29,7 +29,7 @@ and  binExpr =
     | Print of string * binExpr
     | Call of string * binExpr list
     | For of string * range * binExpr list
-    | ModExpr of md * binExpr list * binExpr option
+    | ModExpr of md * binExpr list
     | Noexpr
 
 and range = Range of intExpr * intExpr

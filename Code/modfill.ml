@@ -33,21 +33,22 @@ and actOnline (line, par, m, m2) = match line with
                     let b = sndM modz in
                     let c = thdM modz in
                     let d = fthM modz in
-                    ModExpr(MD(a,b,c, (runThroughLines d par m m2)), args, par)
+                    ModExpr(MD(a,b,c, (runThroughLines d par m m2)), args)
                else raise( MissingFunction ("Module " ^ name ^ 
                " not found! Make sure module is declared."))
-    | ModExpr(MD(a,b,c,d), args, parent) -> 
+    | ModExpr(MD(a,b,c,d), args) -> 
             let _ = print_endline ("Something's wrong! modExpr called in modfill") in
-            let this = ModExpr(MD(a,b,c,d), args, None) in
+            let this = ModExpr(MD(a,b,c,d), args) in
             if StringMap.find b m2
-            then ModExpr(MD(a,b,c,d), args, Some this)
-            else ModExpr(MD(a,b,c, runThroughLines d par m m2), args, Some this)
+            then ModExpr(MD(a,b,c,d), args)
+            else ModExpr(MD(a,b,c, runThroughLines d par m m2), args)
             (*TODO actually make updates to m2*)
             (*TODO it seems like parent is never actually used. If unecessary, trash it*)
             (*It also seems like ModExpr should never be called. Check that it isn't*)
     | Noexpr -> Noexpr
     | a -> print_endline("ERROR: Case not found!"); a
 
+    (*
 let rec setPars (line,par, m, m2) = match line with
     | Buslit(x) -> Buslit(x)
     | BoolId(x) -> BoolId(x)
@@ -66,6 +67,7 @@ let rec setPars (line,par, m, m2) = match line with
             else ModExpr(MD(a,b,c, List.map (fun x -> setPars(x,Some line,m,m2)) d), args, par )
     | Noexpr -> Noexpr
     | a -> print_endline("ERROR: Case not found!"); a
+    *)
 
 
 (*Helper method for fillHelper. Replaces d in some mod with d' where d' is lines where calls are replaced with mods*)
@@ -125,6 +127,7 @@ let fill mdlist =
         let fst (a,_,_) = a in
         let snd (_,b,_) = b in
         let thd (_,_,c) = c in
-        setPars (ModExpr( (fst filledMap),[],None ), None, snd(filledMap), thd(filledMap))
+        (*setPars (ModExpr( (fst filledMap),[]None ), None, snd(filledMap), thd(filledMap))*)
+        ModExpr(fst filledMap, []) 
 (*~fn called in unic~*)
 

@@ -40,12 +40,9 @@ let rec getBinExpr = function
  | Call(id, arglist) -> id ^ "(" ^ listToString (fun x-> getBinExpr x ^ ",") arglist ^ ")"
  | Print(id, x) -> "print " ^ id ^ ":  " ^ getBinExpr x ^ ";"
  | For(var, Range(a,b), lines) -> "for(" ^ var ^ " from "^ (getIntExpr a)^ " to "^ (getIntExpr b)^ "){\n" ^ toStringBinExprlist lines
- | ModExpr(modz, args, parent) -> 
-                 let parNm = match parent with
-                    | Some(ModExpr(MD(_,nm,_,_),_,_)) -> nm
-                    | None -> "noPar" in
+ | ModExpr(modz, args) -> 
                  "\n\tin: " ^ listToString (fun x-> getBinExpr x ^ ",") args ^
-                 "\nof: " ^ parNm ^ "\n\t" ^ toStringMod modz
+                 "\n\t" ^ toStringMod modz
  | _ -> "?"
 
  and makeline x = "\t" ^ x ^ ";\n"

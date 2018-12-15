@@ -155,7 +155,7 @@ let rec semant n (valz,map) = function
   | Index(_,Range(Lit(a),Lit(b))) -> (b-a+1,map)
   | Call(_,_)  -> p ("Something is wrong. Call should not be called in indexing");(valz,map)
   | For(_,_,_) -> p ("Something is wrong. For should not be called in indexing");(valz,map)
-  | ModExpr(_,_,_) -> p ("Something is wrong. ModExpr should not be called in indexing");(valz,map)
+  | ModExpr(_,_) -> p ("Something is wrong. ModExpr should not be called in indexing");(valz,map)
   | Noexpr -> p ("Something is wrong. Noexpr should not be called in indexing");(valz,map)
   | x -> p ("Missed case (indexing): "^ Printer.getBinExpr x); (valz,map)
                    

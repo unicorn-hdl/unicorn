@@ -34,16 +34,16 @@ let rec replace str pos exp = match exp with
                     Assign(isR, l, replace str pos r, init)
           | BoolId(x) -> Assign(isR, l, replace str pos r, init)
        )
-      | Index(ModExpr(dec,args,par),rng) ->
+      | Index(ModExpr(dec,args),rng) ->
             let args= List.map (replace str pos) args in
-            Index(ModExpr(dec,args,par),rng) 
+            Index(ModExpr(dec,args),rng) 
       | Index(ex, Range(a,b)) -> Index(replace str pos ex, Range(intRep str pos a, intRep str pos b))
       | Print(nm,ex) -> Print(nm, replace str pos ex)
       | Call(_,_) -> print_endline("Error: Call got called in noloop."); Noexpr
       | For(_,_,_) -> print_endline("Error: For got called in noloop-replace."); Noexpr
-      | ModExpr(dec,args,par) -> 
+      | ModExpr(dec,args) -> 
             let args= List.map (replace str pos) args in
-            ModExpr(dec,args,par)
+            ModExpr(dec,args)
       | Noexpr -> Noexpr
 
 let rec loop str curr until outlist exprlist = 
@@ -78,9 +78,9 @@ and evalLine d expr=
       | Call(_,_) -> print_endline("Error: Call got called in noloop."); d
       | For(str,Range(Lit(a),Lit(b)),expList) -> 
                 loop str a b d.o expList
-      | ModExpr(dec,args,par) -> 
+      | ModExpr(dec,args) -> 
                 let args = List.map (replace i c) args in
-                let newExpr = ModExpr(dec,args,par) in
+                let newExpr = ModExpr(dec,args) in
                 {i=d.i; c=d.c; n=d.c; o=newExpr::d.o}
       | Noexpr -> d
 
@@ -99,7 +99,7 @@ let rec dissolveLoop exp = match exp with
       | Call(_,_) -> let _=p ("this shouldn't happen") in [exp]
       | For(index, Range(Lit(a),Lit(b)), expList) ->
                (loop index a b [] expList).o
-      | ModExpr(MD(o,nm,f,d),a,par) -> 
+      | ModExpr(MD(o,nm,f,d),a) -> 
                let foldFn outlist line = outlist@(dissolveLoop line)in
                let d = List.fold_left foldFn [] d in
                (*
@@ -107,7 +107,7 @@ let rec dissolveLoop exp = match exp with
                let _ = List.iter (fun x-> p (Printer.getBinExpr x)) d in
                let _ = p ("Doen Printing "^nm) in
                *)
-               [ModExpr(MD(o,nm,f,d),a,par)]
+               [ModExpr(MD(o,nm,f,d),a)]
       | Noexpr -> [exp] 
       | x -> let _ = print_endline("no match in loop: "^ Printer.getBinExpr x^"ENDDD") in [exp]
 
