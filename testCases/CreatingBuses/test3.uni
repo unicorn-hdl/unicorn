@@ -2,6 +2,7 @@ main(){
 
 	busZ= 1011b;
 	busssO= 111111b; 
-	bbOO= 000000b; 
+	bbOO= 000000b;
+	out:; 
 }
 🦄

@@ -1,7 +1,9 @@
 main(){
-	busOne = 100011b; //valid 
+	busOne = 100011b; //valid
 	busTwo = 1111100000b; //valid 
-	sasakSSEWWW = 1001011; //valid
+	sasakSSEWWW = 1001011b; //valid
+
+	out:; 
 
 }
-neigh 
+🦄 
