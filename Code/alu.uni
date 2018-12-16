@@ -1,0 +1,20 @@
+main(){
+	a = 10101b;
+	b = 01011b;
+	print araw: a;
+	print am: mux(a,b,0b);
+	print space: 00b;
+	print braw: b;
+	print bm: mux(a,b,1b);
+	print space: 00b;
+}
+
+mux(a<n>, b<n>, sel){
+	for (i from 0 to n-1){
+		as[i] = a[i] and not sel;
+		bs[i] = b[i] and sel;
+		o[i] = a[i] or b[i];
+	};
+	out: o<n>;
+}
+neigh!
