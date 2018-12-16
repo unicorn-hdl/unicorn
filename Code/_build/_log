@@ -1,0 +1,100 @@
+### Starting build.
+# Target: unic.ml.depends, tags: { package(llvm), package(llvm.analysis), extension:ml, file:unic.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.analysis -package llvm -modules unic.ml > unic.ml.depends # cached
+# Target: codegen.ml.depends, tags: { package(llvm), package(llvm.analysis), extension:ml, file:codegen.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.analysis -package llvm -modules codegen.ml > codegen.ml.depends # cached
+# Target: ast.ml.depends, tags: { package(llvm), package(llvm.analysis), extension:ml, file:ast.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.analysis -package llvm -modules ast.ml > ast.ml.depends # cached
+# Target: ast.cmo, tags: { package(llvm), package(llvm.analysis), byte, compile, extension:cmo, extension:ml, file:ast.cmo, file:ast.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -w +a-4 -package llvm.analysis -package llvm -o ast.cmo ast.ml # cached
+# Target: codegen.cmo, tags: { package(llvm), package(llvm.analysis), byte, compile, extension:cmo, extension:ml, file:codegen.cmo, file:codegen.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -w +a-4 -package llvm.analysis -package llvm -o codegen.cmo codegen.ml # cached
+# Target: elaborate.ml.depends, tags: { package(llvm), package(llvm.analysis), extension:ml, file:elaborate.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.analysis -package llvm -modules elaborate.ml > elaborate.ml.depends # cached
+# Target: printer.ml.depends, tags: { package(llvm), package(llvm.analysis), extension:ml, file:printer.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.analysis -package llvm -modules printer.ml > printer.ml.depends # cached
+# Target: printer.cmo, tags: { package(llvm), package(llvm.analysis), byte, compile, extension:cmo, extension:ml, file:printer.cmo, file:printer.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -w +a-4 -package llvm.analysis -package llvm -o printer.cmo printer.ml # cached
+# Target: elaborate.cmo, tags: { package(llvm), package(llvm.analysis), byte, compile, extension:cmo, extension:ml, file:elaborate.cmo, file:elaborate.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -w +a-4 -package llvm.analysis -package llvm -o elaborate.cmo elaborate.ml # cached
+# Target: harden2.ml.depends, tags: { package(llvm), package(llvm.analysis), extension:ml, file:harden2.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.analysis -package llvm -modules harden2.ml > harden2.ml.depends # cached
+# Target: harden2.cmo, tags: { package(llvm), package(llvm.analysis), byte, compile, extension:cmo, extension:ml, file:harden2.cmo, file:harden2.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -w +a-4 -package llvm.analysis -package llvm -o harden2.cmo harden2.ml # cached
+# Target: indexing.ml.depends, tags: { package(llvm), package(llvm.analysis), extension:ml, file:indexing.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.analysis -package llvm -modules indexing.ml > indexing.ml.depends # cached
+# Target: indexing.cmo, tags: { package(llvm), package(llvm.analysis), byte, compile, extension:cmo, extension:ml, file:indexing.cmo, file:indexing.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -w +a-4 -package llvm.analysis -package llvm -o indexing.cmo indexing.ml # cached
+# Target: io.ml.depends, tags: { package(llvm), package(llvm.analysis), extension:ml, file:io.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.analysis -package llvm -modules io.ml > io.ml.depends # cached
+# Target: io.cmo, tags: { package(llvm), package(llvm.analysis), byte, compile, extension:cmo, extension:ml, file:io.cmo, file:io.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -w +a-4 -package llvm.analysis -package llvm -o io.cmo io.ml # cached
+# Target: modfill.ml.depends, tags: { package(llvm), package(llvm.analysis), extension:ml, file:modfill.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.analysis -package llvm -modules modfill.ml > modfill.ml.depends # cached
+# Target: modfill.cmo, tags: { package(llvm), package(llvm.analysis), byte, compile, extension:cmo, extension:ml, file:modfill.cmo, file:modfill.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -w +a-4 -package llvm.analysis -package llvm -o modfill.cmo modfill.ml # cached
+# Target: noloop2.ml.depends, tags: { package(llvm), package(llvm.analysis), extension:ml, file:noloop2.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.analysis -package llvm -modules noloop2.ml > noloop2.ml.depends # cached
+# Target: noloop2.cmo, tags: { package(llvm), package(llvm.analysis), byte, compile, extension:cmo, extension:ml, file:noloop2.cmo, file:noloop2.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -w +a-4 -package llvm.analysis -package llvm -o noloop2.cmo noloop2.ml # cached
+# Target: parser.mly, tags: { package(llvm), package(llvm.analysis), extension:mly, file:parser.mly, infer, ocaml, ocamlyacc, parser, quiet }
+/Users/maryamaly/.opam/4.07.0/bin/ocamlyacc parser.mly # cached
+# Target: parser.mli.depends, tags: { package(llvm), package(llvm.analysis), extension:mli, file:parser.mli, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.analysis -package llvm -modules parser.mli > parser.mli.depends # cached
+# Target: parser.cmi, tags: { package(llvm), package(llvm.analysis), byte, compile, extension:mli, file:parser.mli, interf, ocaml, quiet }
+ocamlfind ocamlc -c -w +a-4 -package llvm.analysis -package llvm -o parser.cmi parser.mli # cached
+# Target: scanner.mll, tags: { package(llvm), package(llvm.analysis), extension:mll, file:scanner.mll, lexer, ocaml, ocamllex, quiet }
+/Users/maryamaly/.opam/4.07.0/bin/ocamllex.opt -q scanner.mll # cached
+# Target: scanner.ml.depends, tags: { package(llvm), package(llvm.analysis), extension:ml, file:scanner.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.analysis -package llvm -modules scanner.ml > scanner.ml.depends # cached
+# Target: scanner.cmo, tags: { package(llvm), package(llvm.analysis), byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -w +a-4 -package llvm.analysis -package llvm -o scanner.cmo scanner.ml # cached
+# Target: semant2.ml.depends, tags: { package(llvm), package(llvm.analysis), extension:ml, file:semant2.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.analysis -package llvm -modules semant2.ml > semant2.ml.depends # cached
+# Target: semant2.cmo, tags: { package(llvm), package(llvm.analysis), byte, compile, extension:cmo, extension:ml, file:semant2.cmo, file:semant2.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -w +a-4 -package llvm.analysis -package llvm -o semant2.cmo semant2.ml # cached
+# Target: simplelines.ml.depends, tags: { package(llvm), package(llvm.analysis), extension:ml, file:simplelines.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.analysis -package llvm -modules simplelines.ml > simplelines.ml.depends # cached
+# Target: simplelines.cmo, tags: { package(llvm), package(llvm.analysis), byte, compile, extension:cmo, extension:ml, file:simplelines.cmo, file:simplelines.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -w +a-4 -package llvm.analysis -package llvm -o simplelines.cmo simplelines.ml # cached
+# Target: topsort4.ml.depends, tags: { package(llvm), package(llvm.analysis), extension:ml, file:topsort4.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.analysis -package llvm -modules topsort4.ml > topsort4.ml.depends # cached
+# Target: topsort4.cmo, tags: { package(llvm), package(llvm.analysis), byte, compile, extension:cmo, extension:ml, file:topsort4.cmo, file:topsort4.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -w +a-4 -package llvm.analysis -package llvm -o topsort4.cmo topsort4.ml # cached
+# Target: unic.cmo, tags: { package(llvm), package(llvm.analysis), byte, compile, extension:cmo, extension:ml, file:unic.cmo, file:unic.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -w +a-4 -package llvm.analysis -package llvm -o unic.cmo unic.ml # cached
+# Target: ast.cmx, tags: { package(llvm), package(llvm.analysis), compile, extension:cmx, extension:ml, file:ast.cmx, file:ast.ml, implem, native, ocaml, quiet }
+ocamlfind ocamlopt -c -w +a-4 -package llvm.analysis -package llvm -o ast.cmx ast.ml # cached
+# Target: codegen.cmx, tags: { package(llvm), package(llvm.analysis), compile, extension:cmx, extension:ml, file:codegen.cmx, file:codegen.ml, implem, native, ocaml, quiet }
+ocamlfind ocamlopt -c -w +a-4 -package llvm.analysis -package llvm -o codegen.cmx codegen.ml # cached
+# Target: printer.cmx, tags: { package(llvm), package(llvm.analysis), compile, extension:cmx, extension:ml, file:printer.cmx, file:printer.ml, implem, native, ocaml, quiet }
+ocamlfind ocamlopt -c -w +a-4 -package llvm.analysis -package llvm -o printer.cmx printer.ml # cached
+# Target: elaborate.cmx, tags: { package(llvm), package(llvm.analysis), compile, extension:cmx, extension:ml, file:elaborate.cmx, file:elaborate.ml, implem, native, ocaml, quiet }
+ocamlfind ocamlopt -c -w +a-4 -package llvm.analysis -package llvm -o elaborate.cmx elaborate.ml # cached
+# Target: harden2.cmx, tags: { package(llvm), package(llvm.analysis), compile, extension:cmx, extension:ml, file:harden2.cmx, file:harden2.ml, implem, native, ocaml, quiet }
+ocamlfind ocamlopt -c -w +a-4 -package llvm.analysis -package llvm -o harden2.cmx harden2.ml # cached
+# Target: indexing.cmx, tags: { package(llvm), package(llvm.analysis), compile, extension:cmx, extension:ml, file:indexing.cmx, file:indexing.ml, implem, native, ocaml, quiet }
+ocamlfind ocamlopt -c -w +a-4 -package llvm.analysis -package llvm -o indexing.cmx indexing.ml # cached
+# Target: io.cmx, tags: { package(llvm), package(llvm.analysis), compile, extension:cmx, extension:ml, file:io.cmx, file:io.ml, implem, native, ocaml, quiet }
+ocamlfind ocamlopt -c -w +a-4 -package llvm.analysis -package llvm -o io.cmx io.ml # cached
+# Target: modfill.cmx, tags: { package(llvm), package(llvm.analysis), compile, extension:cmx, extension:ml, file:modfill.cmx, file:modfill.ml, implem, native, ocaml, quiet }
+ocamlfind ocamlopt -c -w +a-4 -package llvm.analysis -package llvm -o modfill.cmx modfill.ml # cached
+# Target: noloop2.cmx, tags: { package(llvm), package(llvm.analysis), compile, extension:cmx, extension:ml, file:noloop2.cmx, file:noloop2.ml, implem, native, ocaml, quiet }
+ocamlfind ocamlopt -c -w +a-4 -package llvm.analysis -package llvm -o noloop2.cmx noloop2.ml # cached
+# Target: parser.ml.depends, tags: { package(llvm), package(llvm.analysis), extension:ml, file:parser.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.analysis -package llvm -modules parser.ml > parser.ml.depends # cached
+# Target: parser.cmx, tags: { package(llvm), package(llvm.analysis), compile, extension:cmx, extension:ml, file:parser.cmx, file:parser.ml, implem, native, ocaml, quiet }
+ocamlfind ocamlopt -c -w +a-4 -package llvm.analysis -package llvm -o parser.cmx parser.ml # cached
+# Target: scanner.cmx, tags: { package(llvm), package(llvm.analysis), compile, extension:cmx, extension:ml, file:scanner.cmx, file:scanner.ml, implem, native, ocaml, quiet }
+ocamlfind ocamlopt -c -w +a-4 -package llvm.analysis -package llvm -o scanner.cmx scanner.ml # cached
+# Target: semant2.cmx, tags: { package(llvm), package(llvm.analysis), compile, extension:cmx, extension:ml, file:semant2.cmx, file:semant2.ml, implem, native, ocaml, quiet }
+ocamlfind ocamlopt -c -w +a-4 -package llvm.analysis -package llvm -o semant2.cmx semant2.ml # cached
+# Target: simplelines.cmx, tags: { package(llvm), package(llvm.analysis), compile, extension:cmx, extension:ml, file:simplelines.cmx, file:simplelines.ml, implem, native, ocaml, quiet }
+ocamlfind ocamlopt -c -w +a-4 -package llvm.analysis -package llvm -o simplelines.cmx simplelines.ml # cached
+# Target: topsort4.cmx, tags: { package(llvm), package(llvm.analysis), compile, extension:cmx, extension:ml, file:topsort4.cmx, file:topsort4.ml, implem, native, ocaml, quiet }
+ocamlfind ocamlopt -c -w +a-4 -package llvm.analysis -package llvm -o topsort4.cmx topsort4.ml # cached
+# Target: unic.cmx, tags: { package(llvm), package(llvm.analysis), compile, extension:cmx, extension:ml, file:unic.cmx, file:unic.ml, implem, native, ocaml, quiet }
+ocamlfind ocamlopt -c -w +a-4 -package llvm.analysis -package llvm -o unic.cmx unic.ml # cached
+# Target: unic.native, tags: { package(llvm), package(llvm.analysis), dont_link_with, extension:native, file:unic.native, link, native, ocaml, program, quiet }
+ocamlfind ocamlopt -linkpkg -package llvm.analysis -package llvm ast.cmx codegen.cmx printer.cmx elaborate.cmx harden2.cmx indexing.cmx io.cmx modfill.cmx noloop2.cmx parser.cmx scanner.cmx semant2.cmx simplelines.cmx topsort4.cmx unic.cmx -o unic.native # cached
+# Compilation successful.

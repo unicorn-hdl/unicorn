@@ -4,7 +4,8 @@ main(){
 	bTwo = 1101b; 
 
 	bRes = bOne nor bTwo; 
+	print o: bRes; 
 	out: bRes<4>; 
 }
-neigh 
+neigh! 
 //program should output 0010
