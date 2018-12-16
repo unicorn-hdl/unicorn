@@ -45,8 +45,8 @@ rule token = parse
 | int as lxm  { LITERAL(int_of_string lxm) } (*does this need 'as lxm'*)
 | boollist as lxm { BOOLLIT(lxm) }
 | eof { EOF }
-|"🦄" { UNICORN }
-| "neigh" { UNICORN2 }
+| "🦄" { UNICORN }
+| "neigh!" { UNICORN2 }
 | _ as ch { raise (Failure("illegal character " ^ Char.escaped ch)) }
 and multi = parse
     "**/" { token lexbuf }
