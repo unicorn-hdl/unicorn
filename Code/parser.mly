@@ -34,8 +34,8 @@ open Ast
 %%
 
 program:
- | modulezList UNICORN  EOF { $1 }
  | modulezList UNICORN2 EOF { $1 }
+ | modulezList UNICORN  EOF { $1 }
 
 modulezList:
  | /*Nothing*/{ [] }
