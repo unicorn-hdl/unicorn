@@ -3,8 +3,9 @@ main(){
 	bTwo = 101111b; 
 
 	bThr = bOne xor bTwo ; 
+	print w: bThr; 
 	out: bThr<6>; 
 
 }
-neigh
+neigh!
 //should print 000101

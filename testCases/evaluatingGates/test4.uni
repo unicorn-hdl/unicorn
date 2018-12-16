@@ -3,7 +3,8 @@ main(){
 	one = 10111b; 
 	two = not one;
 
+	print a: two; 
 	out: two<5>; 
 }
-neigh
+neigh!
 //should print 01000

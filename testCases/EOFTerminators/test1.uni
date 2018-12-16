@@ -3,6 +3,5 @@ main(){
 	print a : busone; 
 	out:;
 }
-neigh 
-
+neigh!
 //program should compile 

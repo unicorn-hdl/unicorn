@@ -5,8 +5,9 @@ main(){
 
 	bThree = bOne or bTwo; 
 
+	print z: bThree; 
 	out: bThree<5>; 
 
 }
-neigh
+neigh!
 //program should print 11101

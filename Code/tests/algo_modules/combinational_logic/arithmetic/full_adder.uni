@@ -1,0 +1,20 @@
+fullAdder(a<2>, b<2>, cin<2>) {
+
+   sum = (a xor b) xor cin;
+   cout = (sum and cin) or (a and b)
+   
+   out: sum, cout; 
+	
+}
+
+main() {
+
+   a = 10b;
+   b = 11b;
+   c = 00b;
+
+   print s : fullAdder(a,b,c)[0];
+
+   out:;
+	
+}

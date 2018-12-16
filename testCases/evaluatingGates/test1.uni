@@ -3,9 +3,10 @@ main(){
 	busOne = 1110b; 
 	busTwo = 1011b;
 	busThree = busOne and busTwo; 
-	
+
+	print a : busThree; 	
 	out: busThree<4>; 
 }
-neigh
+neigh!
 
 //program should print 1010 

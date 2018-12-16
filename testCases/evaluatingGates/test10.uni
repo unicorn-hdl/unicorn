@@ -4,7 +4,7 @@ main(){
 	b = 1111b; 
 	
 	c = a and b;
-
+	print q: c; 
 	out: c<2>; 
 }
 🦄
