@@ -2,21 +2,15 @@
 
 void tick();
 
-extern char a_0;
-extern char a_1;
-extern char d_0;
-
 int main(){
-	printf("%d\n", d_0);
+	printf("tick1\n");
 	tick();
-	printf("%d\n", d_0);
+	printf("\ntick2\n");
 	tick();
-	printf("%d\n", d_0);
+	printf("\ntick3\n");
 	tick();
-	printf("%d\n", d_0);
+	printf("\ntick4\n");
 	tick();
-	printf("%d\n", d_0);
-	tick();
-	printf("%d\n", d_0);
+	printf("\ntick5\n");
 	tick();
 }
