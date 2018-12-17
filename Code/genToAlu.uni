@@ -1,0 +1,40 @@
+main() {
+	a = 0101b;
+	b = 0011b;
+	AND = logic(a,b,00b);
+	OR  = logic(a,b,01b);
+	XOR = logic(a,b,10b);
+	NOT = logic(a,b,11b);
+	print And: AND;
+	print OR :  OR;
+	print XOR: XOR;
+	print NOT: NOT;
+	out:;
+}
+
+mux(a<n>,b<n>,s){
+	for (i from 0 to n-1){
+		as[i] = a[i] and not s;
+		bs[i] = b[i] and s;
+		o[i] = as[i] or bs[i]; 
+	};
+	out:o<n>;
+}
+
+mux2(a<n>,b<n>,c<n>,d<n>,sel<2>){
+	m1 = mux(a,b,sel[0]);
+	m2 = mux(c,d,sel[0]);
+	m  = mux(m1,m2,sel[1]);
+	out:m<n>;
+}
+
+logic(a<n>, b<n>, sel<2>){
+	AND = a and b;
+	OR = a or b;
+	XOR = a xor b;
+	NOT = not a;
+	o = mux2(AND,OR,XOR,NOT,sel);	
+	out:o<n>;
+}
+🦄
+
