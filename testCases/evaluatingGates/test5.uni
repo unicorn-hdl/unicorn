@@ -3,7 +3,7 @@ main(){
 	bOne = 101010b; 
 	bTwo = 111110b;
 
-	bThr= bOne nand bTwo;
+	bThr=not(bOne and bTwo);
 	print e: bThr; 
 	out: bThr<6>; 
 }

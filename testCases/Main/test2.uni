@@ -4,5 +4,5 @@ main(){
 	print x : 10111b; 
 	out: ; 
 }
-neigh
+neigh!
 //this should print out 1011111 and 10111

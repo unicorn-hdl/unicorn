@@ -1,6 +1,6 @@
 main(){
 	helloThereBus = 1011100000b; //valid  
 	from = 100111b; //error
-
+	out:; 
 }
-neigh
+neigh!

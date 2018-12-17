@@ -1,6 +1,6 @@
 main(){
 	busOne= 100111b; //valid 	
 	to = 11111100b; //error
-
+	out:;
 }
-neigh
+neigh!

@@ -2,7 +2,7 @@ main(){
 	bOne = 101010b; 
 	bTwo = 101111b; 
 
-	bThr = bOne xor bTwo ; 
+	bThr = not(bOne or bTwo) ; 
 	print w: bThr; 
 	out: bThr<6>; 
 

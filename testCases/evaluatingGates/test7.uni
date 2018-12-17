@@ -3,7 +3,7 @@ main(){
 	bOne = 10101b; 
 	bTwo = 11110b; 
 	
-	bThr = bOne xnor bTwo; 
+	bThr = not(bOne xor bTwo); 
 
 	print p: bThr; 	
 	out: bThr<5>; 

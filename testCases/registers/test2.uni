@@ -2,9 +2,9 @@ main(){
 	a = 1101b; 
 	b = 110000001111b; 
 
-	a:= a *0000*; //error because bus is already called a -- overloading
+	a:= a *0000b*; //error because bus is already called a -- overloading
 	print asas: a; 
-
+	out:; 
 }
-neigh
+neigh!
 //should print 1101

@@ -1,0 +1,9 @@
+main(){
+
+	a = 1101b; 
+	b = 1101010010b; 
+	
+	x:= a *0101010010101*; //error because of size of initializing  
+	out:;
+}
+neigh!
