@@ -1,0 +1,12 @@
+main(){
+	
+	c[0]= 1b; 
+	c[1]= 0b; 
+	c[2]= 1b;
+	c[3] =1b; 	
+	print asa: c; 
+	out:; 
+	
+}
+neigh!
+//print 1101 

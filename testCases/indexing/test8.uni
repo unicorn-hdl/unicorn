@@ -1,0 +1,11 @@
+main(){
+
+	a = 1010b; 
+	b[1:4] = 1101b; 	
+	b[0] = 1b; 
+	print asa : b; 
+	out:; 
+
+}
+neigh!
+//prints 11011
