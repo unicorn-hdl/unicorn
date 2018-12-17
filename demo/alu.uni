@@ -1,7 +1,16 @@
+/**
+	000 -> A+B
+	001 -> A-B
+	100 -> A&B
+	101 -> A|B
+	110 -> A xor B
+	111 -> Not A
+**/
+
 main(){
-	a = 10101b;
-	b = 01011b;
-	x = alu(000b, a,b);
+	a = 00111111b;
+	b = 11000100b;
+	x = alu(111b,a,b);
 	print x: x;
 	out:;
 }
@@ -71,5 +80,4 @@ logic(a<n>, b<n>, sel<2>){
 	o = mux2(AND,OR,XOR,NOT,sel);	
 	out:o<n>;
 }
-
-neigh!
+🦄

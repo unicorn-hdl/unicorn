@@ -1,0 +1,83 @@
+/**
+	000 -> A+B
+	001 -> A-B
+	100 -> A&B
+	101 -> A|B
+	110 -> A xor B
+	111 -> Not A
+**/
+
+main(){
+	a = 00111111b;
+	b = 11000100b;
+	x = alu(111b,a,b);
+	print x: x;
+	out:;
+}
+
+alu(instr<3>,a<n>,b<n>){
+	m = math(a,b,instr[0]);
+	l = logic(a,b,instr[0:1]);
+	o = mux(m,l,instr[2]);	
+	out:o<n>;
+}
+
+math(a<n>,b<n>,sel){
+	bc = comp(b);
+	bnew = mux(b,bc,sel);
+	sum = add(a,bnew);
+	out:sum<n>;
+}
+
+comp(a<n>){
+	a1 = not a;
+	for (i from 1 to n-1){
+		one[i] = 0b;
+	};
+	one[0] = 1b;
+	cmp = add(a1,one);
+	out:cmp<n>;	
+}
+
+fA(a, b, carryIn){
+	axb = a xor b;
+    sum = axb xor carryIn;
+    carry = (axb and carryIn) or (a and b);
+	out: sum, carry;
+}
+
+add(a<n>,b<n>){
+	c[0] = 0b;	
+
+	for (i from 0 to n-1){
+		sum[i] = fA(a[i],b[i],c[i])[sum];
+		c[i+1] = fA(a[i],b[i],c[i])[carry];	
+	};
+	out:sum<n>;
+}
+
+mux(a<n>,b<n>,s){
+	for (i from 0 to n-1){
+		as[i] = a[i] and not s;
+		bs[i] = b[i] and s;
+		o[i] = as[i] or bs[i]; 
+	};
+	out:o<n>;
+}
+
+mux2(a<n>,b<n>,c<n>,d<n>,sel<2>){
+	m1 = mux(a,b,sel[0]);
+	m2 = mux(c,d,sel[0]);
+	m  = mux(m1,m2,sel[1]);
+	out:m<n>;
+}
+
+logic(a<n>, b<n>, sel<2>){
+	AND = a and b;
+	OR = a or b;
+	XOR = a xor b;
+	NOT = not a;
+	o = mux2(AND,OR,XOR,NOT,sel);	
+	out:o<n>;
+}
+🦄
