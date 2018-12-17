@@ -1,0 +1,16 @@
+main(){
+
+	a = 1010b; 
+	a[0]= 1b;
+	a[1]= 1b;
+	a[2]= 1b;
+	a[3]= 1b; 
+
+	print asa: a; 
+	out:; 
+}
+neigh! 
+//print 1111
+
+
+

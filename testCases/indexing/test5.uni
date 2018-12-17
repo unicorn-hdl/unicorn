@@ -1,0 +1,10 @@
+main(){
+	a=10101b; 
+	b= a[0+2:4]; 
+	
+	print ahsa: b; 	
+	out:;
+
+}
+neigh!
+//prints 101 
