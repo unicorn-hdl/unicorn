@@ -85,6 +85,8 @@ let iostuff (nlist,globs) fms outs =
         let globs =
                 let addOut globs (Lit(x),nm) = indxLoop 0 x globs nm in
                 List.fold_left addOut globs outs in
+                
+        let globs = List.map (fun (a,b,c) -> (rep a, b, c)) globs in
         (*
         let _ = List.iter (fun (a,b,c) -> P.p (a^","^b^","^c)) globs in
 *)
