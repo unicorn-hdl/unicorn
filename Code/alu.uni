@@ -7,13 +7,15 @@ main(){
 	print braw: b;
 	print bm: mux(a,b,1b);
 	print space: 00b;
+	out:;
 }
 
 mux(a<n>, b<n>, sel){
-	for (i from 0 to n-1){
-		as[i] = a[i] and not sel;
-		bs[i] = b[i] and sel;
-		o[i] = a[i] or b[i];
+	
+	for (i from 1 to n){
+		as[i-1] = a[i-1] and not sel;
+		bs[i-1] = b[i-1] and sel;
+		o[i-1] = as[i-1] or bs[i-1];
 	};
 	out: o<n>;
 }
