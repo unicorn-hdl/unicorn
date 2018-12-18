@@ -9,8 +9,8 @@ open Ast
 %token SEMI UNICORN UNICORN2 EOF 
 %token OGENERIC CGENERIC 
 %token ASSIGN REGASSIGN STAR
-%token PLUS MINUS
-%token PLUSDOT TIMESDOT
+%token PLUS MINUS POUND
+%token EXCITEDSTAR EXCITEDPLUS EXCITEDPOUND WOW
 %token FOR TO FROM
 %token OUT INIT
 %token AND OR NOT NAND NOR XOR XNOR
@@ -83,18 +83,21 @@ line:
 
 binExpr:
  | BOOLLIT { Buslit($1) } 
- | binExpr PLUSDOT binExpr { BoolBinop($1, Or, $3) }
- | binExpr TIMESDOT binExpr { BoolBinop($1, And, $3) }
- | binExpr XOR binExpr { BoolBinop($1, Xor, $3) }
- | binExpr XNOR binExpr { BoolBinop($1, Xnor, $3) }
- | binExpr NAND binExpr { BoolBinop($1, Nand, $3) }
  | binExpr AND binExpr { BoolBinop($1, And, $3) }
- | binExpr STAR binExpr { BoolBinop($1, And, $3) }
  | binExpr OR binExpr { BoolBinop($1, Or, $3) }
+ | binExpr XOR binExpr { BoolBinop($1, Xor, $3) }
+ | binExpr STAR binExpr { BoolBinop($1, And, $3) }
  | binExpr PLUS binExpr { BoolBinop($1, Or, $3) }
- | binExpr NOR binExpr { BoolBinop($1, Nor, $3) }
+ | binExpr POUND binExpr { BoolBinop($1, Xor, $3) }
+ | binExpr NAND binExpr { Unop(Not, BoolBinop($1, And, $3)) }
+ | binExpr NOR binExpr { Unop(Not, BoolBinop($1, Or, $3)) }
+ | binExpr XNOR binExpr { Unop(Not, BoolBinop($1, Xor, $3)) }
+ | binExpr EXCITEDPOUND binExpr { Unop(Not, BoolBinop($1, Xor, $3)) }
+ | binExpr EXCITEDSTAR binExpr { Unop(Not, BoolBinop($1, And, $3)) }
+ | binExpr EXCITEDPLUS binExpr { Unop(Not, BoolBinop($1, Or, $3)) }
  | OPAREN binExpr CPAREN { $2 } 
  | NOT binExpr { Unop(Not, $2) }
+ | WOW binExpr { Unop(Not, $2)}
  | ID { BoolId($1) } 
  | binExpr index { Index($1, $2) }
  /*note these other important things are exprs too: */

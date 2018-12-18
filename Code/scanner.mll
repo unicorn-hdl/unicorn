@@ -22,13 +22,18 @@ rule token = parse
 | ':' { COLON }
 | ',' { COMMA }
 | '=' { ASSIGN }
-| "out" { OUT } 
 | '<' { OGENERIC }
 | '>' { CGENERIC }
-| ":=" { REGASSIGN }
-| "*" { STAR } 
-| '+' { PLUS }
+| ":="{ REGASSIGN }
+| "*" { STAR  } 
+| "!*"{ EXCITEDSTAR }
+| "#" { POUND }
+| "!#"{ EXCITEDPOUND }
+| '+' { PLUS  }
+| "!+"{ EXCITEDPLUS  }
+| "!" { WOW }
 | '-' { MINUS }
+| "out" { OUT } 
 | "for" { FOR }
 | "to" { TO } | "from" { FROM }
 | "init" { INIT }
