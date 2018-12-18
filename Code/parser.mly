@@ -101,7 +101,6 @@ binExpr:
  | assignment {$1}
  | call {$1}
  | print {$1}
- | declare {$1}
  | loop {$1}
 
 assignment:
@@ -122,9 +121,6 @@ argList:
 
 print: 
  | PRINT ID COLON binExpr { Print($2, $4) }
-
-declare:
- | MAKE ID typdecl {BoolId($2)}
 
 loop:
  | FOR OPAREN ID FROM intExprz TO intExprz CPAREN OCURL lineList CCURL {
