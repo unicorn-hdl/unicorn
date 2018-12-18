@@ -46,7 +46,8 @@ let opToStr = function
           | Nand -> "Nand"
           | Nor  -> "Nor"
           | Xor  -> "Xor"
-          | Xnor -> "Xnor" )
+          | Xnor -> "Xnor" 
+      )
     | U(x) -> (match x with
           | Not -> "Not" 
           | Ident -> "Ident")

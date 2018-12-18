@@ -85,7 +85,6 @@ let rec check d x =
         match x with  
       Buslit(valz) -> {m=d.m; x=[x]; s=String.length valz -1}
     | BoolId(name) -> 
-    (*TODO: Need a "badsearch" in case var hasn't been decl'd yet*)
         let s =
             if StringMap.mem name d.m
             then lookup name d.m
@@ -96,7 +95,7 @@ let rec check d x =
         let r = hardenline d.m r in
         let ld = check  d l in
         let rd = check ld r in
-        let x = BoolBinop(l,op,r) in
+        let x = BoolBinop(List.hd ld.x,op,List.hd rd.x) in
         let s = 
             if (ld.s= rd.s)
             then ld.s 
@@ -105,7 +104,7 @@ let rec check d x =
     | Unop(op, x) -> 
         let x = hardenline d.m x in
         let d = check d x in
-        let x = Unop(op,x) in
+        let x = Unop(op,List.hd d.x) in
         {m=d.m; x=[x]; s=d.s}
     | Assign(isR, lval, rval, init) ->
         let lval = hardenline d.m lval in
@@ -149,7 +148,7 @@ let rec check d x =
         let x = ModExpr(MD(outs,nm,fm,lns),args) in
         let d = checkMod x d selected in
         let x = Index(List.hd d.x,Range(a,b)) in
-        {m=oldMap.m; x=d.x; s=d.s}
+        {m=oldMap.m; x=[x]; s=d.s}
     | Index(x, Range(a,b)) -> 
         let a' = getLit (eval d.m a) in
         let b' = getLit (eval d.m b) in
@@ -165,11 +164,12 @@ let rec check d x =
     | Print(nm, x) -> 
         let x = hardenline d.m x in
         let d = check d x in
-        let x = Print(nm,x) in
+        let x = Print(nm, List.hd d.x) in
         let s = 1 in
         {m=d.m; x=[x]; s=s}
     | Call(_) -> print_endline ("Call is showing up in check"); d
     | For(str, Range(a,b), lines) ->
+                    (*TODO return the correct x here*)
         let a = eval d.m a in
         let b = eval d.m b in
         let _ = rangeIsValid a b in
