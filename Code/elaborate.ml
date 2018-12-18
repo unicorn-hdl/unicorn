@@ -14,16 +14,16 @@ let listInvert (lst, b) = List.map (fun a->(a,b)) lst
 let rec collapseFn maps exp = match exp with  
     | Buslit(x) -> (Buslit(x), maps)
     | BoolId(x) -> let newX = 
-                    if (StringMap.mem x maps.argMap)
-                        then StringMap.find x maps.argMap 
-                        else BoolId(x) in
-                    let newerX = match newX with
-                         BoolId(x) ->
-                            if (x.[0] = '.')
-                            then BoolId(x)
-                            else BoolId ("."^maps.n^"_"^string_of_int (StringMap.find maps.n maps.cMap)^"_"^x)
-                       | a -> a in
-                    (newerX, maps)
+            if (StringMap.mem x maps.argMap)
+                then StringMap.find x maps.argMap 
+                else BoolId(x) in
+            let newerX = match newX with
+                  BoolId(x) ->
+                      if (x.[0] = '.')
+                      then BoolId(x)
+                      else BoolId ("."^maps.n^"_"^string_of_int (StringMap.find maps.n maps.cMap)^"_"^x)
+                | a -> a in
+            (newerX, maps)
     | BoolBinop(lval, op, rval) -> 
             let l2 = collapseFn maps lval in
             let r2 = collapseFn (snd l2) rval in
@@ -36,20 +36,8 @@ let rec collapseFn maps exp = match exp with
             let r2 = collapseFn maps  rval in
             let l2 = collapseFn (snd r2) lval in
             (Assign(isReg, fst l2, fst r2, init), snd l2)
-    | Index(ModExpr(MD(out,nm,fm,exps), args),Range(IntId(a),b)) ->
-        let oldMap = maps in
-        let maps = collapseMod maps out nm fm exps args in 
-
-        let getOut(*by Jordan Peele*)= 
-                let findFn nm (sz,bindName) = nm=bindName in
-                collapseFn maps (BoolId(snd (List.find (findFn a) out))) in
-        let maps = {n=oldMap.n; argMap=oldMap.argMap; cMap=maps.cMap; net=maps.net} in
-
-        let lst = List.hd (List.rev maps.net) in
-        let net = lst::List.rev (List.tl (List.rev maps.net)) in 
-
-        let maps = {n=maps.n; argMap=maps.argMap; cMap=maps.cMap; net=maps.net} in
-        (fst getOut, maps)
+    | Index(ModExpr(md, args),
+            Range(IntId(a),b)) -> collapseMod maps ModExpr(md,args) a
     | Index (exp, rng) ->
             let exp2 = collapseFn maps exp in
             (Index(fst exp2, rng), snd exp2)
@@ -60,32 +48,22 @@ let rec collapseFn maps exp = match exp with
             print_endline ("Something is wrong! Call called in elaborate");
             (Noexpr, maps)
     | For(str,Range(Lit(a),Lit(b)),exprLst) -> 
-                    let oldMap = maps in
-                    let forFn maps expr = 
-                            let cex = collapseFn maps expr in
-                            let maps' = snd cex in
-                            let cexp = fst cex in
-                            {n=maps.n; argMap=maps'.argMap; cMap=maps'.cMap; net=cexp::maps'.net} 
-                    in
-                    let maps = {n=maps.n; argMap=maps.argMap; cMap=maps.cMap; net=[]} in
-                    let exprLst = List.fold_left forFn maps exprLst in
-                    let maps = {n=maps.n; argMap=maps.argMap; cMap=exprLst.cMap; net=oldMap.net} in
-                    (For(str,Range(Lit(a),Lit(b)),exprLst.net), maps) 
-    | ModExpr(MD(out,nm,fm,exps), args) -> 
-        let oldMap = maps in
-        let maps = collapseMod maps out nm fm exps args in 
-
-        let getOut(*by Jordan Peele*)= 
-                if (List.length out >0)
-                then collapseFn maps (BoolId(snd (List.hd out)))
-                else (Noexpr, maps) in
-        let maps = {n=oldMap.n; argMap=oldMap.argMap; cMap=maps.cMap; net=maps.net} in
-        let x = getOut in
-        (fst getOut, maps)
+             let oldMap = maps in
+             let forFn maps expr = 
+                  let cex = collapseFn maps expr in
+                  let maps' = snd cex in
+                  let cexp = fst cex in
+                  {n=maps.n; argMap=maps'.argMap; cMap=maps'.cMap; net=cexp::maps'.net} in
+             let maps = {n=maps.n; argMap=maps.argMap; cMap=maps.cMap; net=[]} in
+             let exprLst = List.fold_left forFn maps exprLst in
+             let maps = {n=maps.n; argMap=maps.argMap; cMap=exprLst.cMap; net=oldMap.net} in
+             (For(str,Range(Lit(a),Lit(b)),exprLst.net), maps) 
+    | ModExpr(md, args) -> collapseMod maps ModExpr(md,args) ""
     | Noexpr -> (Noexpr,maps)
     | x -> print_endline ("we missed a case in elaborate: "^ Printer.getBinExpr "" x); (Noexpr, maps)
 
-and collapseMod maps out nm fm exps args =
+and collapseMod maps ModExpr(MD(out,nm,fm,exps),args) a =
+        let oldMap = maps in
         let cMap0 = maps.cMap in
         let argFn maps arg = snd(collapseFn maps arg) in
         let maps = List.fold_left argFn maps args in
@@ -112,6 +90,19 @@ and collapseMod maps out nm fm exps args =
                 {n=maps.n; argMap=maps.argMap; cMap=maps.cMap; net=(fst collapsedEx)::maps.net} in
         let maps = List.fold_left foldFn maps exps in
         maps
+    
+        let getOut (*By Jordan Peele*) = 
+          if (a <> "")
+          then 
+                let findFn nm (sz,bindName) = nm=bindName in
+                collapseFn maps (BoolId(snd (List.find (findFn a) out))) in
+          else
+                if (List.length out >0)
+                then collapseFn maps (BoolId(snd (List.hd out)))
+                else (Noexpr, maps) in
+
+        let maps = {n=oldMap.n; argMap=oldMap.argMap; cMap=maps.cMap; net=maps.net} in
+        (fst getOut, maps)
 
 let collapse ast = 
         let strtMap = {n=""; argMap=StringMap.empty; cMap=StringMap.empty; net=[]} in
