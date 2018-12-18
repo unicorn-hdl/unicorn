@@ -26,6 +26,7 @@ rule token = parse
 | '<' { OGENERIC }
 | '>' { CGENERIC }
 | ":=" { REGASSIGN }
+| "*" { STAR } 
 | '+' { PLUS }
 | '-' { MINUS }
 | "for" { FOR }
@@ -40,7 +41,6 @@ rule token = parse
 | "xnor" { XNOR }
 | "print" { PRINT }
 | "make" { MAKE }
-| "*" { STAR } 
 | var as lxm { ID(lxm) }
 | int as lxm  { LITERAL(int_of_string lxm) } (*does this need 'as lxm'*)
 | boollist as lxm { BOOLLIT(lxm) }

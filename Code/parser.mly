@@ -89,7 +89,9 @@ binExpr:
  | binExpr XNOR binExpr { BoolBinop($1, Xnor, $3) }
  | binExpr NAND binExpr { BoolBinop($1, Nand, $3) }
  | binExpr AND binExpr { BoolBinop($1, And, $3) }
+ | binExpr STAR binExpr { BoolBinop($1, And, $3) }
  | binExpr OR binExpr { BoolBinop($1, Or, $3) }
+ | binExpr PLUS binExpr { BoolBinop($1, Or, $3) }
  | binExpr NOR binExpr { BoolBinop($1, Nor, $3) }
  | OPAREN binExpr CPAREN { $2 } 
  | NOT binExpr { Unop(Not, $2) }
