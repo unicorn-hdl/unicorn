@@ -37,7 +37,7 @@ let rec collapseFn maps exp = match exp with
             let l2 = collapseFn (snd r2) lval in
             (Assign(isReg, fst l2, fst r2, init), snd l2)
     | Index(ModExpr(md, args),
-            Range(IntId(a),b)) -> collapseMod maps ModExpr(md,args) a
+            Range(IntId(a),b)) -> collapseMod maps (ModExpr(md,args)) a
     | Index (exp, rng) ->
             let exp2 = collapseFn maps exp in
             (Index(fst exp2, rng), snd exp2)
@@ -58,11 +58,11 @@ let rec collapseFn maps exp = match exp with
              let exprLst = List.fold_left forFn maps exprLst in
              let maps = {n=maps.n; argMap=maps.argMap; cMap=exprLst.cMap; net=oldMap.net} in
              (For(str,Range(Lit(a),Lit(b)),exprLst.net), maps) 
-    | ModExpr(md, args) -> collapseMod maps ModExpr(md,args) ""
+    | ModExpr(md, args) -> collapseMod maps (ModExpr(md,args)) ""
     | Noexpr -> (Noexpr,maps)
     | x -> print_endline ("we missed a case in elaborate: "^ Printer.getBinExpr "" x); (Noexpr, maps)
 
-and collapseMod maps ModExpr(MD(out,nm,fm,exps),args) a =
+and collapseMod maps (ModExpr(MD(out,nm,fm,exps),args)) a =
         let oldMap = maps in
         let cMap0 = maps.cMap in
         let argFn maps arg = snd(collapseFn maps arg) in
@@ -89,18 +89,17 @@ and collapseMod maps ModExpr(MD(out,nm,fm,exps),args) a =
                 let maps = snd collapsedEx in
                 {n=maps.n; argMap=maps.argMap; cMap=maps.cMap; net=(fst collapsedEx)::maps.net} in
         let maps = List.fold_left foldFn maps exps in
-        maps
     
         let getOut (*By Jordan Peele*) = 
-          if (a <> "")
+          if (a = "")
           then 
-                let findFn nm (sz,bindName) = nm=bindName in
-                collapseFn maps (BoolId(snd (List.find (findFn a) out))) in
+            if (List.length out >0)
+            then collapseFn maps (BoolId(snd (List.hd out)))
+            else (Noexpr, maps)
           else
-                if (List.length out >0)
-                then collapseFn maps (BoolId(snd (List.hd out)))
-                else (Noexpr, maps) in
-
+            let findFn nm (sz,bindName) = nm=bindName in
+            collapseFn maps (BoolId(snd (List.find (findFn a) out)))
+        in
         let maps = {n=oldMap.n; argMap=oldMap.argMap; cMap=maps.cMap; net=maps.net} in
         (fst getOut, maps)
 

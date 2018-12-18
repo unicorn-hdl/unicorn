@@ -131,6 +131,7 @@ let rec check d x =
         let x = Assign(isR,lval,List.hd rd.x,init) in
         {m=d.m; x=[x]; s=d.s}
     | Index(ModExpr(MD(outs,nm,fm,lns),args), Range(a,b)) ->
+        let oldMap = d in
         let _ = 
            if (a = b)
            then ()
@@ -148,7 +149,7 @@ let rec check d x =
         let x = ModExpr(MD(outs,nm,fm,lns),args) in
         let d = checkMod x d selected in
         let x = Index(List.hd d.x,Range(a,b)) in
-        {m=d.m; x=[x]; s=d.s}
+        {m=oldMap.m; x=d.x; s=d.s}
     | Index(x, Range(a,b)) -> 
         let a' = getLit (eval d.m a) in
         let b' = getLit (eval d.m b) in
@@ -190,12 +191,14 @@ let rec check d x =
         let x = For(str, Range(Lit(a),Lit(b)), lines) in
         {m=d.m; x=[x]; s=0}
     | ModExpr(MD(out,_,_,_), _) -> 
+        let oldMap = d in
         (*When ModExpr has no index, it just returns its first out*)
         let selected = 
             if (List.length out> 0)
             then snd(List.hd out)
             else "" in
-        checkMod x d selected 
+        let d = checkMod x d selected in
+        {m=oldMap.m; x=d.x; s=d.s}
     | Noexpr -> d
     | a -> print_endline("missing case in checkvalidities: " ^ getBinExpr "" a ^ "DONE\n") ; d
 
