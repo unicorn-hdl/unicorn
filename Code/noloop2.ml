@@ -3,6 +3,7 @@ open Printer
 
 exception UndeclaredVar of string 
 
+(*This file no longer does anything :( *)
 
 type data = {i:string; c:int; n:int; o:binExpr list}
 (*i is index name

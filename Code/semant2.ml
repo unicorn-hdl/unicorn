@@ -188,8 +188,8 @@ let rec check d x =
                    loop (a+1) b d 
                 else d in
         let d = loop a b d in
-        let x = For(str, Range(Lit(a),Lit(b)), lines) in
-        {m=d.m; x=[x]; s=0}
+        let x = For(str, Range(Lit(a),Lit(b)), d.x) in
+        {m=d.m; x=d.x; s=0}
     | ModExpr(MD(out,_,_,_), _) -> 
         let oldMap = d in
         (*When ModExpr has no index, it just returns its first out*)

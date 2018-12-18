@@ -9,7 +9,7 @@ module C = Codegen
 module H = Harden2
 module T = Topsort4
 module I = Indexing
-(* Top-level of the MicroC compiler: scan & parse the input,
+(* Top-level of the Unic compiler: scan & parse the input,
    check the resulting AST and generate an SAST from it, generate LLVM IR,
    and dump the module *)
 
@@ -29,7 +29,7 @@ let () =
     ("-i",  Arg.Unit (set_action Index), "Print Netlist with collapsed inidices");
     ("-n2", Arg.Unit (set_action Netlist2), "Print MoreSimplified Netlist");
     ("-t",  Arg.Unit (set_action Topsort), "Print Topsorted Netlist");
-    ("-io",  Arg.Unit (set_action IO), "Print Topsorted Netlist after IO stuff");
+    ("-io", Arg.Unit (set_action IO), "Print Topsorted Netlist after IO stuff");
     ("-l",  Arg.Unit (set_action LLVM_IR), "Print the generated LLVM IR");
     ("-c",  Arg.Unit (set_action Compile),
       "Check and print the generated LLVM IR (default)");
