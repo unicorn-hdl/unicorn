@@ -2,34 +2,37 @@ open Ast
 open Printer
 module StringMap = Map.Make(String)
 exception MissingFunction of string 
-let modzIntoTuples d par m m2 = List.map (fun d-> (d,par, m,m2)) d
+let modzIntoTuples d m m2 = List.map (fun d-> (d,m,m2)) d
 let fstM (MD(a,b,c,d)) = a
 let sndM (MD(a,b,c,d)) = b
 let thdM (MD(a,b,c,d)) = c
 let fthM (MD(a,b,c,d)) = d
-let toString (MD(a,b,c,d)) = b ^ "\n" ^ toStringBinExprlist d
+let toString (MD(a,b,c,d)) = b ^ "\n" ^ toStringBinExprlist "" d
 
 (*replace calls in a mod with modules*)
-let rec runThroughLines d par m m2 = List.rev (List.map actOnline (modzIntoTuples d par m m2))
+let rec runThroughLines d m m2 = List.rev (List.map actOnline (modzIntoTuples d m m2))
 (*TODO change this to fold left, so as to pass on changes to m2*)
         (*Perhaps not necessary? Seems like it's working ok as is. Run tests.*)
 
 (*replace calls in a line with the module*)
-and actOnline (line, par, m, m2) = 
+and actOnline (line, m, m2) = 
         (*TODO use this to see if we can kill par*)
+        (*
     let _ = (match par with
         None -> (*p ("none")*) ()
        | _ -> p "something!!!!") in
+*)
         match line with 
     | Buslit(x) -> Buslit(x)
     | BoolId(x) -> BoolId(x)
-    | BoolBinop(l, op, r) -> BoolBinop(actOnline (l,par, m, m2), op, actOnline (r,par,m, m2))
-    | Unop(op, exp) -> Unop(op, actOnline (exp,par,m,m2))
-    | Assign(a, e1, e2, b) -> Assign(a, actOnline (e1,par,m,m2), actOnline (e2,par,m,m2), b)
-    | Index(e, r) -> Index(actOnline (e,par,m, m2), r)
-    | Print(s, e) -> Print(s, actOnline (e,par,m, m2))
-    | For(s, r, e) -> For(s, r, runThroughLines e par m m2)
+    | BoolBinop(l, op, r) -> BoolBinop(actOnline (l, m, m2), op, actOnline (r,m, m2))
+    | Unop(op, exp) -> Unop(op, actOnline (exp,m,m2))
+    | Assign(a, e1, e2, b) -> Assign(a, actOnline (e1,m,m2), actOnline (e2,m,m2), b)
+    | Index(e, r) -> Index(actOnline (e,m, m2), r)
+    | Print(s, e) -> Print(s, actOnline (e,m, m2))
+    | For(s, r, e) -> For(s, r, runThroughLines e m m2)
     | Call(name, args) -> 
+               let args = List.map (fun x -> actOnline(x, m, m2)) args in
                if StringMap.mem name m
                then
                     let modz = StringMap.find name m in
@@ -38,7 +41,7 @@ and actOnline (line, par, m, m2) =
                     let b = sndM modz in
                     let c = thdM modz in
                     let d = fthM modz in
-                    ModExpr(MD(a,b,c, (runThroughLines d par m m2)), args)
+                    ModExpr(MD(a,b,c, (runThroughLines d m m2)), args)
                else raise( MissingFunction ("Module " ^ name ^ 
                " not found! Make sure module is declared."))
     | ModExpr(MD(a,b,c,d), args) -> 
@@ -46,7 +49,7 @@ and actOnline (line, par, m, m2) =
             let this = ModExpr(MD(a,b,c,d), args) in
             if StringMap.find b m2
             then ModExpr(MD(a,b,c,d), args)
-            else ModExpr(MD(a,b,c, runThroughLines d par m m2), args)
+            else ModExpr(MD(a,b,c, runThroughLines d m m2), args)
             (*TODO actually make updates to m2*)
     | Noexpr -> Noexpr
     | a -> print_endline("ERROR: Case not found!"); a
@@ -74,8 +77,8 @@ let rec setPars (line,par, m, m2) = match line with
 
 
 (*Helper method for fillHelper. Replaces d in some mod with d' where d' is lines where calls are replaced with mods*)
-let replaceCalls (MD(a, b, c, d), par, m, m2) =
-                        ((MD(a, b, c, (runThroughLines d par m m2))), m, m2)
+let replaceCalls (MD(a, b, c, d), m, m2) =
+                        ((MD(a, b, c, (runThroughLines d m m2))), m, m2)
 
 
 (*create map that links module names to the modules themselves*)
@@ -90,7 +93,7 @@ let makeIsFilledMap mdlist = List.fold_left popIsFilledMap StringMap.empty mdlis
 (*
 let spitOut = fillHelper mdlistEx theMap fillMap;;
 *)
-let toString (MD(a,b,c,d)) = b ^ "\n" ^ toStringBinExprlist d
+let toString (MD(a,b,c,d)) = b ^ "\n" ^ toStringBinExprlist "" d
 let printx (x,y,z) = print_endline(toString x)
 let printz x = printx x;;
 
@@ -106,7 +109,7 @@ let main nameMap = if StringMap.mem "main" nameMap
     (*
     else par;;
 *)
-let fillHelper mdlist nameMap fillMap = replaceCalls ((main nameMap), None, nameMap, fillMap);;
+let fillHelper mdlist nameMap fillMap = replaceCalls ((main nameMap), nameMap, fillMap);;
 let genFill mdlist nameMap fillMap = (fun (a,b,c)-> a) (fillHelper mdlist nameMap fillMap);;
 
 (*~fn called in unic~*)

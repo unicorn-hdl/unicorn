@@ -124,7 +124,7 @@ let rec collapseFn maps exp = match exp with
         let x = getOut in
         (fst getOut, maps)
     | Noexpr -> (Noexpr,maps)
-    | x -> print_endline ("we missed a case in elaborate: "^ Printer.getBinExpr x); (Noexpr, maps)
+    | x -> print_endline ("we missed a case in elaborate: "^ Printer.getBinExpr "" x); (Noexpr, maps)
 
 
 let collapse ast = 
@@ -137,7 +137,7 @@ let collapse ast =
 let getStrOrLit = function
       Buslit(x) -> x
     | BoolId(x) -> x
-    | x -> print_endline("mc-getStrOrlit: "^Printer.getBinExpr x); ""
+    | x -> print_endline("mc-getStrOrlit: "^Printer.getBinExpr "" x); ""
 
 let collapseFn2 = function
     Assign(_,l,r,_) -> (match r with
@@ -149,12 +149,12 @@ let collapseFn2 = function
             (getStrOrLit(l), "Ident", x, x)
         | BoolId(x) -> 
             (getStrOrLit(l), "Ident", x, x)
-        | x -> let _ = print_endline("missed case: "^ Printer.getBinExpr x)  in
+        | x -> let _ = print_endline("missed case: "^ Printer.getBinExpr "" x)  in
                     (getStrOrLit(l), "", "", "")
     )
   | Print(nm, r) -> (nm, "Print", getStrOrLit(r), getStrOrLit(r))
   | a -> print_endline ("something else!!"); 
-         print_endline (Printer.getBinExpr a);
+         print_endline (Printer.getBinExpr "" a);
          ("","","","")
 
 let collapse2 (prenet, globs) = 

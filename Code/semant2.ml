@@ -18,13 +18,13 @@ let getLit exp = match exp with
 (*Moving error messages out of the way, for readability*)
 let uvERR name = raise (UndeclaredVar ("Variable \"" ^ name ^ "\" is not defined!"))
 
-let tmERR op l r = raise(TypeMismatch ("You tried performing " ^ opToStr op ^ " on " ^ Printer.getBinExpr l ^" and "^Printer.getBinExpr r^" but these are of different sizes"))
+let tmERR op l r = raise(TypeMismatch ("You tried performing " ^ opToStr op ^ " on " ^ Printer.getBinExpr "" l ^" and "^Printer.getBinExpr "" r^" but these are of different sizes"))
 
-let tm_assERR rval rtyp x a' b'= raise(TypeMismatch ("You tried assigning " ^ Printer.getBinExpr rval^ " of size " ^ string_of_int rtyp ^ " to " ^  x ^ " on the range " ^ string_of_int a' ^ "-" ^ string_of_int b' ^ " but these are of different sizes"))
+let tm_assERR rval rtyp x a' b'= raise(TypeMismatch ("You tried assigning " ^ Printer.getBinExpr "" rval^ " of size " ^ string_of_int rtyp ^ " to " ^  x ^ " on the range " ^ string_of_int a' ^ "-" ^ string_of_int b' ^ " but these are of different sizes"))
 
 let irERR x nm outs = raise (InvalidRange ("ERROR: You tried to access the "^string_of_int x^"th element of "^nm^" but it only has "^string_of_int (List.length outs)^" outputs!"))
 
-let tm_argERR arg argS fm fmS = raise(TypeMismatch ("You tried assigning argument " ^ Printer.getBinExpr arg^ " of size "^ string_of_int argS ^ " to formal " ^ fm ^ "<" ^ string_of_int fmS ^ "> but these are of different sizes"))
+let tm_argERR arg argS fm fmS = raise(TypeMismatch ("You tried assigning argument " ^ Printer.getBinExpr ""arg^ " of size "^ string_of_int argS ^ " to formal " ^ fm ^ "<" ^ string_of_int fmS ^ "> but these are of different sizes"))
 
 let tm_outERR out sz = raise(TypeMismatch ("The output call "^ snd out ^"<"^ string_of_int (getLit (fst out)) ^ "> does not match assignment of size "^ string_of_int sz)) 
 
@@ -52,7 +52,7 @@ let evalBind (a,b) = (string_of_int (evalInt a), b)
 let assignIsValid lval = match lval with
       BoolId(_) -> () (*valid*)
     | Index(BoolId(_), _) -> () (*valid*)
-    | x -> raise(InvalidAssignment("\"" ^ Printer.getBinExpr x ^ "\" may not be assigned to"))
+    | x -> raise(InvalidAssignment("\"" ^ Printer.getBinExpr "" x ^ "\" may not be assigned to"))
 
 let rangeIsValid (Lit a) (Lit b) = 
     if (a<=b && a>=0)
@@ -76,7 +76,7 @@ let rec findRegs outMap expr =
     | Assign(false,_,r,_) -> findRegs outMap r
     | Index(x,_) ->findRegs outMap x
     | Print(_,x) -> findRegs outMap x
-    | Call(_,_) -> print_endline("Call got called in semant"); outMap
+    | Call(nm,_) -> print_endline("Call "^nm^" got called in semant"); outMap
     | For(_,_,exprs) -> List.fold_left foldFn outMap exprs
     | ModExpr(MD(_,_,_,exprs),args) -> 
             let argMap = List.fold_left foldFn outMap args in 
@@ -200,7 +200,7 @@ let rec check d x =
             else "" in
         checkMod x d selected 
     | Noexpr -> d
-    | a -> print_endline("missing case in checkvalidities: " ^ getBinExpr a ^ "DONE\n") ; d
+    | a -> print_endline("missing case in checkvalidities: " ^ getBinExpr "" a ^ "DONE\n") ; d
 
 
 and checkMod (ModExpr(MD(out,name,fms,exprs), args)) d selected= 

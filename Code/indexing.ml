@@ -11,7 +11,7 @@ let id boolin digit = match boolin with
        BoolId(nm) -> BoolId(nm^"["^(string_of_int digit)^"]")
      | Index(BoolId(nm),r) -> BoolId(nm^"["^(string_of_int digit)^"]")
      | Buslit(x) -> Buslit(getI digit x) 
-     | x -> p("Missed case in id(indx): "^ Printer.getBinExpr x); x
+     | x -> p("Missed case in id(indx): "^ Printer.getBinExpr "" x); x
 
 let id2 boolin digit = 
         let x = id boolin digit in
@@ -68,7 +68,7 @@ let rec loop from1 until from2 outlist expr = match expr with
                   loop (from1+1) until (from2+1) (assig::outlist) expr
                 else
                   outlist
-          | a -> p("missing case: "^ Printer.getBinExpr a); outlist
+          | a -> p("missing case: "^ Printer.getBinExpr "" a); outlist
         ) 
       | Print(nm, ex) -> 
           let nm = BoolId(nm) in
@@ -120,7 +120,7 @@ let rec loop from1 until from2 outlist expr = match expr with
                   loop (from1+1) until (from2+1) (prt::outlist) expr
                 else
                   outlist
-          | a -> p("missing case: "^ Printer.getBinExpr a); outlist
+          | a -> p("missing case: "^ Printer.getBinExpr "" a); outlist
         ) 
 
   (*
@@ -157,7 +157,7 @@ let rec semant n (valz,map) = function
   | For(_,_,_) -> p ("Something is wrong. For should not be called in indexing");(valz,map)
   | ModExpr(_,_) -> p ("Something is wrong. ModExpr should not be called in indexing");(valz,map)
   | Noexpr -> p ("Something is wrong. Noexpr should not be called in indexing");(valz,map)
-  | x -> p ("Missed case (indexing): "^ Printer.getBinExpr x); (valz,map)
+  | x -> p ("Missed case (indexing): "^ Printer.getBinExpr "" x); (valz,map)
                    
 and badSearch map n str =
    let badfold (valz,map) expr = match expr with
@@ -193,7 +193,7 @@ let indicize (outlist,slist) line =
           | Unop(op,ex) -> 0
           | Index(Buslit(x),Range(Lit(a),Lit(b))) -> a
           | Index(ex,Range(Lit(a),Lit(b))) -> a
-          | x -> p ("MIssed case-indexingr: "^ Printer.getBinExpr x); 0
+          | x -> p ("MIssed case-indexingr: "^ Printer.getBinExpr "" x); 0
             ) in
     match line with
     Buslit(x) -> (outlist,slist)
@@ -205,13 +205,13 @@ let indicize (outlist,slist) line =
           | BoolId(x) -> 
                 let sz = StringMap.find x slist in
                 (loop 0 (sz-1) from2 outlist (Assign(isR,l,r,init)), slist)
-          | x -> p ("MIssed case-indexingl: "^ Printer.getBinExpr x); ([],slist)
+          | x -> p ("MIssed case-indexingl: "^ Printer.getBinExpr "" x); ([],slist)
             )
   | Print(nm,ex) -> 
             let from2 = from2 ex in
             let sz = semant [] (0,slist) ex in
             (loop 0 (fst sz-1) from2 outlist (Print(nm, ex)), slist)
-  | x -> p("Missed case in indexing: "^ Printer.getBinExpr x); (outlist,slist)
+  | x -> p("Missed case in indexing: "^ Printer.getBinExpr "" x); (outlist,slist)
 
 let printf k v = p(k^ ": "^ (string_of_int v))
 

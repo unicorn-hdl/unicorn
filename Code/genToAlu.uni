@@ -1,15 +1,43 @@
 main() {
-	a = 0101b;
-	b = 0011b;
-	AND = logic(a,b,00b);
-	OR  = logic(a,b,01b);
-	XOR = logic(a,b,10b);
-	NOT = logic(a,b,11b);
-	print And: AND;
-	print OR :  OR;
-	print XOR: XOR;
-	print NOT: NOT;
+	a = 010010b;
+	b = 101010b;
+	sum = math(a,b,0b);
+	print sum: sum;
 	out:;
+}
+
+math(a<n>,b<n>,sel){
+	bnew = mux(b,comp(b),sel);
+	sum = add(a,bnew);
+	out:sum<n>;
+}
+
+comp(a<n>){
+	a1 = not a;
+	for (i from 1 to n-1){
+		one[i] = 0b;
+	};
+	one[0] = 1b;
+	print one: one;
+	cmp = add(a1,one);
+	out:cmp<n>;	
+}
+
+fA(a, b, carryIn){
+	axb = a xor b;
+    sum = axb xor carryIn;
+    carry = (axb and carryIn) or (a and b);
+	out: sum, carry;
+}
+
+add(a<n>,b<n>){
+	c[0] = 0b;	
+
+	for (i from 0 to n-1){
+		sum[i] = fA(a[i],b[i],c[i])[sum];
+		c[i+1] = fA(a[i],b[i],c[i])[carry];	
+	};
+	out:sum<n>;
 }
 
 mux(a<n>,b<n>,s){

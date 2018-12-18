@@ -80,7 +80,7 @@ let rec simpExp m = function
         | For(_,_,_)     -> print_endline ("Something is wrong! For called in simplelines");m
         | ModExpr(_,_) -> print_endline ("Something is wrong! ModExpr called in simplelines");m
         | Noexpr -> {r=Noexpr; o=m.o; n=m.n}
-        | x -> print_endline ("we missed a case in simplelines: "^ Printer.getBinExpr x);m
+        | x -> print_endline ("we missed a case in simplelines: "^ Printer.getBinExpr ""x);m
 
 let nullmap = {r=Noexpr; o=[]; n=0};;
 let simplify nlist = List.rev (List.fold_left simpExp nullmap nlist).o

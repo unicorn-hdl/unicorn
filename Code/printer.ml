@@ -22,37 +22,36 @@ let rec getIntExpr = function
 
 let index = function | Range (a,b) ->  "[" ^ getIntExpr a ^ ":" ^ getIntExpr b ^ "]"
 
-let bindFn (b,c) = match b with 
-   Lit(x) -> c ^ "<" ^ string_of_int x ^ "> " 
- | _ -> c ^ "<"^getIntExpr b^"> "
+let bindFn (b,c) = c ^ "<"^getIntExpr b^"> "
+
+
 let toStringBindlist blist = listToString bindFn blist
 
-let rec getBinExpr = function
+let rec getBinExpr tabs = function
    Buslit(x) -> x
  | BoolId(x) -> x
- | BoolBinop(a,b,c) -> (getBinExpr a) ^ " " ^ (opToString b) ^ " " ^ (getBinExpr c)
- | Unop(Not,a) -> "~" ^ getBinExpr a
+ | BoolBinop(a,b,c) -> (getBinExpr tabs a) ^ " " ^ (opToString b) ^ " " ^ (getBinExpr tabs c)
+ | Unop(Not,a) -> "~" ^ getBinExpr tabs a
  | Noexpr -> "noexpr"
- | Index(expr, ind) -> getBinExpr expr ^ index ind
+ | Index(expr, ind) -> getBinExpr tabs expr ^ index ind
  | Assign(isReg, lval, rval, initval) -> if isReg
-        then getBinExpr lval ^ ":= " ^ getBinExpr rval ^ " init " ^ initval
-        else getBinExpr lval ^ "= " ^ getBinExpr rval
- | Call(id, arglist) -> id ^ "(" ^ listToString (fun x-> getBinExpr x ^ ",") arglist ^ ")"
- | Print(id, x) -> "print " ^ id ^ ":  " ^ getBinExpr x ^ ";"
- | For(var, Range(a,b), lines) -> "for(" ^ var ^ " from "^ (getIntExpr a)^ " to "^ (getIntExpr b)^ "){\n" ^ toStringBinExprlist lines
- | ModExpr(modz, args) -> 
-                 "\n\tin: " ^ listToString (fun x-> getBinExpr x ^ ",") args ^
-                 "\n\t" ^ toStringMod modz
+        then getBinExpr tabs lval ^ ":= " ^ getBinExpr tabs rval ^ " init " ^ initval
+        else getBinExpr tabs lval ^ "= " ^ getBinExpr tabs rval
+ | Call(id, arglist) -> id ^ "(" ^ listToString (fun x-> getBinExpr tabs x ^ ",") arglist ^ ")"
+ | Print(id, x) -> "print " ^ id ^ ":  " ^ getBinExpr tabs x 
+ | For(var, Range(a,b), lines) -> "for(" ^ var ^ " from "^ (getIntExpr a)^ " to "^ (getIntExpr b)^ "){\n" ^ toStringBinExprlist (tabs^"   ") lines ^ tabs^"}"
+ | ModExpr(MD(out,nm,fm,lns), args) -> 
+        nm ^ "(" ^ (List.fold_left (fun inStr x-> inStr^getBinExpr "" x^", ") "" args)^ "){\n" ^ 
+        toStringBinExprlist (tabs^"   ") lns^ tabs^"}"
  | _ -> "?"
 
- and makeline x = "\t" ^ x ^ ";\n"
- and toStringBinExprlist explist = listToString makeline (List.map getBinExpr explist)
+ and makeline tabs x = tabs^x^";\n"
+ and toStringBinExprlist tabs explist = listToString (makeline tabs) (List.map (getBinExpr tabs) explist)
 
- and toStringMod = function
-        |MD (outlist, name, formals, linelist) ->
+ and toStringMod (MD (outlist, name, formals, linelist)) =
         name ^ "(" ^ (toStringBindlist formals) ^ "){\n" ^ 
-        toStringBinExprlist linelist ^ 
-        "\tout: " ^ toStringBindlist outlist ^ "\n}\n\n"
+        toStringBinExprlist "" linelist ^ 
+        "   out: " ^ toStringBindlist outlist ^ "\n}\n\n"
 let toStringPgm pgm = List.map toStringMod pgm
 
 (*
@@ -67,10 +66,10 @@ let printAst pgm = print_endline ("\n\n~~PRINTING AST~~\n");
                    print_endline (listToString (fun x->x) (toStringPgm pgm))
 
 let printMast pgm = print_endline ("\n\n~~PRINTING MAST~~\n");
-                   print_endline (getBinExpr pgm)
+                   print_endline (getBinExpr "" pgm)
 
 let printNet pgm = print_endline ("\n\n~~PRINTING NAST~~\n");
-                    List.iter (fun x->print_endline (getBinExpr x^";")) pgm
+                    List.iter (fun x->print_endline (getBinExpr "" x^";")) pgm
 
 let printNet2 pgm = print_endline ("\n\n~~PRINTING NAST2~~\n\n");
                     List.iter (fun (a,b,c,d)->print_endline ("{"^ 
