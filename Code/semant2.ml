@@ -68,6 +68,19 @@ let rec findRegs outMap expr =
     | Noexpr -> outMap
 
 
+let rec validArg arg = match arg with
+    | BoolId(x) -> ()
+    | Buslit(x) -> ()
+    | BoolBinop(l,_,r) -> (validArg l; validArg r)
+    | Unop(_,x) -> validArg x
+    | Assign(_,_,_,_) -> raise (InvalidCall("Assignments may not be arguments"))
+    | Index(x,_) -> validArg x
+    | Print(_,_) -> raise (InvalidCall("Print statements may not be arguments"))
+    | Call (_,_) -> p "Something is wrong! Call called in semant"
+    | For(_,_,_) -> raise (InvalidCall("For loops may not be arguments"))
+    | ModExpr(_,_) -> raise (InvalidCall("Module calls may not be arguments"))
+    | Noexpr -> raise (InvalidCall("Noexpr may not be an argument"))
+
 let rec check d x = 
         match x with  
       Buslit(valz) -> {m=d.m; x=[x]; s=String.length valz -1}
@@ -191,6 +204,7 @@ and checkMod (ModExpr(MD(out,name,fms,exprs), args)) d selected=
         let oldD = d in
 
         let _ = lengthsAreValid fms args name in
+        let _ = List.iter validArg args in
 
         (*Add generics and registers to m. Also harden args*)
         let x = List.fold_left2 (tableFn oldD) (StringMap.empty,[]) fms args in 

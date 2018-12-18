@@ -1,6 +1,6 @@
 main() {
-	a = 010010b;
-	b = 101010b;
+	a = 01b;
+	b = 10b;
 	sum = math(a,b,0b);
 	print sum: sum;
 	out:;
@@ -8,8 +8,9 @@ main() {
 
 math(a<n>,b<n>,sel){
 	bnew = mux(b,comp(b),sel);
-	sum = add(a,bnew);
-	out:sum<n>;
+//	sum = add(a,bnew);
+//	out:sum<n>;
+	out:bnew<n>;
 }
 
 comp(a<n>){
@@ -18,8 +19,8 @@ comp(a<n>){
 		one[i] = 0b;
 	};
 	one[0] = 1b;
-	print one: one;
-	cmp = add(a1,one);
+//	cmp = add(a1,one);
+	cmp = a;
 	out:cmp<n>;	
 }
 
