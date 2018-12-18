@@ -55,7 +55,7 @@ let () =
         match !action with
           | Netlist -> P.printNet netlist
           | SimpleLines -> P.printNet (SL.simplify (netlist))
-          | Index -> P.printNet (I.index ( (SL.simplify netlist)))
+          | Index -> P.printNet (I.index (SL.simplify netlist))
           | _ ->
               let netlist2 = (E.collapse2 (E.regs (I.index ( (SL.simplify netlist))))) in
               match !action with

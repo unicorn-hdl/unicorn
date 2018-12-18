@@ -41,7 +41,7 @@ let rec getBinExpr tabs = function
  | Print(id, x) -> "print " ^ id ^ ":  " ^ getBinExpr tabs x 
  | For(var, Range(a,b), lines) -> "for(" ^ var ^ " from "^ (getIntExpr a)^ " to "^ (getIntExpr b)^ "){\n" ^ toStringBinExprlist (tabs^"   ") lines ^ tabs^"}"
  | ModExpr(MD(out,nm,fm,lns), args) -> 
-        nm ^ "(" ^ (List.fold_left (fun inStr x-> inStr^getBinExpr "" x^", ") "" args)^ "){\n" ^ 
+        nm ^ "(" ^ (List.fold_left (fun inStr x-> inStr^getBinExpr tabs x^" ") "" args)^ "){\n" ^ 
         toStringBinExprlist (tabs^"   ") lns^ tabs^"}"
  | _ -> "?"
 

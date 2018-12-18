@@ -1,6 +1,7 @@
 open Ast
 open Printer
 open Harden2
+open ERR 
 module StringMap = Map.Make(String)
 
 exception InvalidAssignment of string
@@ -10,26 +11,14 @@ exception InvalidRange of string
 exception InvalidCall of string
 
 type d = {m: int StringMap.t; x:binExpr list; s:int}
+(* m is name map
+ * x is return value (i.e. the new expression)
+ * s is size of returned expr
+ * *)
 
 let getLit exp = match exp with
        Lit(x) -> x
      | x -> p ("missed case: "^ Printer.getIntExpr x); 0
-
-(*Moving error messages out of the way, for readability*)
-let uvERR name = raise (UndeclaredVar ("Variable \"" ^ name ^ "\" is not defined!"))
-
-let tmERR op l r = raise(TypeMismatch ("You tried performing " ^ opToStr op ^ " on " ^ Printer.getBinExpr "" l ^" and "^Printer.getBinExpr "" r^" but these are of different sizes"))
-
-let tm_assERR rval rtyp x a' b'= raise(TypeMismatch ("You tried assigning " ^ Printer.getBinExpr "" rval^ " of size " ^ string_of_int rtyp ^ " to " ^  x ^ " on the range " ^ string_of_int a' ^ "-" ^ string_of_int b' ^ " but these are of different sizes"))
-
-let irERR x nm outs = raise (InvalidRange ("ERROR: You tried to access the "^string_of_int x^"th element of "^nm^" but it only has "^string_of_int (List.length outs)^" outputs!"))
-
-let tm_argERR arg argS fm fmS = raise(TypeMismatch ("You tried assigning argument " ^ Printer.getBinExpr ""arg^ " of size "^ string_of_int argS ^ " to formal " ^ fm ^ "<" ^ string_of_int fmS ^ "> but these are of different sizes"))
-
-let tm_outERR out sz = raise(TypeMismatch ("The output call "^ snd out ^"<"^ string_of_int (getLit (fst out)) ^ "> does not match assignment of size "^ string_of_int sz)) 
-
-let icERR name fms args= raise(InvalidCall ("Call to " ^ name ^ " with " ^ string_of_int (List.length args)
-        ^ " arguments but " ^ name ^ " expects " ^ string_of_int (List.length fms) ^ " arguments."))
 
 (*some utility fns*)
 let printMap map name=
@@ -41,25 +30,20 @@ let lookup str map =
        try StringMap.find str map
        with Not_found -> -1
 
-let rec evalInt = function
- | Lit(x) -> x
- | IntId(_) -> 1 (*have to have evalInt x here, but really evalInt x depends on a values table (and will be hard to implement)*)
- | IntBinop(a,Add,b) -> evalInt a + evalInt b
- | IntBinop(a,Sub,b) -> evalInt a - evalInt b
-
-let evalBind (a,b) = (string_of_int (evalInt a), b)
-
 let assignIsValid lval = match lval with
       BoolId(_) -> () (*valid*)
     | Index(BoolId(_), _) -> () (*valid*)
     | x -> raise(InvalidAssignment("\"" ^ Printer.getBinExpr "" x ^ "\" may not be assigned to"))
+    
+let lengthsAreValid fms args name = 
+      if List.length fms = List.length args
+      then ()
+      else icERR name fms args
 
 let rangeIsValid (Lit a) (Lit b) = 
     if (a<=b && a>=0)
     then ()
-    else raise(InvalidRange ("The range (" ^ string_of_int a ^ ", " ^ 
-                                string_of_int b ^ ") is invalid!"))
-
+    else raise(InvalidRange ("The range (" ^ string_of_int a ^ ", " ^ string_of_int b ^ ") is invalid!"))
 
 let rec findRegs outMap expr = 
     let foldFn map ex = findRegs map ex in
@@ -205,22 +189,22 @@ let rec check d x =
 
 and checkMod (ModExpr(MD(out,name,fms,exprs), args)) d selected= 
         let oldD = d in
-        let _ = 
-            if List.length fms = List.length args
-            then ()
-            else icERR name fms args in 
 
-        let m = List.fold_left2 (tableFn oldD) StringMap.empty fms args in 
+        let _ = lengthsAreValid fms args name in
+
+        (*Add generics and registers to m. Also harden args*)
+        let x = List.fold_left2 (tableFn oldD) (StringMap.empty,[]) fms args in 
+        let m = fst x in
+        let args = List.rev(snd x) in
         let m = List.fold_left findRegs m exprs in
         let d = {m=m; x=[]; s=d.s} in
 
+        (*Call check on every line in mod*)
         let foldFn d line = 
                 let d2 = check d line in
                 {m=d2.m; x=d.x@d2.x; s=d2.s} in
         let d = List.fold_left foldFn d exprs in
 
-            
-            (*TODO this actually needs to be declared recursively for every binExpr but I don't feel like it rn*)
         let checkOut (intEx,nm) =
             let fmS = getLit(eval d.m intEx) in
             let argS = lookup nm d.m in
@@ -237,28 +221,30 @@ and checkMod (ModExpr(MD(out,name,fms,exprs), args)) d selected=
         let x = ModExpr(MD(out,name,fms,d.x),args) in
         {m=d.m; x=[x]; s=s}
 
-and tableFn oldD m (fmX,nm) arg = 
-     let argS = (check oldD arg).s in
+and tableFn oldD (m,newArgs) (fmX,nm) arg = 
+     let oldArg = arg in
+     let arg = (check oldD arg) in
      match fmX with
      | IntId(x) -> 
             let x = "*"^x in
             let m =
                if StringMap.mem x m
-               then if (StringMap.find x m = argS)
+               then 
+                    let fmS = StringMap.find x m in
+                    if (fmS = arg.s)
                     then m
-                    else let _ = p ("error") in m
-                    (*TODO write this as a real error*)
-               else StringMap.add x argS m in
-            let m = StringMap.add nm argS m in
-            m
+                    else tm_argERR oldArg arg.s nm fmS
+               else StringMap.add x arg.s m in
+            let m = StringMap.add nm arg.s m in
+            (m, arg.x@newArgs)
      | x -> 
             let fmS = getLit(eval oldD.m fmX) in
             let _ =
-                if (fmS = argS)
+                if (fmS = arg.s)
                 then ()
-                else tm_argERR arg argS nm fmS in
-            let m = StringMap.add nm argS m in
-            m
+                else tm_argERR oldArg arg.s nm fmS in
+            let m = StringMap.add nm arg.s m in
+            (m, arg.x@newArgs)
 
 let semant hast =
     let d = {m=StringMap.empty; x=[]; s=0} in

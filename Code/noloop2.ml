@@ -1,9 +1,14 @@
 open Ast
+open Printer
 
 exception UndeclaredVar of string 
 
 
 type data = {i:string; c:int; n:int; o:binExpr list}
+(*i is index name
+ *c is current value of index
+ *n is max value of index
+ *o is the return value*)
 
 let add (Lit(a)) (Lit(b)) = Lit(a+b)
 let sub (Lit(a)) (Lit(b)) = Lit(a-b)
@@ -65,7 +70,7 @@ and evalLine d expr=
                 {i=d.i; c=d.c; n=d.c; o=newExpr::d.o}
       | Unop(op,x) -> 
                 let newExpr = Unop(op, replace i c x) in
-                {i=d.i; c=d.c; n=d.c; o=expr::d.o}
+                {i=d.i; c=d.c; n=d.c; o=newExpr::d.o}
       | Assign(isR, l, r, init) -> 
                 let newExpr = Assign(isR, replace i c l, replace i c r, init) in
                 {i=d.i; c=d.c; n=d.c; o=newExpr::d.o}
@@ -100,6 +105,15 @@ let rec dissolveLoop exp = match exp with
       | For(index, Range(Lit(a),Lit(b)), expList) ->
                (loop index a b [] expList).o
       | ModExpr(MD(o,nm,f,d),a) -> 
+               let a = 
+                   if List.length a > 0
+                   then 
+                      let mapFn arg = List.hd (dissolveLoop arg) in
+                      List.map mapFn a
+                   else a in
+               (*
+               let _ = List.iter (fun x -> p (getBinExpr ""x)) a in
+*)
                let foldFn outlist line = outlist@(dissolveLoop line)in
                let d = List.fold_left foldFn [] d in
                (*
