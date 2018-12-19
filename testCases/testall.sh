@@ -203,6 +203,18 @@ echo -----------------------
 ./run.sh programs/alu c.c 
 rm programs/alu 
 
+echo -----------------------
+echo Testing gate Precedence
+echo -----------------------
+./run.sh gatePrecedence/test1 c.c 
+rm gatePrecedence/test1 
+./run.sh gatePrecedence/test2 c.c 
+rm gatePrecedence/test2 
+./run.sh gatePrecedence/test3 c.c 
+rm gatePrecedence/test3 
+./run.sh gatePrecedence/test4 c.c 
+rm gatePrecedence/test4 
+
 echo -e "\n"
 echo -e "\n"
 echo ====================================================================================================================================================
