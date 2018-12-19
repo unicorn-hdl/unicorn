@@ -2,9 +2,7 @@ type intOp = Add | Sub
 type boolOp = And | Or | Nand | Nor | Xor | Xnor
 type unOp = Not | Ident
 type boolval = One of bool | Zero of bool
-
-type genOp = B of boolOp 
-           | U of unOp
+type genOp = B of boolOp | U of unOp
 
 type typ = Int | Bus of intExpr
 
@@ -21,11 +19,7 @@ and  binExpr =
     | BoolBinop of binExpr * boolOp * binExpr
     | Unop of unOp * binExpr
     | Assign of bool * binExpr * binExpr * string 
-    (*final int is size of lval*)
     | Index of binExpr * range
-    (*when bool = false, normal; bool = true, register*)
-    (*final bool is init state*)
-    (*add new assign indexing rule to LRM*)
     | Print of string * binExpr
     | Call of string * binExpr list
     | For of string * range * binExpr list
@@ -37,7 +31,7 @@ and range = Range of intExpr * intExpr
 and md = MD of bind list * string * bind list * binExpr list
                         (*outlist   name      formals     line list *)  
 
-type program = (*bind list *  *) md list
+type program = md list
 
 let opToStr = function
       B(x) -> (match x with

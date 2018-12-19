@@ -69,3 +69,4 @@ let () =
                     | Compile -> let m = C.translate netlist2 in
 	                Llvm_analysis.assert_valid_module m;
 	                print_string (L.string_of_llmodule m)
+                    | _ -> print_string (L.string_of_llmodule (C.translate io))

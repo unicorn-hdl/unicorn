@@ -7,10 +7,10 @@
 	111 -> Not A
 **/
 
-main(){
+main(sel<3>){
 	a = 00111111b;
 	b = 11000100b;
-	x = alu(111b,a,b);
+	x = alu(sel,a,b);
 	print x: x;
 	out:;
 }
