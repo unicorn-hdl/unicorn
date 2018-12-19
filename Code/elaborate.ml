@@ -1,6 +1,9 @@
 (*Elaborate contains 4 important functions:
-        * 1. 
-        *)
+        * 1. collapse-takes in semantically-checked (hardened), modfilled ast, and returns a netlist of binExprs
+        * 2. collapse2- takes in simplified binExpr netlist and replaces the exprs with string-tuples
+        * 3. registers- creates a global for each register and changes name in local appearances respectively 
+        * 4. registers2- adds lines at the bottom of netlist when global variables change
+*)
 
 open Ast
 open Printer
@@ -115,6 +118,8 @@ and collapseMod m (ModExpr(MD(out,nm,fm,exps),args)) ind =
                 let findFn nm (sz,bindName) = nm=bindName in
                 collapseFn m (BoolId(snd (List.find (findFn ind) out)))
         in
+
+        (* revert n and a to parent's before returning *)
         let m = {n=oldMap.n; a=oldMap.a; c=m.c; net=m.net} in
         (fst getOut, m)
 
@@ -147,12 +152,13 @@ let collapseFn2 = function
   | a -> print_endline ("something else!!"); 
          print_endline (Printer.getBinExpr "" a);
          ("","","","")
-
+         
+(* Replace netList of shallow binExprs with 4-string tuples*)
 let collapse2 (prenet, globs) = 
     (List.map collapseFn2 prenet, globs)
 
 
-(*REGISTERS*)
+(*--------------------registers---------------------------------*)
 let fst (a,_,_) = a
 let snd (_,b,_) = b
 
@@ -167,7 +173,7 @@ let regs netlist =
     let lst = List.fold_left regFn ([],[],0) netlist in
     (List.rev (fst lst), snd lst) 
 
-(*ADD REGASSIGNS AT BOTTOM*)
+(*-----------------registers2--------------------*)
 
 let r2 (netlist, globs) =
         let assFn (l,r,_) = (l,"Ident",r,r) in
