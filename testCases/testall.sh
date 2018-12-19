@@ -85,6 +85,7 @@ echo ----------------------
 
 ./run.sh indexing/test1 c.c 
 rm indexing/test1 
+echo =============================================================== This should give an error ========================================================
 ./run.sh indexing/test2 c.c 
 rm indexing/test2 
 ./run.sh indexing/test3 c.c 
