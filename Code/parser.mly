@@ -21,11 +21,11 @@ open Ast
 
 %left COLON
 %right ASSIGN REGASSIGN
-%left XNOR XOR
-%left OR NOR PLUSDOT
-%left AND NAND TIMESDOT
-%left NOT
-%left PLUS MINUS
+%left XNOR XOR POUND EXCITEDPOUND
+%left OR NOR PLUS EXCITEDPLUS
+%left AND NAND STAR EXCITEDSTAR
+%left NOT WOW
+%left MINUS
 %left OSQUARED
 
 %start program
