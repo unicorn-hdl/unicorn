@@ -100,7 +100,7 @@ let rec check d x =
             if (ld.s= rd.s)
             then ld.s 
             else tmERR (B  op) l r in
-        {m=d.m; x=[x]; s=s}
+        {m=rd.m; x=[x]; s=s}
     | Unop(op, x) -> 
         let x = hardenline d.m x in
         let d = check d x in
@@ -114,7 +114,7 @@ let rec check d x =
         let d = 
           (match lval with
           | BoolId(x) -> 
-             let m = StringMap.add x rd.s d.m in
+             let m = StringMap.add x rd.s rd.m in
              {m=m; x=[]; s=rd.s}
           | Index(BoolId(x), Range(a,b)) -> 
              let b' = getLit b in
@@ -123,8 +123,8 @@ let rec check d x =
                  if (rd.s = (b'-a'+1))
                  then ()
                  else tm_assERR rval rd.s x a' b' in
-             let s = max (lookup x d.m) (b'+1) in
-             let m = StringMap.add x s d.m in
+             let s = max (lookup x rd.m) (b'+1) in
+             let m = StringMap.add x s rd.m in
              {m=m; x=[]; s=s}
           ) in
         let x = Assign(isR,lval,List.hd rd.x,init) in
