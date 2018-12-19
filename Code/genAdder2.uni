@@ -1,0 +1,25 @@
+main() {
+	a = 1011010b;
+	b = 0011101b;
+	m = modA(a,b)[sum];
+	print m: m;
+	out:;
+}
+
+fA(a, b, carryIn){
+	axb = a xor b;
+    sum = axb xor carryIn;
+    carry = (axb and carryIn) or (a and b);
+	out: sum, carry;
+}
+
+modA(a<n>,b<n>){
+	c[0] = 0b;	
+
+	for (i from 0 to n-1){
+		sum[i] = fA(a[i],b[i],c[i])[sum];
+		c[i+1] = fA(a[i],b[i],c[i])[carry];	
+	};
+	out:sum<n>;
+}
+🦄
