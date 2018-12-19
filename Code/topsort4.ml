@@ -5,11 +5,17 @@
 open Ast
 module StringMap = Map.Make(String)
 
+exception Reassign of string
 
-let topsort netlist = 
-    let globs = snd netlist in
+let checkOverride namelist (a,b,c,d) =
+    if List.mem a namelist
+    then raise (Reassign (a^" has been assigned to twice!"))
+    else a::namelist
+
+let topsort (netlist,globs) = 
+    let _ = List.fold_left checkOverride [] netlist in
     let getA = List.map (fun (x,_,_) ->x) globs in
-    let netlist = ("","","","")::(fst netlist) in 
+    let netlist = ("","","","")::netlist in 
     let foldFn outMap (a,b,c,d) = StringMap.add a (a,b,c,d) outMap in
     let map = List.fold_left foldFn StringMap.empty netlist in
     let lookup x = match x with

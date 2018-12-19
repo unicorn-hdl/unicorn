@@ -1,5 +1,7 @@
 main() {
 	a := b *0b*;
+	a = 0b;
+	a = 00b;
 	print a: a;
     print b: b; 
 	b := a *1b*;

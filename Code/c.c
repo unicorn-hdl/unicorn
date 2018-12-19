@@ -25,8 +25,7 @@ int main(){
 	tick();
 
 	printf("\nLogical Or(11111111)\n");
-	sel_2 = 1;
-	sel_1 = 0;
+	sel_2 = 1; sel_1 = 0;
 	sel_0 = 1;
 	tick();
 

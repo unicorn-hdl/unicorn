@@ -2,6 +2,8 @@ open Ast
 open Printer
 module StringMap = Map.Make(String)
 
+exception Error of string
+
 let getI pos str =
         if (String.length str > pos)
         then String.make 1 str.[pos]
@@ -24,7 +26,12 @@ let rec loop from1 until from2 outlist expr = match expr with
           | Buslit(x) ->
                 if (from1 <= until)
                 then 
-                  let digit = String.make 1 (x.[String.length x - from2-2]) in
+                  let ix = String.length x - from2-2 in
+                  let _ = 
+                    if ix < 0
+                    then raise (Error ("Something is wrong with assignment to "^getBinExpr "" la^". Check that it's not double-assigned"))
+                    else () in
+                  let digit = String.make 1 (x.[ix]) in
                   let assig = (Assign(isR, id la from1, Buslit(digit), init)) in
                   loop (from1+1) until (from2+1) (assig::outlist) expr
                 else

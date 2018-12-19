@@ -176,6 +176,7 @@ let rec check d x =
 
         let a = getLit a in
         let b = getLit b in 
+        let d = {m=d.m; x=[]; s=d.s} in
         let linesFn x = List.map (Noloop2.replace str x) lines in
         let foldFn d line = 
                 let line = hardenline d.m line in
@@ -188,7 +189,11 @@ let rec check d x =
                    loop (a+1) b d 
                 else d in
         let d = loop a b d in
-        let x = For(str, Range(Lit(a),Lit(b)), d.x) in
+        (*
+        let _ = p "Printing for loop" in
+        let _ = List.iter (fun x-> p (getBinExpr "" x)) d.x in
+        let _ = p "\n\n" in
+*)
         {m=d.m; x=d.x; s=0}
     | ModExpr(MD(out,_,_,_), _) -> 
         let oldMap = d in
@@ -204,6 +209,9 @@ let rec check d x =
 
 
 and checkMod (ModExpr(MD(out,name,fms,exprs), args)) d selected= 
+        (*
+        let _  = p name in
+*)
         let oldD = d in
 
         let _ = lengthsAreValid fms args name in
