@@ -92,7 +92,7 @@ let fill mdlist =
         let thd (_,_,c) = c in
         let mainDec = fst filledMap in
         let mainCall = ModExpr(mainDec, Io.getMainArgs mainDec) in 
-        let supermainDec = MD([],"~",[],List.rev (mainCall::(Io.makeVars mainDec))) in
+        let supermainDec = MD([],"~.~",[],List.rev (mainCall::(Io.makeVars mainDec))) in
         ModExpr(supermainDec, [])
 (*~fn called in unic~*)
 
