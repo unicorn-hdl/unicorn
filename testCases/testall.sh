@@ -30,11 +30,13 @@ echo ============================================================ this should gi
 rm creatingBuses/test3
 ./run.sh creatingBuses/test4 c.c
 rm creatingBuses/test4
+echo ============================================================ this should give an error ===========================================================
 ./run.sh creatingBuses/test5 c.c
 rm creatingBuses/test5
+echo ============================================================ this should give an error ===========================================================
 ./run.sh creatingBuses/test6 c.c
 rm creatingBuses/test6
-
+echo =============================================================this should give an error ==========================================================
 echo -e "\n"
 echo ----------------------
 echo Testing EOF Terminators 
@@ -111,7 +113,6 @@ echo --------------------------
 
 ./run.sh keywords/test1 c.c 
 rm keywords/test1 
-echo =================================================================This should give an error =======================================================
 ./run.sh keywords/test2 c.c 
 rm keywords/test2 
 echo =================================================================This should give an error =======================================================
@@ -131,6 +132,7 @@ rm keywords/test7
 echo ==================================================================This should give an error ======================================================
 ./run.sh keywords/test8 c.c 
 rm keywords/test8
+echo ================================================================== This should give an error =====================================================
  ./run.sh keywords/test9 c.c 
 rm keywords/test9
 echo ===================================================================This should give an error ======================================================

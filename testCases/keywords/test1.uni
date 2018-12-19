@@ -1,6 +1,6 @@
 main() {
 	busOne = 11101b; //valid
-	make = 110b; //error 
+	make = 110b; //valid 
 	
 	out:;
 	

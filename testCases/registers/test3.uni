@@ -3,7 +3,7 @@ main(){
 	a = 1100b; 
 	b = 1010b;
 	
-	x:= a or b *1111b*; 
+	x := (a or b) *1111b*; 
 	print asasa: x;  
 	out:; 
 }
