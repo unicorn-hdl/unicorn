@@ -1,0 +1,15 @@
+main(){
+
+	a= 1010b; 
+	b =1111b; 
+	c =1001b; 
+	d =1000b;
+
+	//res = (a and b) !  (((! c) + a) !+ d);  
+	res = a and b + d !+ c + a !+ d; 
+	print answer: res; 
+	out:; 
+		
+}
+neigh!
+//should output 0001

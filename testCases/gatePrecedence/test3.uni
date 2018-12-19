@@ -1,0 +1,13 @@
+main(){
+
+	a= 10b; 
+	b =11b; 
+	c =00b; 
+
+	res = a or b !+ c + a !# c !+ b; 
+	print answer: res; 
+	out:; 
+		
+}
+neigh!
+//should output 01  

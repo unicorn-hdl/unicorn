@@ -1,0 +1,14 @@
+main(){
+
+	a= 10b; 
+	b =11b; 
+	c =1b; 
+	d =1b;
+
+	res = a[0] !* b[0] # c !+ a[1]; 
+	print answer: res; 
+	out:; 
+		
+}
+neigh!
+//should output 1 

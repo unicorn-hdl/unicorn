@@ -1,0 +1,21 @@
+main(){
+
+	a= 1010b; 
+	b =1111b; 
+	c =1001b; 
+	d =1000b;
+
+	//res = (a and b) !  (((! c) + a) !+ d);  
+	res = a and b # ! c + a !+ d; 
+	print answer: res; 
+	out:; 
+		
+}
+neigh!
+//should output 1011
+//a and b: 1010 
+//!c = 0110 
+//!c + a = 1110 
+//0001 xor 1010  
+//1011
+
