@@ -1,9 +1,14 @@
+(* Takes in a netlist of shallow binExprs and replaces all
+ * buses with n boolean variables. Accounts for indexing.
+ *)
+
 open Ast
 open Printer
 module StringMap = Map.Make(String)
 
 exception Error of string
 
+(*---------helper functions--------*)
 let getI pos str =
         if (String.length str > pos)
         then String.make 1 str.[pos]
@@ -18,6 +23,8 @@ let id boolin digit = match boolin with
 let id2 boolin digit = 
         let x = id boolin digit in
         match x with BoolId(x) -> x
+(*---------------------------------*)
+
 
 let rec loop from1 until from2 outlist expr = match expr with
         Assign(isR,la,ra,init) -> 
@@ -130,10 +137,7 @@ let rec loop from1 until from2 outlist expr = match expr with
           | a -> p("missing case: "^ Printer.getBinExpr "" a); outlist
         ) 
 
-  (*
-let indicize (outlist,slist) f = (f::outlist, slist)
-*)
-
+(* Simplified version of semantic checking— returns size of argument*)
 let rec semant n (valz,map) = function
   | Buslit(x) -> (String.length x-1, map)
   | BoolId(x) -> 
@@ -166,6 +170,8 @@ let rec semant n (valz,map) = function
   | Noexpr -> p ("Something is wrong. Noexpr should not be called in indexing");(valz,map)
   | x -> p ("Missed case (indexing): "^ Printer.getBinExpr "" x); (valz,map)
                    
+(*In case things got moved around during collapse, run a search
+ * through the entire netlist for semantic checking, if n hasn't been found yet*)
 and badSearch map n str =
    let badfold (valz,map) expr = match expr with
      Assign(_,lval,rval,_) -> 
@@ -192,6 +198,7 @@ and badSearch map n str =
   | x -> (valz,map) in
   List.fold_left badfold (0,map) n
 
+(* replace line with its indexed version*)
 let indicize (outlist,slist) line = 
             let from2 x = (match x with  
             Buslit(x) -> 0
@@ -200,7 +207,7 @@ let indicize (outlist,slist) line =
           | Unop(op,ex) -> 0
           | Index(Buslit(x),Range(Lit(a),Lit(b))) -> a
           | Index(ex,Range(Lit(a),Lit(b))) -> a
-          | x -> p ("MIssed case-indexingr: "^ Printer.getBinExpr "" x); 0
+          | x -> p ("Missed case-indexingr: "^ Printer.getBinExpr "" x); 0
             ) in
     match line with
     Buslit(x) -> (outlist,slist)
@@ -212,7 +219,7 @@ let indicize (outlist,slist) line =
           | BoolId(x) -> 
                 let sz = StringMap.find x slist in
                 (loop 0 (sz-1) from2 outlist (Assign(isR,l,r,init)), slist)
-          | x -> p ("MIssed case-indexingl: "^ Printer.getBinExpr "" x); ([],slist)
+          | x -> p ("Missed case-indexingl: "^ Printer.getBinExpr "" x); ([],slist)
             )
   | Print(nm,ex) -> 
             let from2 = from2 ex in
@@ -220,8 +227,7 @@ let indicize (outlist,slist) line =
             (loop 0 (fst sz-1) from2 outlist (Print(nm, ex)), slist)
   | x -> p("Missed case in indexing: "^ Printer.getBinExpr "" x); (outlist,slist)
 
-let printf k v = p(k^ ": "^ (string_of_int v))
-
+(* Get sizes of registers before everything else*)
 let presemant outmap = function
             Assign(true,BoolId(x),_,init) -> 
                     StringMap.add x (String.length init) outmap
