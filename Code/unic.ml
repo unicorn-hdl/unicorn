@@ -1,12 +1,12 @@
 module P = Printer
 module M = Modfill
-module S = Semant2
+module S = Semant
 module E = Elaborate
 module SL = Simplelines
 module L = Llvm
 module C = Codegen
-module H = Harden2
-module T = Topsort4
+module H = Harden
+module T = Topsort
 module I = Indexing
 (* Top-level of the Unic compiler: scan & parse the input,
    check the resulting AST and generate an SAST from it, generate LLVM IR,

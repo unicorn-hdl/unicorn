@@ -10,7 +10,7 @@
  * hardened sast with no for loops or generics*)
 open Ast
 open Printer
-open Harden2
+open Harden
 open ERR 
 module StringMap = Map.Make(String)
 
