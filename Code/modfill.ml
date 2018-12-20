@@ -1,7 +1,11 @@
+(* Replaces calls to modules with the modules themselves*)
+
 open Ast
 open Printer
 module StringMap = Map.Make(String)
 exception MissingFunction of string 
+
+
 let modzIntoTuples d m m2 = List.map (fun d-> (d,m,m2)) d
 let fstM (MD(a,b,c,d)) = a
 let sndM (MD(a,b,c,d)) = b
@@ -53,46 +57,27 @@ let replaceCalls (MD(a, b, c, d), m, m2) =
 
 
 (*create map that links module names to the modules themselves*)
-let populateMap map (MD(a,b,c,d)) = StringMap.add b (MD(a,b,c,d)) map
-let createMapz mdlist = List.fold_left populateMap StringMap.empty mdlist;;
+let createMapz mdlist = 
+        let populateMap map (MD(a,b,c,d)) = StringMap.add b (MD(a,b,c,d)) map in
+        List.fold_left populateMap StringMap.empty mdlist
 
 (*Make a string map that keeps track of whether a module has been "decompressed"*)
-let popIsFilledMap map (MD(a,b,c,d)) = StringMap.add b false map
-let makeIsFilledMap mdlist = List.fold_left popIsFilledMap StringMap.empty mdlist;;
-
-(*print stuff*) 
-(*
-let spitOut = fillHelper mdlistEx theMap fillMap;;
-*)
-let toString (MD(a,b,c,d)) = b ^ "\n" ^ toStringBinExprlist "" d
-let printx (x,y,z) = print_endline(toString x)
-let printz x = printx x;;
-
-let printMapEl key v = print_endline(key ^ ":\n " ^ (toString v));;
-let printMap m = StringMap.iter printMapEl m;;
-
-let printMapEl2 key v = print_endline(key ^ ": " ^ (string_of_bool v));;
-let printMap2 m = StringMap. iter printMapEl2 m;;
+let makeIsFilledMap mdlist = 
+        let popIsFilledMap map (MD(a,b,c,d)) = StringMap.add b false map in
+        List.fold_left popIsFilledMap StringMap.empty mdlist
 
 let main nameMap = if StringMap.mem "main" nameMap 
     then StringMap.find "main" nameMap
-    else raise(MissingFunction "There is no main function. Please create a main");;
-    (*
-    else par;;
-*)
-let fillHelper mdlist nameMap fillMap = replaceCalls ((main nameMap), nameMap, fillMap);;
-let genFill mdlist nameMap fillMap = (fun (a,b,c)-> a) (fillHelper mdlist nameMap fillMap);;
+    else raise(MissingFunction "There is no main function. Please create a main")
 
-(*~fn called in unic~*)
-(*mdlist -> md*)
+let fillHelper mdlist nameMap fillMap = replaceCalls ((main nameMap), nameMap, fillMap)
+
 let fill mdlist = 
         let filledMap =  fillHelper mdlist (createMapz mdlist) (makeIsFilledMap mdlist) in
         let fst (a,_,_) = a in
         let snd (_,b,_) = b in
-        let thd (_,_,c) = c in
         let mainDec = fst filledMap in
         let mainCall = ModExpr(mainDec, Io.getMainArgs mainDec) in 
         let supermainDec = MD([],"~.~",[],List.rev (mainCall::(Io.makeVars mainDec))) in
         ModExpr(supermainDec, [])
-(*~fn called in unic~*)
 

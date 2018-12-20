@@ -1,3 +1,7 @@
+(* Simplifies strings so that programmers
+ * don't have to write the long full names
+ * of args in/out of the main*)
+
 open Ast
 
 module StringMap = Map.Make(String)
@@ -6,6 +10,7 @@ module S = String
 
 exception InvalidCall of string
 
+(* "main_0_a[2]" -> "a_2" *)
 let simple str = 
         let str0 = str in
         let a = (S.index str '_')+1 in
@@ -19,6 +24,7 @@ let simple str =
         let ix = S.sub str0 (S.index str0 '['+1) endX in
         str'^"_"^ix
 
+(* "main_0_a[2]" -> "a" *)
 let simple2 str = 
         let str0 = str in
         let a = (S.index str '_')+1 in
@@ -39,7 +45,6 @@ let rec indxLoop a b globs nm =
            indxLoop (a+1) b (newG::globs) nm
         else
            globs
-
 
 let iostuff (nlist,globs) fms outs = 
         let rep str = 
@@ -87,9 +92,6 @@ let iostuff (nlist,globs) fms outs =
                 List.fold_left addOut globs outs in
                 
         let globs = List.map (fun (a,b,c) -> (rep a, b, c)) globs in
-        (*
-        let _ = List.iter (fun (a,b,c) -> P.p (a^","^b^","^c)) globs in
-*)
         (List.map editFn nlist, globs)
 
 let getFms (ModExpr(MD(_,_,_,lns),_)) = match (List.rev lns) with

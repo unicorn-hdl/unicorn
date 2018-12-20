@@ -1,7 +1,6 @@
 module P = Printer
 module M = Modfill
 module S = Semant2
-module F = Noloop2
 module E = Elaborate
 module SL = Simplelines
 module L = Llvm
@@ -13,7 +12,7 @@ module I = Indexing
    check the resulting AST and generate an SAST from it, generate LLVM IR,
    and dump the module *)
 
-type action = Ast | Sast | Mast | Hast | Netlist | Forloops | SimpleLines | Index | Netlist2 | Topsort | IO | LLVM_IR | Compile
+type action = Ast | Sast | Mast | Hast | Netlist | SimpleLines | Index | Netlist2 | Topsort | IO | LLVM_IR | Compile
 
 let () =
   let action = ref Compile in
@@ -23,7 +22,6 @@ let () =
     ("-m",  Arg.Unit (set_action Mast), "Print the modfilled AST");
     ("-h",  Arg.Unit (set_action Hast), "Print the hardened AST");
     ("-s",  Arg.Unit (set_action Sast), "Print the SAST");
-    ("-f",  Arg.Unit (set_action Forloops), "Print Netlist with collapsed for loops");
     ("-n",  Arg.Unit (set_action Netlist), "Print Netlist");
     ("-sl", Arg.Unit (set_action SimpleLines), "Print Netlist with Simplified Lines");
     ("-i",  Arg.Unit (set_action Index), "Print Netlist with collapsed inidices");
@@ -47,9 +45,8 @@ let () =
     | Mast -> P.printMast (M.fill ast)
     | Sast -> P.printMast (S.semant (M.fill ast))
     | Hast -> P.printMast (S.semant (M.fill ast))
-    | Forloops -> P.printMast (F.unloop (S.semant (M.fill ast)))
     | _    -> 
-        let netlist = E.collapse (F.unloop (S.semant (M.fill ast))) in 
+        let netlist = E.collapse (S.semant (M.fill ast)) in 
         let outs = Io.getOuts mast in
         let fms = Io.getFms mast in
         match !action with
