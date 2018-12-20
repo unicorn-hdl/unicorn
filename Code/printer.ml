@@ -1,3 +1,14 @@
+(*Nothing much to say. Grabs, an AST, 
+ * binExpr, netlist, or netlist2 and
+ * spits out stuff onto the screen
+ *
+ * It's all pretty self-explanatory
+ *
+ * I guess what I'm tying to say is that maybe
+ * since Printer makes pretty things it doesn't
+ * need to be pretty—it has a transitive kind of beauty
+ * (through a layer of indrection, one might say) *)
+
 open Ast
 module StringMap = Map.Make(String)
 
@@ -6,13 +17,6 @@ let sOfI x = string_of_int x
 
 let concat a b = a ^ b
 let listToString fn thinglist = List.fold_left concat "" (List.map fn thinglist)
-
-let opToString = function
-   And -> "and"
- | Or  -> "or"
- | Nand -> "nand"
- | _ -> "op"
-(*someone can finish this bit*)
 
 let rec getIntExpr = function
  | IntBinop(lval, Add, rval) -> getIntExpr lval ^ "+" ^ getIntExpr rval
@@ -24,13 +28,13 @@ let index = function | Range (a,b) ->  "[" ^ getIntExpr a ^ ":" ^ getIntExpr b ^
 
 let bindFn (b,c) = c ^ "<"^getIntExpr b^"> "
 
-
 let toStringBindlist blist = listToString bindFn blist
 
+(*returns string for binExpr*)
 let rec getBinExpr tabs = function
    Buslit(x) -> x
  | BoolId(x) -> x
- | BoolBinop(a,b,c) -> (getBinExpr tabs a) ^ " " ^ (opToString b) ^ " " ^ (getBinExpr tabs c)
+ | BoolBinop(a,b,c) -> (getBinExpr tabs a) ^ " " ^ (opToStr (B(b))) ^ " " ^ (getBinExpr tabs c)
  | Unop(Not,a) -> "~" ^ getBinExpr tabs a
  | Noexpr -> "noexpr"
  | Index(expr, ind) -> getBinExpr tabs expr ^ index ind
@@ -52,15 +56,8 @@ let rec getBinExpr tabs = function
         name ^ "(" ^ (toStringBindlist formals) ^ "){\n" ^ 
         toStringBinExprlist "" linelist ^ 
         "   out: " ^ toStringBindlist outlist ^ "\n}\n\n"
-let toStringPgm pgm = List.map toStringMod pgm
 
-(*
-let _ =
-let lexbuf = Lexing.from_channel stdin in
-let pgm = Parser.program Scanner.token lexbuf in
-let result = listToString (fun x->x) (toStringPgm pgm) in
-print_endline (result)
-*)
+let toStringPgm pgm = List.map toStringMod pgm
 
 let printAst pgm = print_endline ("\n\n~~PRINTING AST~~\n");
                    print_endline (listToString (fun x->x) (toStringPgm pgm))

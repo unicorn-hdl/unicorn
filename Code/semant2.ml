@@ -1,3 +1,13 @@
+(*A horrible beast that was supposed to originally
+ * just check whether assignments are the same size.
+ * Turns out that it's very difficult to check sizes
+ * and resolve generics asynchronously. Also turns
+ * out that its much easier to implement for loops
+ * during this pass. 
+ *
+ * In short: takes a modfilled Ast (no all calls are 
+ * replaced with the modules they call) and returns a
+ * hardened sast with no for loops or generics*)
 open Ast
 open Printer
 open Harden2
@@ -16,11 +26,11 @@ type d = {m: int StringMap.t; x:binExpr list; s:int}
  * s is size of returned expr
  * *)
 
+(*-------------some utility fns---------------*)
 let getLit exp = match exp with
        Lit(x) -> x
      | x -> p ("missed case: "^ Printer.getIntExpr x); 0
 
-(*some utility fns*)
 let printMap map name=
         print_endline ("\nprinting map (" ^ name ^ ")");
         StringMap.iter (fun k v -> print_string(k ^"<"^string_of_int v^">, ")) map;
@@ -29,7 +39,11 @@ let printMap map name=
 let lookup str map =
        try StringMap.find str map
        with Not_found -> -1
+(*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*)
 
+
+(*Moved here to help readability of code*)
+(*--------validity checks----------------------*)
 let assignIsValid lval = match lval with
       BoolId(_) -> () (*valid*)
     | Index(BoolId(_), _) -> () (*valid*)
@@ -45,6 +59,28 @@ let rangeIsValid (Lit a) (Lit b) =
     then ()
     else raise(InvalidRange ("The range (" ^ string_of_int a ^ ", " ^ string_of_int b ^ ") is invalid!"))
 
+let assignRngIsValid a' b' s x rval  =
+    if (s = (b'-a'+1))
+    then ()
+    else tm_assERR rval s x a' b'
+
+let modIdxsValid a b =
+    if (a = b)
+    then ()
+    else raise(InvalidRange ("You can only access one output from a module at a time!"))
+
+let validSize argS nm = 
+    if (argS = -1) 
+    then raise(UndeclaredVar ("The output call "^ nm^ " is never defined"))
+    else ()
+
+let validArgs fmS argS oldArg nm =
+    if (fmS = argS)
+    then ()
+    else tm_argERR oldArg argS nm fmS
+(*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*)
+
+(* put registers into the map before anything else*)
 let rec findRegs outMap expr = 
     let foldFn map ex = findRegs map ex in
     match expr with
@@ -59,15 +95,14 @@ let rec findRegs outMap expr =
             StringMap.add x (String.length init -1) outMap
     | Assign(false,_,r,_) -> findRegs outMap r
     | Index(x,_) ->findRegs outMap x
-    | Print(_,x) -> findRegs outMap x
-    | Call(nm,_) -> print_endline("Call "^nm^" got called in semant"); outMap
+    | Print(_,x) -> findRegs outMap x | Call(nm,_) -> print_endline("Call "^nm^" got called in semant"); outMap
     | For(_,_,exprs) -> List.fold_left foldFn outMap exprs
     | ModExpr(MD(_,_,_,exprs),args) -> 
             let argMap = List.fold_left foldFn outMap args in 
             List.fold_left foldFn argMap exprs
     | Noexpr -> outMap
 
-
+(*check that args to a module are only the allowed ones*)
 let rec validArg arg = match arg with
     | BoolId(x) -> ()
     | Buslit(x) -> ()
@@ -81,6 +116,11 @@ let rec validArg arg = match arg with
     | ModExpr(_,_) -> raise (InvalidCall("Module calls may not be arguments"))
     | Noexpr -> raise (InvalidCall("Noexpr may not be an argument"))
 
+(* Update map recursively in accordance to x, such that m.x=x' with x' is the
+ * hardened version of x (intVars' values are inferred and turned into numbers).
+ * Also collapse for loops.
+ * (x is an array to account for collapsed fors returning many lines).
+ * As check executes, perform all pertinent syntax checks *)
 let rec check d x = 
         match x with  
       Buslit(valz) -> {m=d.m; x=[x]; s=String.length valz -1}
@@ -119,10 +159,7 @@ let rec check d x =
           | Index(BoolId(x), Range(a,b)) -> 
              let b' = getLit b in
              let a' = getLit a in
-             let _ =  
-                 if (rd.s = (b'-a'+1))
-                 then ()
-                 else tm_assERR rval rd.s x a' b' in
+             let _ = assignRngIsValid a' b' rd.s x rval in 
              let s = max (lookup x rd.m) (b'+1) in
              let m = StringMap.add x s rd.m in
              {m=m; x=[]; s=s}
@@ -131,10 +168,7 @@ let rec check d x =
         {m=d.m; x=[x]; s=d.s}
     | Index(ModExpr(MD(outs,nm,fm,lns),args), Range(a,b)) ->
         let oldMap = d in
-        let _ = 
-           if (a = b)
-           then ()
-           else raise(InvalidRange ("You can only access one output from a module at a time!")) in
+        let _ = modIdxsValid a b in
         let selected = 
           match a with
           | Lit(x) -> 
@@ -169,7 +203,6 @@ let rec check d x =
         {m=d.m; x=[x]; s=s}
     | Call(_) -> print_endline ("Call is showing up in check"); d
     | For(str, Range(a,b), lines) ->
-                    (*TODO return the correct x here*)
         let a = eval d.m a in
         let b = eval d.m b in
         let _ = rangeIsValid a b in
@@ -189,15 +222,10 @@ let rec check d x =
                    loop (a+1) b d 
                 else d in
         let d = loop a b d in
-        (*
-        let _ = p "Printing for loop" in
-        let _ = List.iter (fun x-> p (getBinExpr "" x)) d.x in
-        let _ = p "\n\n" in
-*)
         {m=d.m; x=d.x; s=0}
+    (*When ModExpr has no index, it just returns its first out*)
     | ModExpr(MD(out,_,_,_), _) -> 
         let oldMap = d in
-        (*When ModExpr has no index, it just returns its first out*)
         let selected = 
             if (List.length out> 0)
             then snd(List.hd out)
@@ -208,10 +236,10 @@ let rec check d x =
     | a -> print_endline("missing case in checkvalidities: " ^ getBinExpr "" a ^ "DONE\n") ; d
 
 
+(*as in elaborate, Index(ModExpr,_) and ModExpr are extremely similar,
+ * as such, it doesn't make sense to write each indepedently
+ * rather they just both call checkMod*)
 and checkMod (ModExpr(MD(out,name,fms,exprs), args)) d selected= 
-        (*
-        let _  = p name in
-*)
         let oldD = d in
 
         let _ = lengthsAreValid fms args name in
@@ -230,13 +258,11 @@ and checkMod (ModExpr(MD(out,name,fms,exprs), args)) d selected=
                 {m=d2.m; x=d.x@d2.x; s=d2.s} in
         let d = List.fold_left foldFn d exprs in
 
+        (*Type-check & harden all the outs*)
         let checkOut (intEx,nm) =
             let fmS = getLit(eval d.m intEx) in
             let argS = lookup nm d.m in
-            let _ = 
-                if (argS = -1) 
-                then raise(UndeclaredVar ("The output call "^ nm^ " is never defined"))
-                else () in
+            let _ = validSize argS nm in
             if (argS = fmS)
             then (Lit(fmS), nm)
             else tm_outERR (intEx,nm) argS in
@@ -246,6 +272,8 @@ and checkMod (ModExpr(MD(out,name,fms,exprs), args)) d selected=
         let x = ModExpr(MD(out,name,fms,d.x),args) in
         {m=d.m; x=[x]; s=s}
 
+(*helper method for associating args with formals
+ * (checks validity and update m ) *)
 and tableFn oldD (m,newArgs) (fmX,nm) arg = 
      let oldArg = arg in
      let arg = (check oldD arg) in
@@ -264,13 +292,11 @@ and tableFn oldD (m,newArgs) (fmX,nm) arg =
             (m, arg.x@newArgs)
      | x -> 
             let fmS = getLit(eval oldD.m fmX) in
-            let _ =
-                if (fmS = arg.s)
-                then ()
-                else tm_argERR oldArg arg.s nm fmS in
+            let _ = validArgs fmS arg.s oldArg nm in
             let m = StringMap.add nm arg.s m in
             (m, arg.x@newArgs)
 
+(* ast -> ast*)
 let semant hast =
     let d = {m=StringMap.empty; x=[]; s=0} in
     List.hd ((check d hast).x)

@@ -1,3 +1,9 @@
+(* Since semant was unwieldy and hideous enough as is,
+ * moved error messages to another file.
+ * This makes reading semant easier.
+ * It also makes indiscriminately littering error messages
+ * with emojis and motivation pretty easy.
+ * Note: shorter errors are written in the files that call them*)
 open Printer
 open Ast
 

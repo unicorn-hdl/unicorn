@@ -7,11 +7,16 @@ module StringMap = Map.Make(String)
 
 exception Reassign of string
 
+(*check for double-assignment *)
 let checkOverride namelist (a,b,c,d) =
     if List.mem a namelist
     then raise (Reassign (a^" has been assigned to twice!"))
     else a::namelist
 
+(*Put netlist into form 
+ * (str*str*str*str) -> (str*str*str*str) list
+ * where left is every call, right is a list of all
+ * the calls that are dependencies*)
 let topsort (netlist,globs) = 
     let _ = List.fold_left checkOverride [] netlist in
     let getA = List.map (fun (x,_,_) ->x) globs in
@@ -42,9 +47,9 @@ let topsort (netlist,globs) =
             let _ = print_endline("") in
             () 
     in
-    (*let _ = List.iter printf dep_libs in*)
 
 
+(*/////////////////////////////////////////////////////*)
 (*Code here and beyond is not ours*)
 let dep_libs =
   let f (lib, deps) =  (* remove self dependency *)

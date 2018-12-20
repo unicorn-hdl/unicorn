@@ -1,10 +1,16 @@
+(*Take netlist of binExprs and "flattens" any expressions
+ * that contain other expressions by rewriting as multiple
+ * expressions. At end, should have only prints and assigns
+ * (each of these can contain a single binop, unop, index
+ * access, buslit or boolid *)
 open Ast
 
 type maps = {r: binExpr; o: binExpr list; n: int}
-(* r for return,
- * o for outlist,
- * n for currentNum*)
+(* r for return
+ * o for outlist (netlist to write to)
+ * n for currentNum (just counts up for every new statment *)
 
+(*s for simple*)
 let isS = function
         | Buslit(_) -> true
         | BoolId(_) -> true
@@ -12,6 +18,7 @@ let isS = function
 
 let toId x = BoolId("#"^ string_of_int x)
 
+(*simplify as specified above*)
 let rec simpExp m = function
         | Buslit(x) -> {r=Buslit(x); o=m.o; n=m.n}
         | BoolId(x) -> {r=BoolId(x); o=m.o; n=m.n}
